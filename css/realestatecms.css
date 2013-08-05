@@ -1,0 +1,33 @@
+.clearfix:before,
+.clearfix:after,
+.row:before,
+.row:after {
+  content: '\0020';
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  width: 0;
+  height: 0; }
+
+.row:after,
+.clearfix:after {
+  clear: both; }
+
+.row,
+.clearfix {
+  zoom: 1; }
+  
+.rightcol, .leftcol {
+	float: left;
+	width: 45%;
+}
+
+.rightcol {
+	padding-left: 20px;
+	border-left: 1px solid #fff;
+}
+
+.leftcol {
+	padding-right: 20px;
+	border-right: 1px solid #D0D3D5;
+}
