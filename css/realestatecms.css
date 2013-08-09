@@ -17,9 +17,13 @@
 .clearfix {
   zoom: 1; }
   
+.rightcol, .leftcol, .oneThird, .addDeets, .propDeets, .finDeets, label, input {
+	box-sizing: border-box;
+}
+
 .rightcol, .leftcol {
 	float: left;
-	width: 45%;
+	width: 50%;
 }
 
 .rightcol {
@@ -30,4 +34,53 @@
 .leftcol {
 	padding-right: 20px;
 	border-right: 1px solid #D0D3D5;
+}
+
+.oneThird {
+	float: left;
+	width: 33%;
+	padding-right: 20px;
+}
+
+
+.addDeets, .propDeets, .finDeets {
+	float:left;
+}
+
+.addDeets, .propDeets {
+	padding-right: 20px;
+	width: 40%;
+}
+
+.finDeets {
+	width: 20%;
+}
+
+.addDeets .field.checkbox, .propDeets .field.checkbox, .finDeets .field.checkbox {
+	width:100%;
+	padding-left: 0;
+}
+
+.stacked span.description {
+	margin-left:0;
+}
+
+div#Form_ItemEditForm_CityID_chzn, div#Form_ItemEditForm_Type_chzn {
+	width: 100% !important;
+}
+
+.rmsListDetails input, .rmsListDetails label{
+	max-width:100% !important;
+}
+
+.field .chzn-container-single .chzn-single {
+	height: 30px;
+}
+
+.chzn-container-single .chzn-single span {
+	padding-top: 2px;
+}
+
+.ui-accordion .ui-widget-content {
+	background-color: #fafafa !important;
 }

@@ -59,7 +59,7 @@ class Listing extends Page {
 		'LotAcreage' => 'Varchar',
 		'Irregular' => 'Boolean',
 		
-		'Caption' => 'Text',
+		'Headline' => 'Text',
 		'Summary' => 'HTMLText',
 		
 		//mapping data
@@ -195,79 +195,83 @@ class Listing extends Page {
 		 	$cityField = DropdownField::create('CityID', 'City', City::get()->map('ID', 'Title'))->setEmptyString('(Select one or Add Town)');
 	 	}
 	 	
-	 	$addressField = ToggleCompositeField::create(
-	 		"AddressGroup",
-	 		"Address",
+	 	$addressField = CompositeField::create(
+	 		
 	 		array (
-	 			TextField::create("Address"),
-	 			TextField::create("Unit"),
-	 			$cityField,
-	 			Textfield::create("Town")->setDescription('Use ONLY for Smaller Communities Outside Target Markets'),
-	 			TextField::create("PostalCode", "Postal Code"),
-	 			DropdownField::create('Type','Type',singleton('Listing')->dbObject('Type')->enumValues())
+	 			HeaderField::create("Address",2),
+	 			TextField::create("Address")->addExtraClass('stacked'),
+	 			TextField::create("Unit")->addExtraClass('stacked'),
+	 			CompositeField::create(
+	 				$cityField->addExtraClass('stacked leftcol'),
+	 				Textfield::create("Town")->setDescription('Use ONLY for Smaller Communities Outside Target Markets')->addExtraClass('stacked rightcol')
+	 			)->addExtraClass('clearfix'),
+	 			
+	 			TextField::create("PostalCode", "Postal Code")->addExtraClass('stacked')
 	 		)
-	 	);
+	 	)->addExtraClass("addDeets");
 	 	
-	 	$detailField = ToggleCompositeField::create(
-	 		"DetailGroup",
-	 		"Key Details",
+	 	$detailField = CompositeField::create(
 	 		array (
-	 			TextField::create("TotalArea", "Total Approximate Area"),
-	 			TextField::create("NumberBed", "Number of Bedrooms"),
-	 			TextField::create("NumberBath", "Number of Bathrooms"),
-	 			TextField::create("NumberRooms", "Number of Rooms"),
-	 		)
-	 	);
-	 	
-	 	$financeDetails = ToggleCompositeField::create(
-	 		"FinancialGroup",
-	 		"Financial Details",
-	 		array (
-	 			NumericField::create("Price"),
-	 			NumericField::create("Taxes"),
-	 			TextField::create("TaxYear", "Tax Assessment Year"),
-	 			CheckboxField::create("HideMonthly", "Hide Monthly Price"),
-	 		)
-	 	);
-	 	
-	 	$lotDetails = ToggleCompositeField::create(
-	 		"LotGroup",
-	 		"Lot Details",
-	 		array (
-	 			TextField::create("LotWidth", "Lot Width"),
-	 			TextField::create("LotLength", "Lot Depth"),
-	 			TextField::create("LotAcreage", "Acreage"),
+	 			HeaderField::create("Property Details",2),
+	 			
+	 			DropdownField::create('Type','Type',singleton('Listing')->dbObject('Type')->enumValues())->addExtraClass('stacked'),
+	 			TextField::create("TotalArea", "Total Approximate Area")->addExtraClass('stacked'),
+	 			CompositeField::create(
+	 				TextField::create("NumberBed", "# Bedrooms")->addExtraClass('stacked oneThird'),
+	 				TextField::create("NumberBath", "# Bathrooms")->addExtraClass('stacked oneThird'),
+	 				TextField::create("NumberRooms", "# Rooms")->addExtraClass('stacked oneThird')
+	 			)->addExtraClass('clearfix'),
+	 			CompositeField::create(
+	 				TextField::create("LotWidth", "Lot Width")->addExtraClass('stacked oneThird'),
+	 				TextField::create("LotLength", "Lot Depth")->addExtraClass('stacked oneThird'),
+	 				TextField::create("LotAcreage", "Acreage")->addExtraClass('stacked oneThird')
+	 			)->addExtraClass('clearfix'),
+	 			
+	 			
 	 			CheckboxField::create("Irregular", "Irregular Lot"),
 	 		)
-	 	);
+	 	)->addExtraClass("propDeets");
+	 	
+	 	$financeDetails = CompositeField::create(
+	 		array (
+	 			HeaderField::create("Financial",2),
+	 			NumericField::create("Price")->addExtraClass('stacked'),
+	 			NumericField::create("Taxes")->addExtraClass('stacked'),
+	 			TextField::create("TaxYear", "Tax Assessment Year")->addExtraClass('stacked'),
+	 			CheckboxField::create("HideMonthly", "Hide Monthly Price"),
+	 		)
+	 	)->addExtraClass("finDeets");
+	 	
+
 	 	
 	 	
 	 	
 	 	//open collapsed fields on new listigs
 	 	if($this->ID == 0){
 		 	$statusField->setStartClosed(false);
-		 	$addressField->setStartClosed(false);
-		 	$detailField->setStartClosed(false);
-		 	$financeDetails->setStartClosed(false);
-		 	$lotDetails->setStartClosed(false);
 	 	}
 	 	
 	 	$fields->insertBefore($statusField, "Content");
-	 	$fields->insertBefore($addressField, "Content");
-	 	$fields->insertBefore($detailField, "Content");
-	 	$fields->insertBefore($financeDetails, "Content");
-	 	$fields->insertBefore($lotDetails, "Content");
+	 	$fields->insertBefore(
+	 		CompositeField::create(
+	 			$addressField,
+	 			$detailField,
+	 			$financeDetails
+	 		)->addExtraClass('clearfix rmsListDetails'),
+	 		"Content"
+	 	);
 	 	
-        
-        $summaryField = new HTMLEditorField('Summary');
-        $summaryField->addExtraClass('stacked');
-        
-		
-		
-		$fields->insertBefore ( new HeaderField('ContentHead','Content',2), 'Content' );
-		$fields->insertAfter (new TextField('Caption'), 'ContentHead');
-		$fields->insertAfter ($summaryField, 'Content');
-		$fields->addFieldToTab ("Root.Main", new HiddenField('CityIDHolder'), 'Summary' );
+	 	$fields->insertBefore( new HeaderField('ContentHead','Content',2), 'Content' );
+	 	
+	 	$fields->insertBefore(
+	 		CompositeField::create(
+	 			TextField::create('Headline')->addExtraClass('stacked'),
+	 			HTMLEditorField::create('Summary')->addExtraClass('stacked')
+	 		)->addExtraClass('clearfix rmsListDetails'),
+	 		"Content"
+	 	);
+	 	
+        $fields->addFieldToTab ("Root.Main", new HiddenField('CityIDHolder'), 'Summary' );
 		
 		if($this->ID == 0 ) {
 			$mainListingsPage = SiteTree::get_by_link("listings");
