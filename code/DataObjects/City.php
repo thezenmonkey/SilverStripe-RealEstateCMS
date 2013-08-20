@@ -91,7 +91,7 @@ class City extends Community {
 		$set = new ArrayList();
 		if($count != "all"){
 			//get own listings
-			foreach($this->Listings()->where("Unavailable = 0")->sort(array("Price"=>"DESC"))->limit($count) as $obj) $set->push($obj);
+			foreach($this->Listings()->where("Status != Unavailable")->sort(array("Price"=>"DESC"))->limit($count) as $obj) $set->push($obj);
 			
 			if($set->count() < $count) {
 				$limit = $count - $set->count();
@@ -102,7 +102,7 @@ class City extends Community {
 				return $set;
 			}
 		} else {
-			foreach($this->Listings()->where("Unavailable = 0")->sort(array("Price"=>"DESC")) as $obj) $set->push($obj);
+			foreach($this->Listings()->where("Status != Unavailable")->sort(array("Price"=>"DESC")) as $obj) $set->push($obj);
 			foreach($this->MLSListings()->sort(array("IsFeatured"=>"DESC","ListPrice"=>"DESC")) as $obj) $set->push($obj);
 			//foreach($this->Listings()->where("Sold = 1")->sort("LastEdited", "DESC")->limit(3) as $obj) $set->push($obj);
 		}
@@ -116,10 +116,10 @@ class City extends Community {
 		$set = new ArrayList();
 		
 		if($count != 'all') {
-			foreach($this->Listings()->where("Unavailable = 0")->sort(array("Price"=>"DESC"))->limit($count) as $obj) $set->push($obj);
+			foreach($this->Listings()->where("Status != Unavailable")->sort(array("Price"=>"DESC"))->limit($count) as $obj) $set->push($obj);
 			
 		} else {
-			foreach($this->Listings()->where("Unavailable = 0")->sort(array("Price"=>"DESC")) as $obj) $set->push($obj);
+			foreach($this->Listings()->where("Status != Unavailable")->sort(array("Price"=>"DESC")) as $obj) $set->push($obj);
 			//foreach($this->Listings()->where("Sold = 1")->sort("LastEdited", "DESC")->limit(4) as $obj) $set->push($obj);
 		}
 		
@@ -141,7 +141,7 @@ class City extends Community {
 	
 	public function getListings($count = null){
 		
-		$listings = $this->Listings()->where("Unavailable = 0")->sort(array("Price"=>"DESC"));
+		$listings = $this->Listings()->exclude("Status","Unavailable")->sort(array("Price"=>"DESC"));
 		
 		if(!$listings->count()) {
 			return false;

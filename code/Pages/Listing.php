@@ -108,10 +108,10 @@ class Listing extends Page {
 	);
 	
 	private static $has_one = array(
-		'Neighbourhood' => 'Neighbourhood',
+		'Neighbourhood' => 'NeighbourhoodPage',
 		'FeatureSheet' => 'File',
 		'Folder' => 'Folder',
-		'City' => 'City',
+		'City' => 'MunicipalityPage',
 	);
 	
 	
@@ -142,9 +142,6 @@ class Listing extends Page {
 	
 	//private static $default_sort = "Street ASC";
 	
-
-
-
 	/**
 	 * Common methods
 	 * ----------------------------------*/
@@ -167,7 +164,7 @@ class Listing extends Page {
 	 	));
 	 	
 	 	//DataLists for Dropdown Maps
-	 	$cities = City::get();
+	 	$cities = MunicipalityPage::get();
 	 	
 	 	//Create Composite Fields
 	 	
@@ -176,10 +173,10 @@ class Listing extends Page {
 	 		"Status",
 	 		array(
 	 			DropdownField::create("Status", "Status", singleton('Listing')->dbObject('Status')->enumValues()),
+	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease")),
 	 			CheckboxField::create("Feature"),
 	 			CheckboxField::create("IsNew"),
 	 			TextField::create("MLS", "MLS Number"),
-	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease")),
 	 		)
 	 	);
 	 	
@@ -188,15 +185,18 @@ class Listing extends Page {
 	 	 */
 	 	
 	 	if ($cities->count() == 1) {
-		 	$cityField = DropdownField::create('CityID', 'City', City::get()->map('ID', 'Title'))->setEmptyString('(Select one or Add Town)')->setHasEmptyDefault(false);
+		 	$cityField = DropdownField::create('CityID', 'City', $cities->map('ID', 'Title'))->setEmptyString('(Select one or Add Town)')->setHasEmptyDefault(false);
 	 	} elseif ($cities->count() > 1 && $siteConfig->DefaultCityID != 0) {
-		 	$cityField = DropdownField::create('CityID', 'City', City::get()->map('ID', 'Title'), $siteConfig->DefaultCityID)->setEmptyString('(Select one or Add Town)')->setHasEmptyDefault(false);
+		 	$cityField = DropdownField::create('CityID', 'City', $cities->map('ID', 'Title'), $siteConfig->DefaultCityID)->setEmptyString('(Select one or Add Town)')->setHasEmptyDefault(false);
 	 	} else {
-		 	$cityField = DropdownField::create('CityID', 'City', City::get()->map('ID', 'Title'))->setEmptyString('(Select one or Add Town)');
+		 	$cityField = DropdownField::create('CityID', 'City', $cities->map('ID', 'Title'))->setEmptyString('(Select one or Add Town)');
 	 	}
 	 	
+	 	/**
+	 	 * Address Fields
+	 	 */
+	 	
 	 	$addressField = CompositeField::create(
-	 		
 	 		array (
 	 			HeaderField::create("Address",2),
 	 			TextField::create("Address")->addExtraClass('stacked'),
@@ -205,15 +205,26 @@ class Listing extends Page {
 	 				$cityField->addExtraClass('stacked leftcol'),
 	 				Textfield::create("Town")->setDescription('Use ONLY for Smaller Communities Outside Target Markets')->addExtraClass('stacked rightcol')
 	 			)->addExtraClass('clearfix'),
-	 			
 	 			TextField::create("PostalCode", "Postal Code")->addExtraClass('stacked')
 	 		)
 	 	)->addExtraClass("addDeets");
 	 	
+	 	if ($this->ID != 0 && $this->CityID != 0) {
+		 	$neighbourhoodList = Neighbourhood::get()->filter(array("CityID" => $this->CityID))->sort('Name')->map('ID', 'Name');
+			if($neighbourhoodList->count() >= 1) {
+				$neighbourhoodField = DropdownField::create('NeighbourhoodID', 'Neighbourhood', $neighbourhoodList);
+				$neighbourhoodField->setEmptyString('(Select one)');
+				$fields->insertBefore( $neighbourhoodField , 'PostalCode');
+			}
+	 	}
+	 	
+	 	/**
+	 	 * Property Deatils
+	 	 */
+	 	
 	 	$detailField = CompositeField::create(
 	 		array (
 	 			HeaderField::create("Property Details",2),
-	 			
 	 			DropdownField::create('Type','Type',singleton('Listing')->dbObject('Type')->enumValues())->addExtraClass('stacked'),
 	 			TextField::create("TotalArea", "Total Approximate Area")->addExtraClass('stacked'),
 	 			CompositeField::create(
@@ -226,11 +237,13 @@ class Listing extends Page {
 	 				TextField::create("LotLength", "Lot Depth")->addExtraClass('stacked oneThird'),
 	 				TextField::create("LotAcreage", "Acreage")->addExtraClass('stacked oneThird')
 	 			)->addExtraClass('clearfix'),
-	 			
-	 			
 	 			CheckboxField::create("Irregular", "Irregular Lot"),
 	 		)
 	 	)->addExtraClass("propDeets");
+	 	
+	 	/**
+	 	 * Financial Details
+	 	 */
 	 	
 	 	$financeDetails = CompositeField::create(
 	 		array (
@@ -241,10 +254,6 @@ class Listing extends Page {
 	 			CheckboxField::create("HideMonthly", "Hide Monthly Price"),
 	 		)
 	 	)->addExtraClass("finDeets");
-	 	
-
-	 	
-	 	
 	 	
 	 	//open collapsed fields on new listigs
 	 	if($this->ID == 0){
@@ -262,11 +271,10 @@ class Listing extends Page {
 	 	);
 	 	
 	 	$fields->insertBefore( new HeaderField('ContentHead','Content',2), 'Content' );
-	 	
 	 	$fields->insertBefore(
 	 		CompositeField::create(
 	 			TextField::create('Headline')->addExtraClass('stacked'),
-	 			HTMLEditorField::create('Summary')->addExtraClass('stacked')
+	 			HTMLEditorField::create('Summary')->addExtraClass('stacked')->setRows(4)
 	 		)->addExtraClass('clearfix rmsListDetails'),
 	 		"Content"
 	 	);
@@ -278,25 +286,15 @@ class Listing extends Page {
 			$fields->addFieldToTab("Root.Main", new HiddenField("ParentID", "Parent", $mainListingsPage->ID));
 		}
 		
-		if ($this->ID != 0){
+		$fields->renameField("Content", "Write-up");
 		
-			
-			
-			
-			
-			$neighbourhoodList = Neighbourhood::get()->filter(array("CityID" => $this->CityID))->sort('Name')->map('ID', 'Name');
-			if($neighbourhoodList->count() >= 1) {
-				$neighbourhoodField = new DropdownField('NeighbourhoodID', 'Neighbourhood', $neighbourhoodList);
-				$neighbourhoodField->setEmptyString('(Select one)');
-				$fields->insertAfter( $neighbourhoodField , 'AddressHead');
-			}
+		if ($this->ID != 0){
 			
 			
 			$galleryField = GalleryUploadField::create('Images', 'Images')
 				->setFolderName("/Homes/".$this->Folder()->Name)
 				->addExtraClass('stacked');
 			
-			//$fields->addFieldToTab("Root.PictureAndResources", new LiteralField('showFolderName','<span>'.$this->Folder()->FileName.'</span>'));
 			$featuresheetField = new UploadField('FeatureSheet');
 			$featuresheetField->setFolderName("/Homes/".$this->Folder()->Name);
 		 	
@@ -336,50 +334,77 @@ $schoolManagerConfig = GridFieldConfig::create();
 		 	);
 		 	$fields->addFieldToTab('Root.Schools', $schoolManager);
 */
-		 	
-		 	
+			
+					 	
 		 	$openHouseManager = new GridField(
 		 		"OpenHouseDates",
 		 		"Open House Dates",
 		 		$this->OpenHouseDates(),
 		 		GridFieldConfig_RelationEditor::create()
+		 			//->removeComponentsByType('GridFieldAddNewButton')
+		 			//->removeComponentsByType('GridFieldSortableHeader')
+		 			->removeComponentsByType('GridFieldDataColumns')
+		 			//->removeComponentsByType('GridFieldDeleteAction')
+		 			//->removeComponentsByType('GridFieldEditButton')
+		 			->removeComponentsByType('GridFieldAddExistingAutocompleter')
+		 			//->addComponent(new GridFieldButtonRow('before'))
+		 			//->addComponent(new GridFieldToolbarHeader())
+		 			//->addComponent(new GridFieldTitleHeader())
+		 			->addComponent(new GridFieldEditableColumns())
+		 			->addComponent(new GridFieldDeleteAction())
+		 			->addComponent(new GridFieldAddNewInlineButton())
+		 			
 		 	);
 		 	$fields->addFieldToTab('Root.OpenHouse', $openHouseManager);
 		 	
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('AdditionalMLS', 'Additional MLS Number'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Vendors'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Possession'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new CheckboxField('Lockbox', 'Lockbox'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Fireplaces'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Garage'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Driveway'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('District'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new DropdownField('Occupied','Occupied',singleton('Listing')->dbObject('Occupied')->enumValues()));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new CheckboxField('AC', 'Air Conditioning'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Heat'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Basement'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Construction'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Topography'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Age'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new DropdownField('Water','Water',singleton('Listing')->dbObject('Water')->enumValues()));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new CheckboxField('Sewer'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Restrictions'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new DropdownField('Zoning','Zoning',singleton('Listing')->dbObject('Zoning')->enumValues()));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('LegalDesc', 'Legal Description'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Deposit'));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new DropdownField('SideOfRoad','Side Of Road',singleton('Listing')->dbObject('SideOfRoad')->enumValues()));
-		 	$fields->addFieldToTab('Root.FeatureSheetData', new TextField('Mortgage'));
+		 	$fields->addFieldToTab("Root.FeatureSheetData",  CompositeField::create(
+		 		array(
+		 			TextField::create('AdditionalMLS', 'Additional MLS Number'),
+		 			TextField::create('Vendors'),
+		 			TextField::create('Possession'),
+		 			CheckboxField::create('Lockbox', 'Lockbox'),
+		 			TextField::create('Fireplaces'),
+		 			TextField::create('Garage'),
+		 			TextField::create('Driveway'),
+		 			TextField::create('District'),
+		 			DropdownField::create('Occupied','Occupied',singleton('Listing')->dbObject('Occupied')->enumValues()),
+		 			CheckboxField::create('AC', 'Air Conditioning'),
+		 			TextField::create('Heat'),
+		 			TextField::create('Basement'),
+		 			TextField::create('Construction'),
+		 			TextField::create('Topography'),
+		 			TextField::create('Age'),
+		 			DropdownField::create('Water','Water',singleton('Listing')->dbObject('Water')->enumValues()),
+		 			CheckboxField::create('Sewer'),
+		 			TextField::create('Restrictions'),
+		 			DropdownField::create('Zoning','Zoning',singleton('Listing')->dbObject('Zoning')->enumValues()),
+		 			TextField::create('LegalDesc', 'Legal Description'),
+		 			TextField::create('Deposit'),
+		 			DropdownField::create('SideOfRoad','Side Of Road',singleton('Listing')->dbObject('SideOfRoad')->enumValues()),
+		 			TextField::create('Mortgage')
+		 		)
+		 	)->addExtraClass('leftcol'));
 		 	
 		 	$roomManagerConfig = GridFieldConfig_RelationEditor::create();
+		 	$roomManagerConfig->removeComponentsByType('GridFieldDataColumns')
+		 		->removeComponentsByType('GridFieldAddExistingAutocompleter');
 		 	$roomManagerConfig->addComponents(
-		 		new GridFieldDetailForm('Room')
+		 		//new GridFieldDetailForm('Room')
+		 		new GridFieldEditableColumns(),
+		 		new GridFieldDeleteAction(),
+		 		new GridFieldAddNewInlineButton()
 		 	);
 		 	$roomManager = new GridField(
 		 		"Rooms", "Rooms",
 		 		$this->Rooms(), 
 		 		$roomManagerConfig
 		 	);
-		 	$fields->addFieldToTab('Root.FeatureSheetData', $roomManager);
+		 	
+		 	$fields->addFieldToTab("Root.FeatureSheetData",  CompositeField::create(
+		 		array(
+		 			$roomManager
+		 		)
+		 	)->addExtraClass('rightcol'));
 		 	
 		 	//mapping system
 		 	
@@ -404,9 +429,9 @@ $schoolManagerConfig = GridFieldConfig::create();
 		 	
 		}
 		
-	 	return $fields;
+		return $fields;
 	 	
-	 }
+	}
 	 
 	 	 
 	 
@@ -416,16 +441,13 @@ $schoolManagerConfig = GridFieldConfig::create();
 			$LatLon = Geocoder::Geocode($this->Address." ".($this->Town ? $this->Town : $this->City()->Title).", Ontario ".$this->PostalCode);
 			
 			if($LatLon) {
-				
 				$this->Lat = $LatLon["Lat"];
 				$this->Lon = $LatLon["Lon"];
 			}
-			
-			
 		}
 		
 		
-		if(!$this->ID || $this->FolderID == 0) {
+		if($this->ID == 0 || $this->FolderID == 0) {
 			/**
 			* Find or Create Folder under assets/Homes named $address-$city 
 			* Finds and attached the FolderID after its created
@@ -468,10 +490,6 @@ $schoolManagerConfig = GridFieldConfig::create();
 		}
 		
 		
-		
-		
-		
-		
 		/**
 		* Clean Values
 		*/
@@ -494,14 +512,7 @@ $schoolManagerConfig = GridFieldConfig::create();
 		}
 		
 				
-		
-		
-		
-		
 		parent::onBeforeWrite();	
-		
-		
-		
 		
 	}
 	
@@ -517,20 +528,6 @@ $schoolManagerConfig = GridFieldConfig::create();
 		parent::onBeforeDelete();
 	}
 
-	
-	/*
-function onAfterWrite() {
-		
-		if($this->GalleryID != 0) {
-			$gallery = Gallery::get()->byID($this->GalleryID);
-			$gallery->PageID = $this->ID;
-			$gallery->write();
-		}
-		
-		parent::onAfterWrite();
-	}
-*/
-
 
 	/**
 	 * Accessor methods
@@ -542,7 +539,7 @@ function onAfterWrite() {
 	
 	
 	
-public function Images() {
+	public function Images() {
 		return $this->getManyManyComponents(
 			'Images',
 			'',
@@ -576,9 +573,9 @@ public function Images() {
 	 * @return Formated Price
 	 */
 	 
-	 public function AbsoluteURLEncoded() {
-	 	return urlencode($this->BaseHref().$this->URLSegment);
-	 }
+	public function AbsoluteURLEncoded() {
+		return urlencode($this->BaseHref().$this->URLSegment);
+	}
 	
 	public function FormattedPrice() {
 		setlocale(LC_MONETARY, 'en_CA');
@@ -598,8 +595,6 @@ public function Images() {
 		
 		
 	}
-	
-	
 	
 	/**
 	 *function to Populate a Feature Image set to metered out in various points in the template 
@@ -920,11 +915,7 @@ class Listing_Controller extends Page_Controller {
 			 		foreach($newSet as $obj ) $set->push($obj);
 		 		}
 		 	}
-		 	
-		 	
-		 	
-		 	
-	 	}
+		}
 	 	
 	    if(!$set) return new HTTPResponse("Not found", 404);
 	     

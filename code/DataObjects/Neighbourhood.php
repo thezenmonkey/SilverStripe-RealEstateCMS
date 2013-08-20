@@ -6,7 +6,7 @@
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
  
-class Neighbourhood extends Community {
+class Neighbourhood extends CommunityDOAP {
 	/**
 	 * Static vars
 	 * ----------------------------------*/

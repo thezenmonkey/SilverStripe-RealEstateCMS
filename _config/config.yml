@@ -1,0 +1,7 @@
+---
+ListingsPage:
+  extensions:
+    - ExcludeChildren
+SiteConfig:
+  extensions:
+    - RealEstateSiteConfig

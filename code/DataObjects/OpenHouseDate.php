@@ -11,7 +11,8 @@ class OpenHouseDate extends ExtraData {
 	
 	private static $summary_fields = array(
 		'OpenHouseDate',
-		'OpenHouseTime',
+		'OpenHouseStart',
+		'OpenHouseEnd'
 	);
 	
 	public function getCMSFields() {

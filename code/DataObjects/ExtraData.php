@@ -26,8 +26,8 @@ class ExtraData extends DataObject {
 	private static $has_one = array(
 		'Listing' => 'Listing',
 		'Page' => 'Page',
-		'CTAPage' => 'CTAPage',
-		"TargetPage" => "Page"
+		//'CTAPage' => 'CTAPage',
+		//"TargetPage" => "Page"
 	);
 	
 }

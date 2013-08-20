@@ -1,6 +1,6 @@
 <?php
 
-class Community extends DataObjectAsPage {
+class CommunityDOAP extends DataObjectAsPage {
 	/**
 	 * Static vars
 	 * ----------------------------------*/

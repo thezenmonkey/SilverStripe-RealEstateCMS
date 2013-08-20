@@ -43,7 +43,7 @@
  	);
  	
  	private static $summary_fields = array(
- 		'Name', 'Level'
+ 		'Name', 'Level','Type', 'Width', 'Length'
  	);
  
  
