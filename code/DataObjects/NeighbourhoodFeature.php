@@ -42,8 +42,8 @@ class NeighbourhoodFeature extends DataObject {
 	);
 	
 	private static $has_one = array(
-		'Neighbourhood' => 'Neighbourhood',
-		'City' => 'City'
+		'Neighbourhood' => 'NeighbourhoodPage',
+		'City' => 'MunicipalityPage'
 	);
 	
 	private static $belongs_many_many = array(
@@ -70,7 +70,7 @@ class NeighbourhoodFeature extends DataObject {
 	 
 	  
 	function getCMSFields() {
-		$cityfield = new DropdownField('CityID', 'City', City::get()->map('ID', 'Title'));
+		$cityfield = new DropdownField('CityID', 'City', MunicipalityPage::get()->map('ID', 'Title'));
         $cityfield->setEmptyString('(Select one)');
 		
 		return new FieldList(

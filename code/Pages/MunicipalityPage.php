@@ -6,6 +6,11 @@ class MunicipalityPage extends Community {
 	 * Static vars
 	 * ----------------------------------*/
 	
+	private static $hide_ancestor = 'Community';
+	private static $singular_name = 'City';
+    private static $plural_name = 'Cities';
+    private static $description = 'Landing Page for Target Market City';
+    private static $icon = 'realestate/images/communities.png';
 	
 
 	/**

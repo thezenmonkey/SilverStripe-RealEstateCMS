@@ -7,13 +7,14 @@
  */
  
  
-class Listing extends Page {
+class Listing extends Page implements HiddenClass {
 	/**
 	 * Static vars
 	 * ----------------------------------*/
 	
 	
 	private static $can_be_root = false;
+	
 	
 	//static $defaults;	
 
@@ -118,17 +119,19 @@ class Listing extends Page {
 	private static $has_many = array(
 		'Rooms' => 'Room',
 		"OpenHouseDates" => "OpenHouseDate",
-		
+		"Floorplans" => "File"
 	);
 	
 	private static $many_many = array(
-		'Schools' => 'NeighbourhoodFeature'
+		'Schools' => 'School'
 	);
 	
 	private static $searchable_fields = array(
 		'Address',
 		'MLS'
 	);
+	
+	
 	
 	private static $summary_fields = array(
 		'Address',
@@ -172,10 +175,10 @@ class Listing extends Page {
 	 		"StatusGroup",
 	 		"Status",
 	 		array(
-	 			DropdownField::create("Status", "Status", singleton('Listing')->dbObject('Status')->enumValues()),
-	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease")),
-	 			CheckboxField::create("Feature"),
-	 			CheckboxField::create("IsNew"),
+	 			DropdownField::create("Status", "Status", singleton('Listing')->dbObject('Status')->enumValues())->addExtraClass('noborder'),
+	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease"))->addExtraClass('noborder'),
+	 			CheckboxField::create("Feature")->addExtraClass('noborder'),
+	 			CheckboxField::create("IsNew")->addExtraClass('noborder'),
 	 			TextField::create("MLS", "MLS Number"),
 	 		)
 	 	);
@@ -195,28 +198,28 @@ class Listing extends Page {
 	 	/**
 	 	 * Address Fields
 	 	 */
+	 	$neighbourhoodField = LiteralField::create("Blank","");
+	 	if ($this->ID != 0 && $this->CityID != 0) {
+		 	$neighbourhoodList = NeighbourhoodPage::get()->filter(array("ParentID" => $this->CityID))->sort('Title')->map('ID', 'Title');
+			if($neighbourhoodList->count() >= 1) {
+				$neighbourhoodField = DropdownField::create('NeighbourhoodID', 'Neighbourhood', $neighbourhoodList);
+				$neighbourhoodField->setEmptyString('(Select one)')->addExtraClass('stacked');
+			}
+	 	}
 	 	
 	 	$addressField = CompositeField::create(
 	 		array (
 	 			HeaderField::create("Address",2),
-	 			TextField::create("Address")->addExtraClass('stacked'),
-	 			TextField::create("Unit")->addExtraClass('stacked'),
+	 			TextField::create("Address")->addExtraClass('stacked noborder'),
+	 			TextField::create("Unit")->addExtraClass('stacked noborder'),
 	 			CompositeField::create(
-	 				$cityField->addExtraClass('stacked leftcol'),
+	 				$cityField->addExtraClass('stacked leftcol noborder'),
 	 				Textfield::create("Town")->setDescription('Use ONLY for Smaller Communities Outside Target Markets')->addExtraClass('stacked rightcol')
 	 			)->addExtraClass('clearfix'),
-	 			TextField::create("PostalCode", "Postal Code")->addExtraClass('stacked')
+	 			TextField::create("PostalCode", "Postal Code")->addExtraClass('stacked noborder'),
+	 			$neighbourhoodField
 	 		)
 	 	)->addExtraClass("addDeets");
-	 	
-	 	if ($this->ID != 0 && $this->CityID != 0) {
-		 	$neighbourhoodList = Neighbourhood::get()->filter(array("CityID" => $this->CityID))->sort('Name')->map('ID', 'Name');
-			if($neighbourhoodList->count() >= 1) {
-				$neighbourhoodField = DropdownField::create('NeighbourhoodID', 'Neighbourhood', $neighbourhoodList);
-				$neighbourhoodField->setEmptyString('(Select one)');
-				$fields->insertBefore( $neighbourhoodField , 'PostalCode');
-			}
-	 	}
 	 	
 	 	/**
 	 	 * Property Deatils
@@ -225,19 +228,20 @@ class Listing extends Page {
 	 	$detailField = CompositeField::create(
 	 		array (
 	 			HeaderField::create("Property Details",2),
-	 			DropdownField::create('Type','Type',singleton('Listing')->dbObject('Type')->enumValues())->addExtraClass('stacked'),
-	 			TextField::create("TotalArea", "Total Approximate Area")->addExtraClass('stacked'),
+	 			DropdownField::create('Type','Type',singleton('Listing')->dbObject('Type')->enumValues())->addExtraClass('stacked noborder'),
+	 			TextField::create("TotalArea", "Total Approximate Area")->addExtraClass('stacked noborder'),
 	 			CompositeField::create(
-	 				TextField::create("NumberBed", "# Bedrooms")->addExtraClass('stacked oneThird'),
-	 				TextField::create("NumberBath", "# Bathrooms")->addExtraClass('stacked oneThird'),
+	 				TextField::create("NumberBed", "# Bedrooms")->addExtraClass('stacked oneThird noborder'),
+	 				TextField::create("NumberBath", "# Bathrooms")->addExtraClass('stacked oneThird noborder'),
 	 				TextField::create("NumberRooms", "# Rooms")->addExtraClass('stacked oneThird')
 	 			)->addExtraClass('clearfix'),
+	 			CheckboxField::create("Irregular", "Irregular Lot")->addExtraClass('noborder'),
 	 			CompositeField::create(
-	 				TextField::create("LotWidth", "Lot Width")->addExtraClass('stacked oneThird'),
-	 				TextField::create("LotLength", "Lot Depth")->addExtraClass('stacked oneThird'),
+	 				TextField::create("LotWidth", "Lot Width")->addExtraClass('stacked oneThird noborder'),
+	 				TextField::create("LotLength", "Lot Depth")->addExtraClass('stacked oneThird noborder'),
 	 				TextField::create("LotAcreage", "Acreage")->addExtraClass('stacked oneThird')
 	 			)->addExtraClass('clearfix'),
-	 			CheckboxField::create("Irregular", "Irregular Lot"),
+	 			
 	 		)
 	 	)->addExtraClass("propDeets");
 	 	
@@ -248,9 +252,9 @@ class Listing extends Page {
 	 	$financeDetails = CompositeField::create(
 	 		array (
 	 			HeaderField::create("Financial",2),
-	 			NumericField::create("Price")->addExtraClass('stacked'),
-	 			NumericField::create("Taxes")->addExtraClass('stacked'),
-	 			TextField::create("TaxYear", "Tax Assessment Year")->addExtraClass('stacked'),
+	 			NumericField::create("Price")->addExtraClass('stacked noborder'),
+	 			NumericField::create("Taxes")->addExtraClass('stacked noborder'),
+	 			TextField::create("TaxYear", "Tax Assessment Year")->addExtraClass('stacked noborder'),
 	 			CheckboxField::create("HideMonthly", "Hide Monthly Price"),
 	 		)
 	 	)->addExtraClass("finDeets");
@@ -302,7 +306,11 @@ class Listing extends Page {
 		 		CompositeField::create(
 		 			CompositeField::create(
 			 			$featuresheetField->addExtraClass('stacked'),
-			 			TextField::create('VideoURL', "Video Embed Code")->addExtraClass('stacked')
+			 			TextField::create('VideoURL', "Video Embed Code")->addExtraClass('stacked')->setDescription('YouTube "Share this video" code'),
+			 			UploadField::create("Floorplans")
+			 				->addExtraClass('stacked')
+			 				->setDescription('Upload Floorplans. Click edit on uploaded file to set Title for each floorplan. ie 1st floor, basement, etc.')
+			 				->setFolderName("/Homes/".$this->Folder()->Name)
 		 			)->addExtraClass('leftcol'),
 		 			CompositeField::create( 
 		 				$galleryField
@@ -311,29 +319,29 @@ class Listing extends Page {
 		 		
 		 	));
 		 	
-		 	/*
-$schoolManagerConfig = GridFieldConfig::create();
-		 	$schoolManagerConfig->addComponents(
-				new GridFieldManyRelationHandler(true),
-				new GridFieldToolbarHeader(),
-				new GridFieldSortableHeader(),
-				new GridFieldDataColumns(),
-				new GridFieldPaginator(20),
-				new GridFieldEditButton(),
-				new GridFieldDeleteAction(),
-				new GridFieldDetailForm(),
-				'GridFieldPaginator'
-		 	);
-		 	$schoolManager = new GridField(
-		 		"Schools", "Schools",
-		 		$this->Schools()->filter(array(
-		 			"CityID" => $this->CityID,
-		 			"Type" => array('Elementary School','Middle School','Secondary School','RC Elementary School','RC Middle School','RC Secondary School'),
-		 		))->sort("Name"), 
-		 		$schoolManagerConfig
-		 	);
-		 	$fields->addFieldToTab('Root.Schools', $schoolManager);
-*/
+		 	if($this->CityID != 0 ) {
+			 	$schoolManagerConfig = GridFieldConfig::create();
+			 	$schoolManagerConfig->addComponents(
+					new GridFieldManyRelationHandler(true),
+					new GridFieldToolbarHeader(),
+					new GridFieldSortableHeader(),
+					new GridFieldDataColumns(),
+					new GridFieldPaginator(20),
+					new GridFieldEditButton(),
+					new GridFieldDeleteAction(),
+					new GridFieldDetailForm(),
+					'GridFieldPaginator'
+			 	);
+			 	$schoolManager = new GridField(
+			 		"Schools", "Schools",
+			 		$this->Schools()->filter(array(
+			 			"CityID" => $this->CityID,
+			 			"Type" => array('Elementary School','Middle School','Secondary School','RC Elementary School','RC Middle School','RC Secondary School'),
+			 		))->sort("Name"), 
+			 		$schoolManagerConfig
+			 	);
+			 	$fields->addFieldToTab('Root.Schools', $schoolManager);
+			 }
 			
 					 	
 		 	$openHouseManager = new GridField(

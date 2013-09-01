@@ -8,9 +8,7 @@
 class ListingAdmin extends DataObjectAsPageAdmin {
    
 	public static $managed_models = array(
-		'Listing' => array("title" => 'Listings'), 
-		'MLSListing'  => array("title" => 'MLS Listings'),
-		'PrintAd' => array("title" => 'Print Ads')
+		'Listing' => array("title" => 'Listings')
 	);
 
 	static $url_segment = 'listings';
@@ -27,7 +25,7 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	    
 	    
 	   // LeftAndMain::require_javascript("RealEstate/javascript/cmsmap.js");
-	    Requirements::javascript("RealEstate/javascript/jquery.ui.map.min.js");
+	    Requirements::javascript("realestate/javascript/jquery.ui.map.full.min.js");
 	}
 	
 	public function getList() {

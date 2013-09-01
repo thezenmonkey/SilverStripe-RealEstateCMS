@@ -12,6 +12,11 @@ class ListingsPage extends Page
 	/**
 	 * Static vars
 	 * ----------------------------------*/
+	
+	private static $singular_name = 'Listings';
+    private static $plural_name = 'Listing Pages';
+    private static $description = 'Displays Listing (if under main Listings page it can be configured to show only one City or Neighbouthod)';
+    private static $icon = 'realestate/images/listings.png'; //Attribute as Martha Ormiston, from The Noun Project
 	 
 	private static $db = array(
 		"City" =>  "Varchar",

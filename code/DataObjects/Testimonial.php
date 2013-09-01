@@ -1,18 +1,17 @@
 <?php
+
 /**
  * 	
- * @package Realestate Listing System - Neighbourhood Listings Page 
- * @requires DataObjectAsPage, Mappable
- * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
+ * @package Testimonials
+ * @author
  */
+ 
+class Testimonial extends DataObject {
 
-
-class CitiesPage extends DataObjectAsPageHolder 
-{
 	/**
 	 * Static vars
 	 * ----------------------------------*/
-		
+	
 
 
 	/**
@@ -31,6 +30,29 @@ class CitiesPage extends DataObjectAsPageHolder
 	 * Data model
 	 * ----------------------------------*/
 
+	 static $db = array(
+	 	"Title" => "Varchar",
+	 	"Content" => "HTMLText",
+	 	"Video" => "Varchar",
+	 	"Client" => "Varchar"
+	 );
+	 
+	 static $has_one = array(
+	 	"Agent" => "Member"
+	 );
+	 
+	 static $summary_fields = array(
+	 	"Title",
+	 	"Agent.Title",
+	 	"Client"
+	 );
+	 
+	 static $search_fields = array(
+	 	"Title",
+	 	"Agent",
+	 	"Client"
+	 );
+	 
 
 
 	/**
@@ -49,7 +71,6 @@ class CitiesPage extends DataObjectAsPageHolder
 	 * Controller actions
 	 * ----------------------------------*/
 
-	
 
 
 	/**
@@ -64,16 +85,5 @@ class CitiesPage extends DataObjectAsPageHolder
 	 
 	 
 
-}
 
-class CitiesPage_Controller extends DataObjectAsPageHolder_Controller 
-{
-	//This needs to know be the Class of the DataObject you want this page to list
-	private static $item_class = 'City';
-	//Set the sort for the items (defaults to Created DESC)
-	private static $item_sort = 'Created ASC';
-	
-	
-	
-	
 }

@@ -30,7 +30,7 @@ class RealEstateSiteConfig extends DataExtension {
 	
 	private static $has_one = array(
 		"Picture" => "Image",
-		"DefaultCity" => "City"
+		"DefaultCity" => "MunicipalityPage"
 	);
 	
 	
@@ -69,11 +69,13 @@ class RealEstateSiteConfig extends DataExtension {
 	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("LandTrasfer", "Land Transfer Tax Rate")->setDescription('Only needed if Have a Land Tranfer Tax Caluclator'));
 	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("DefaultProvince", "Default Province for All Listings"));
 	 	
-	 	$cityList = City::get();
+	 	$cityList = MunicipalityPage::get();
 		if($cityList->count() > 1) {
 			$fields->addFieldToTab( 
 				"Root.DefaultSettings",
-				DropdownField::create("DefaultCityID", "Default City", $cityList->sort('Title')->map('ID', 'Title'))->setEmptyString('(Select one)')->setDescription('Set for your Primary Selling Location to save time when adding listings')
+				DropdownField::create("DefaultCityID", "Default City", $cityList->sort('Title')->map('ID', 'Title'))
+					->setEmptyString('(Select one)')
+					->setDescription('Set for your Primary Selling Location to save time when adding listings')
 			);
 		}
 

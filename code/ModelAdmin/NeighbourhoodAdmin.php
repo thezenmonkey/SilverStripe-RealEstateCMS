@@ -8,8 +8,8 @@
 class NeighbourhoodAdmin extends DataObjectAsPageAdmin {
    
 	public static $managed_models = array(
-		'City',
-		'Neighbourhood',
+		'MunicipalityPage',
+		'NeighbourhoodPage',
 		'NeighbourhoodFeature'
 	);
 
@@ -17,7 +17,8 @@ class NeighbourhoodAdmin extends DataObjectAsPageAdmin {
 	static $menu_title = 'Communities';
 	static $menu_icon = 'realestate/images/communities.png';
 	
-	public function getEditForm($id = null, $fields = null) {
+	/*
+public function getEditForm($id = null, $fields = null) {
 
 	    $form = parent::getEditForm($id = null, $fields = null);    
 	    
@@ -46,4 +47,5 @@ class NeighbourhoodAdmin extends DataObjectAsPageAdmin {
 
 	    return $form;
 	}
+*/
 }
