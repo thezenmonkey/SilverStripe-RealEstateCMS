@@ -41,7 +41,7 @@ class RMSBlogExtension extends DataExtension {
 		
 		$filter2 = array();
 		
-		$listings = Listing::get()->filterAny($filter);
+		$listings = Listing::get()->filterAny($filter)->exclude('Status', 'Unavailable');
 		
 		return $listings->count() ? $listing->limit($limit) : false;
 		
