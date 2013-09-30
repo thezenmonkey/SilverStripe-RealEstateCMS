@@ -15,7 +15,7 @@ class School extends NeighbourhoodFeature {
 	);
 	
 	function getCMSFields() {
-		$cityfield = new DropdownField('CityID', 'City', City::get()->map('ID', 'Title'));
+		$cityfield = new DropdownField('CityID', 'City', MunicipalityPage::get()->map('ID', 'Title'));
         $cityfield->setEmptyString('(Select one)');
 		
 		return new FieldList(

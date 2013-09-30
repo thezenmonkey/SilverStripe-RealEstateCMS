@@ -732,14 +732,22 @@ public function PriceClass(){
 		 return implode('_', array(
 		 $this->URLSegment,
 	        $this->LasteEdited,
+	        //has_one
+	        $this->City()->LastEdited,
+	        $this->Neighbourhood()->LastEdited,
+	        $this->FeatureSheet()->LastEdited,
+	        //has_many
+	        $this->RelationshipAggregate('Rooms')->Max('LastEdited'),
+	        $this->RelationshipAggregate('OpenHouseDates')->Max('LastEdited'),
+	        $this->RelationshipAggregate('Floorplans')->Max('LastEdited'),
+	        //many_many
 	        $this->RelationshipAggregate('Schools')->Max('LastEdited'),
 	        $this->RelationshipAggregate('Images')->Max('LastEdited'),
-	        $this->Neighbourhood()->LastEdited,
-	        $this->RelationshipAggregate('Rooms')->Max('LastEdited'),
-	        $this->FeatureSheet()->LastEdited
+	        
+	       
+	        
 	    ));
 	 }
-	 
 	
 	
 	public function MonthlyPrice(){
@@ -868,10 +876,10 @@ public function PriceClass(){
 class Listing_Controller extends Page_Controller {
 
 	public function index() { 
-	if ($this->Status == "Unavailable") { 
-		return $this->renderWith(array('SoldListing','Page')); 
-	} 
-		else return $this->renderWith(array('Listing','Page')); 
+		if ($this->Status == "Sold") { 
+			return $this->renderWith(array('SoldListing','Page')); 
+		} 
+			else return $this->renderWith(array('Listing','Page')); 
 	
 	}	
 	
