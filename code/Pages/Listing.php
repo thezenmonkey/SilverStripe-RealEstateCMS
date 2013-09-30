@@ -200,6 +200,7 @@ class Listing extends Page implements HiddenClass {
 	 	 */
 	 	$neighbourhoodField = LiteralField::create("Blank","");
 	 	if ($this->ID != 0 && $this->CityID != 0) {
+		 	// Check if Neighbourhood Pages 
 		 	$neighbourhoodList = NeighbourhoodPage::get()->filter(array("ParentID" => $this->CityID))->sort('Title')->map('ID', 'Title');
 			if($neighbourhoodList->count() >= 1) {
 				$neighbourhoodField = DropdownField::create('NeighbourhoodID', 'Neighbourhood', $neighbourhoodList);
@@ -319,6 +320,8 @@ class Listing extends Page implements HiddenClass {
 		 		
 		 	));
 		 	
+		 	$schoolManager = LiteralField::create("Blank2", "");
+		 	$schoolHeader = LiteralField::create("Blank3", "");
 		 	if($this->CityID != 0 ) {
 			 	$schoolManagerConfig = GridFieldConfig::create();
 			 	$schoolManagerConfig->addComponents(
@@ -340,7 +343,8 @@ class Listing extends Page implements HiddenClass {
 			 		))->sort("Name"), 
 			 		$schoolManagerConfig
 			 	);
-			 	$fields->addFieldToTab('Root.Schools', $schoolManager);
+			 	$schoolHeader = HeaderField::create("SchoolHeader", "Schools", 2);
+			 	//$fields->addFieldToTab('Root.Schools', $schoolManager);
 			 }
 			
 					 	
@@ -349,7 +353,7 @@ class Listing extends Page implements HiddenClass {
 		 		"Open House Dates",
 		 		$this->OpenHouseDates(),
 		 		GridFieldConfig_RelationEditor::create()
-		 			//->removeComponentsByType('GridFieldAddNewButton')
+		 			->removeComponentsByType('GridFieldAddNewButton')
 		 			//->removeComponentsByType('GridFieldSortableHeader')
 		 			->removeComponentsByType('GridFieldDataColumns')
 		 			//->removeComponentsByType('GridFieldDeleteAction')
@@ -395,7 +399,8 @@ class Listing extends Page implements HiddenClass {
 		 	
 		 	$roomManagerConfig = GridFieldConfig_RelationEditor::create();
 		 	$roomManagerConfig->removeComponentsByType('GridFieldDataColumns')
-		 		->removeComponentsByType('GridFieldAddExistingAutocompleter');
+		 		->removeComponentsByType('GridFieldAddExistingAutocompleter')
+		 		->removeComponentsByType('GridFieldAddNewButton');
 		 	$roomManagerConfig->addComponents(
 		 		//new GridFieldDetailForm('Room')
 		 		new GridFieldEditableColumns(),
@@ -410,7 +415,10 @@ class Listing extends Page implements HiddenClass {
 		 	
 		 	$fields->addFieldToTab("Root.FeatureSheetData",  CompositeField::create(
 		 		array(
-		 			$roomManager
+		 			$roomManager,
+		 			LiteralField::create("HR", "<hr>"),
+		 			$schoolHeader,
+		 			$schoolManager
 		 		)
 		 	)->addExtraClass('rightcol'));
 		 	
@@ -655,7 +663,8 @@ class Listing extends Page implements HiddenClass {
 		}
 	}
 	
-	public function PriceClass(){
+	/*
+public function PriceClass(){
 		$PriceClass = false;
 		switch ($this->Price) {
 			case ($this->Price >= 0 && $this->Price <= 500000 ):
@@ -673,6 +682,7 @@ class Listing extends Page implements HiddenClass {
 		}
 		return $PriceClass;
 	}
+*/
 	
 	/**
 	 *Check if there is an open house and if it is the future 
@@ -695,7 +705,7 @@ class Listing extends Page implements HiddenClass {
 	 	if($method == "price") {
 	 		$items = Listing::get()->filter(array(
 	 			"CityID" => $this->CityID,
-	 			"Sold" => 0,
+	 			"Status" => "Available",
 	 			"Price:LessThan" => $value + 50000,
 	 			"Price:GreaterThan" => $value - 50000
 	 		))->limit(5);
@@ -881,13 +891,13 @@ class Listing_Controller extends Page_Controller {
 	 			"Price:LessThan" => $value + 50000,
 	 			"Price:GreaterThan" => $value - 50000,
 	 			"CityID" => $this->CityID,
-	 			"Sold" => 0
+	 			"Status" => "Available"
 	 		);
 	 		foreach(Listing::get()->filter($filter)->exclude('ID', $this->ID)->limit(4) as $obj) $set->push($obj);
 	 	} elseif ($method == "neighbourhood") {
 	 		$filter = array(
 	 			"CityID" => $this->CityID,
-	 			"Sold" => 0
+	 			"Status" => "Available"
 	 		);
 	 		$items = Listing::get()->filter($filter)->exclude('ID', $this->ID);
 	 		if($items->count()){

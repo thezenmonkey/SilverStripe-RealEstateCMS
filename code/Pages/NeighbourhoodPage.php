@@ -6,6 +6,7 @@ class NeighbourhoodPage extends Community {
 	 * Static vars
 	 * ----------------------------------*/
 	
+	
 	private static $hide_ancestor = 'Community';
 
 	/**

@@ -84,3 +84,7 @@ div#Form_ItemEditForm_CityID_chzn, div#Form_ItemEditForm_Type_chzn {
 .ui-accordion .ui-widget-content {
 	background-color: #fafafa !important;
 }
+
+div.relationhandler {
+	margin-bottom: 16px;
+}

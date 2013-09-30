@@ -1,6 +1,7 @@
 <?php
  
 class RealEstateSiteConfig extends DataExtension {
+	
 	private static $db = array(
 		//Business Info
 		'BusinessName' => 'Varchar',
@@ -32,6 +33,7 @@ class RealEstateSiteConfig extends DataExtension {
 		"Picture" => "Image",
 		"DefaultCity" => "MunicipalityPage"
 	);
+	
 	
 	
 	public function updateCMSFields(FieldList $fields) {
