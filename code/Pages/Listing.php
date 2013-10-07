@@ -69,6 +69,7 @@ class Listing extends Page implements HiddenClass {
 		'SVHeading' => 'Varchar(25)',
 		'SVPitch' => 'Varchar(25)',
 		'SVZoom' => 'Varchar(25)',
+		// REMOVE OPEN HOUSE DATA
 		//open house data
 		'OpenHouseDate' => 'Date',
 		'OpenHouseStart' => 'Time',
@@ -593,14 +594,6 @@ class Listing extends Page implements HiddenClass {
 		return urlencode($this->BaseHref().$this->URLSegment);
 	}
 	
-	public function FormattedPrice() {
-		setlocale(LC_MONETARY, 'en_CA');
-		if($this->Price){
-			return money_format('%.0n', $this->Price);
-		} else {
-			return false;
-		}
-	}
 	
 	public function GroupedSchools(){
 		if($this->Schools()->count()){
@@ -642,17 +635,27 @@ class Listing extends Page implements HiddenClass {
 		}
 		
 	}
-		
+	
+	//MOVE TO A UTILITY CLASS
 	//checks if Pased Item is with 15 miles of this DataObject
 	public function getDistance($lat,$lon) {
 		return ( 3959 * acos( cos( deg2rad($lat) ) * cos( deg2rad( $this->Lat ) ) * cos( deg2rad($this->Lon ) - deg2rad($lon) ) + sin( deg2rad($lat) ) * sin( deg2rad( $this->Lat ) ) ) );
 	}
 	
 	/**
-	 *Return Money Formated Values for Taxes 
+	 * Return Money Formated Values  
 	 *
-	 * @return Formated Taxes
+	 * @return 
 	 */
+	
+	public function FormattedPrice() {
+		setlocale(LC_MONETARY, 'en_CA');
+		if($this->Price){
+			return money_format('%.0n', $this->Price);
+		} else {
+			return false;
+		}
+	}
 	
 	public function FormattedTaxes() {
 		if($this->Taxes){
@@ -663,43 +666,31 @@ class Listing extends Page implements HiddenClass {
 		}
 	}
 	
-	/*
-public function PriceClass(){
-		$PriceClass = false;
-		switch ($this->Price) {
-			case ($this->Price >= 0 && $this->Price <= 500000 ):
-				$PriceClass = "price0-500k";
-				break;
-			case ($this->Price >= 500001 && $this->Price <= 1000000 ):
-				$PriceClass = "price500-1m";
-				break;
-			case ($this->Price >= 1000001 && $this->Price <= 2000000 ):
-				$PriceClass = "price1-2m";
-				break;
-			case ($this->Price >= 2000001):
-				$PriceClass = "price2m";
-				break;
+	public function MonthlyPrice(){
+		$siteConfig = SiteConfig::current_site_config();
+		
+		if($this->Price){
+			$borrowed = $this->Price - ceil($this->Price*($siteConfig->DownPayment/100));
+			$int = ($siteConfig->InterestRate/100)/12;
+			$term = 360;
+			setlocale(LC_MONETARY, 'en_CA');
+			return money_format('%.0n',floor((($borrowed*$int)/(1-pow(1+$int, (-1*$term)))*100)/100));
+		} else {
+			return false;
 		}
-		return $PriceClass;
 	}
-*/
 	
-	/**
-	 *Check if there is an open house and if it is the future 
-	 *
-	 * @return Formated Taxes
-	 */
-	 
-	 public function GetCover() {
-	 	return $this->Images()->where("Cover = 1")->First();
-	 }
+	public function DownPayment() {
+		$siteConfig = SiteConfig::current_site_config();
+		return ceil($this->Price*($siteConfig->DownPayment/100));
+	}
 	
+	
+	function ContactForm() {
+		return new ListingRequestForm($this, 'RequestForm');
+	}
 	 
-	 function ContactForm() {
-	 	  return new ListingRequestForm($this, 'RequestForm');
-	 }
-	 
-	 function RelatedProperties() {
+	function RelatedProperties() {
 	 	$method = $_GET["method"];
 	 	$value = $_GET["value"];
 	 	if($method == "price") {
@@ -711,12 +702,12 @@ public function PriceClass(){
 	 		))->limit(5);
 	 	} elseif ($method == "neighbourhood") {
 	 		if($this->NeighbourhoodID != 0) {
-		 		$items = Listing::get()->filter(array("NeighbourhoodID" => $this->NeighbourhoodID, "Sold" => 0))->limit(5);
+		 		$items = Listing::get()->filter(array("NeighbourhoodID" => $this->NeighbourhoodID, "Status:not" => 'Unavailable'))->limit(5);
 	 		} else {
-		 		$items = Listing::get()->filter(array("CityID" => $this->CityID, "Sold" => 0))->limit(5);
+		 		$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status:not" => 'Unavailable'))->limit(5);
 	 		}
 	 	} else {
-		 	$items = Listing::get()->filter(array("CityID" => $this->CityID, "Sold" => 0))->limit(5);
+		 	$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status:not" => 'Unavailable'))->limit(5);
 	 	}
 	 	if($items) {
 	 		return $items;
@@ -750,54 +741,21 @@ public function PriceClass(){
 	 }
 	
 	
-	public function MonthlyPrice(){
-		$siteConfig = SiteConfig::current_site_config();
-		
-		if($this->Price){
-			$borrowed = $this->Price - ceil($this->Price*($siteConfig->DownPayment/100));
-			$int = ($siteConfig->InterestRate/100)/12;
-			$term = 360;
-			setlocale(LC_MONETARY, 'en_CA');
-			return money_format('%.0n',floor((($borrowed*$int)/(1-pow(1+$int, (-1*$term)))*100)/100));
-		} else {
-			return false;
-		}
-	}
-	
-	public function DownPayment() {
-		$siteConfig = SiteConfig::current_site_config();
-		return ceil($this->Price*($siteConfig->DownPayment/100));
-	}
-	
 	function ShowListingsPage() {
 		return ListingsPage::get()->where("City = ".$this->CityID)->count() ? ListingsPage::get()->where("City = ".$this->CityID)->First() : false;
 	}
 	
+	
+	
 	public function UpcomingOpenHouse() {
-		if($this->OpenHouseDates()->count()) {
-			$set = new ArrayList();
-			foreach($this->OpenHouseDates() as $openHouse) {
-				strtotime($openHouse->OpenHouseDate) >= strtotime("today") ? $set->push($openHouse) : false;
-				//date(strtotime($openHouse->OpenHouseDate)) >= time() ? $set->push($openHouse) : false; 
-			}
-			
-			if($set->count()){
-				//Debug::show($set);
-				return $set;
-				
-			} else {
-				return false;
-			}
-			
-		} else {
-			return false;
-		}
+		$OpenHouses = $this->OpenHouseDates()->filter(array("OpenHouseDate:greaterThan" => strtotime("today")));
+		return $OpenHouses->count() ? $OpenHouses : false;
 	}
 	
 	
 	public function NextOpenHouse() {
 		if($this->OpenHouseDates()->count()) { 
-			$openHouse = $this->OpenHouseDates()->filter(array ("OpenHouseDate:GreaterThan" => strtotime('Today'), "OpenHouseDate:LessThan" => strtotime("1 week")))->First();
+			$openHouse = $this->OpenHouseDates()->filter(array ("OpenHouseDate:GreaterThan" => strtotime('yesterday'), "OpenHouseDate:LessThan" => strtotime("1 week")))->First();
 			if($openHouse) {
 				$date = new DateTime($openHouse->OpenHouseDate);
 				$startTime = new DateTime($openHouse->OpenHouseStart);
@@ -883,12 +841,9 @@ class Listing_Controller extends Page_Controller {
 	
 	}	
 	
-	
 	public function ListingRequestForm() {
 		return new ListingRequestForm($this, 'ListingRequestForm');
 	}
-	
-	
 	
 	function RelatedProperties() {
 	 	$method = $_GET["method"];

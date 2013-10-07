@@ -1,0 +1,16 @@
+---
+Name: rmsroutes
+After: framework/routes#coreroutes
+---
+Director:
+  rules:
+    # 'MLS': 'MLSController'
+    # 'MLSSearch': 'MLSSearchController'
+    'property/$Action/$ID/$Name' : 'RMSController'
+---
+Name: maintenance
+After: framework/routes#coreroutes
+---
+Director:
+  rules:
+    'maintenance/$Action/$ID/$Name': 'RMSMaintenance'

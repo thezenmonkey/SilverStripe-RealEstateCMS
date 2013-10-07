@@ -1,0 +1,21 @@
+{
+	"name": "thezenmonkey/rms",
+	"description": "Realestate Management System based on SilverStripe",
+	"require": {
+		"php": ">=5.3.2",
+		"silverstripe/cms": "3.1.0",
+		"silverstripe/framework": "3.1.0",
+		"silverstripe-themes/simple": "*",
+		"silverstripe/blog": "*",
+	    "unclecheese/betterbuttons": "dev-master",
+	    "simonwelsh/gridfieldrelationhandler": "dev-master",
+	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
+	    "arambalakjian/dataobjectaspage",
+	    "silverstripe/widgets": "dev-master",
+	    'colymba/gridfield-bulk-editing-tools': "dev-master"
+	},
+	"config": {
+		"process-timeout": 600	
+	},
+	"minimum-stability": "dev"
+}
