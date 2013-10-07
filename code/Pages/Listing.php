@@ -498,10 +498,11 @@ class Listing extends Page implements HiddenClass {
 				}
 				
 			} else {
+				$config = SiteConfig::current_site_config(); 
 				$this->URLSegment = $URLFilter->filter($this->MLS." ".($this->Town ? $this->Town : $this->City()->Title));
 				$this->MetaTitle = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
 				$this->Title = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
-				$this->MetaDescription = $this->Title." sold by the Dan Cooper Group";
+				$this->MetaDescription = $this->Title." sold by ".$config->BusinessName;
 			}	
 			
 		}
