@@ -606,36 +606,6 @@ class Listing extends Page implements HiddenClass {
 		
 	}
 	
-	/**
-	 *function to Populate a Feature Image set to metered out in various points in the template 
-	 * 
-	 * @return DataObject set into $featureImage
-	 */
-	
-	
-	protected $featureImageCache = null;
-	protected $featureImageFlag = "new";
-	
-	public function FeatureImages($operation, $number) {
-		if (empty($this->featureImageCache) && $this->featureImageFlag == "new"){
-			$this->featureImageCache = new ArrayList();
-			foreach($this->Images()->where("Feature = 1")->sort("SortOrder") as $img) $this->featureImageCache->push($img);
-			$this->featureImageFlag = "old";
-		} elseif (!$this->featureImageCache->count() && $this->featureImageFlag == "old"){
-			return false;
-		}
-		if($operation == "check" && $this->featureImageCache->count() >= $number) {
-			return true;
-		} elseif ($operation == "get") {
-			$requested = new ArrayList();
-			foreach($this->featureImageCache->limit($number) as $img) $requested->push($img);
-			foreach($requested as $request) $this->featureImageCache->remove($request);
-			return $requested;
-		} else {
-			return false;
-		}
-		
-	}
 	
 	//MOVE TO A UTILITY CLASS
 	//checks if Pased Item is with 15 miles of this DataObject
