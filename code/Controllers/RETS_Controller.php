@@ -6,6 +6,12 @@
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
 class RETS_Controller extends Controller {
+	
+	private static $allowed_actions = array(
+		'MLSUpdate' => 'ADMIN',
+		'ImageUpdate' => 'ADMIN'
+	);
+	
 	public function MLSUpdate() {
 		global $_RETS_SERVER_INFO;
 		$rets_login_url = $_RETS_SERVER_INFO['URL'];
@@ -72,20 +78,16 @@ class RETS_Controller extends Controller {
 		        echo "+ Property:{$class}<br>\n";
 		        
 		        $todaysDate = date("Y-m-d");
-		        /*
-if ($params['ID'] == "check") {
-			        $file_name = "../MLSBackup/clean_{$class}-{$todaysDate}.csv";
-		        } else {
-			        $file_name = "../MLSBackup/property_{$class}-{$previous_start_time}.csv";
-		        }
-*/
-		        
-		        //$fh = fopen($file_name, "w+");
 		
 		        $fields_order = array();
 		        
-		        $minVal = SiteConfig::current_site_config()->MinValue;
-		        $maxVal = SiteConfig::current_site_config()->MaxValue;
+		        $config = SiteConfig::current_site_config();
+		        if($config->MLSMax != 0) {
+			        $minVal = $config->MLSMin;
+					$maxVal = $config->MLSMax;
+		        } else {
+			        return "Please configure MLS Defaults in Site Settings";
+		        }
 		        
 		        if($params['ID'] == "all") {
 		        	
@@ -395,7 +397,7 @@ if ($params['ID'] == "check") {
 		
 		// Link MLS Listing to Existing Cities and Neighbourhoods
 		
-		$city = DataObject::get_one('City', "Title = '".$listingCity."'");
+		$city = DataObject::get_one('MunicipalityPage', "Title = '".$listingCity."'");
 		
 		if($city) {
 			$MLSListing->CityID = $city->ID;
@@ -411,7 +413,7 @@ if ($params['ID'] == "check") {
 			}
 			 
 			$filterList = (array_filter($townList));
-			$city = City::get()->where("Title = 'Rural Communities'")->First();
+			$city = MunicipalityPage::get()->where("Title = 'Rural Communities'")->First();
 			if($city){
 				in_array($listingCity, $filterList) ? $MLSListing->CityID = $city->ID : false;
 			}
@@ -594,12 +596,12 @@ if ($params['ID'] == "check") {
 				echo "<br>\n  +Photos Updated:<br>\n";
 			}
 			
-			if(!$MLSlisting->Pictures()->count()) {
+			if(!$MLSlisting->Images()->count()) {
 				echo "<br>\n  +No Images:<br>\n";
 			}
 			
 			
-			if(!$MLSlisting->Pictures()->count() || $MLSlisting->PixUpdateDate >= $previous_start_time) {
+			if(!$MLSlisting->Images()->count() || $MLSlisting->PixUpdateDate >= $previous_start_time) {
 				echo "  + MLS: ".$MLSlisting->MLS."<br>\n";
 				$photos = $rets->GetObject("Property", "Photo", $MLSlisting->MLS, "*", 0);
 				//print_r($photos);

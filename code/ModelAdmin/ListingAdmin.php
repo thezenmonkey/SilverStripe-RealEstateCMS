@@ -8,7 +8,8 @@
 class ListingAdmin extends DataObjectAsPageAdmin {
    
 	public static $managed_models = array(
-		'Listing' => array("title" => 'Listings')
+		'Listing' => array("title" => 'Listings'),
+		'MLSListing' => array("title" => 'MLS Listings')
 	);
 
 	static $url_segment = 'listings';

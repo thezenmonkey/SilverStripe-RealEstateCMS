@@ -26,7 +26,9 @@ class RealEstateSiteConfig extends DataExtension {
 		"DefaultProvince" => "Varchar",
 		"InterestRate" => "Decimal",
 		"LandTrasfer" => "Decimal",
-		"DownPayment" => "Int"
+		"DownPayment" => "Int",
+		'MLSMin' => 'Int',
+		'MLSMax' => 'Int'
 	);
 	
 	private static $has_one = array(
@@ -80,7 +82,9 @@ class RealEstateSiteConfig extends DataExtension {
 					->setDescription('Set for your Primary Selling Location to save time when adding listings')
 			);
 		}
-
+		
+		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMin", "Minimum Price for MLS download"));
+		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMax", "Maximum Price for MLS download"));
 	 	
 	}
 }

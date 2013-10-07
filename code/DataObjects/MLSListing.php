@@ -168,12 +168,12 @@ class MLSListing extends DataObjectAsPage {
 	
 	static $has_many = array(
 		'Rooms' => 'Room',
-		'Pictures' => 'Image'	
+		'Images' => 'Image'	
 	);
 	
 	static $has_one = array(
-		"City" => "City",
-		"Neighbourhood" => "Neighbourhood",
+		"City" => "MunicipalityPage",
+		"Neighbourhood" => "NeighbourhoodPage",
 	);
 	
 	/**
@@ -192,10 +192,10 @@ class MLSListing extends DataObjectAsPage {
 	 	$gridFieldConfig->addComponent(
 	 		new GridFieldDeleteAction()
 	 	);
-	 	$gridField = new GridField('Pictures', 'Linked images', $this->Pictures(), $gridFieldConfig);
+	 	$gridField = new GridField('Images', 'Linked images', $this->Images(), $gridFieldConfig);
 	 	
 	 	
-	 	$fields->addFieldToTab("Root.Pictures", $gridField);
+	 	$fields->addFieldToTab("Root.Images", $gridField);
 	 	
 	 	return $fields;
 	 	
@@ -264,8 +264,8 @@ class MLSListing extends DataObjectAsPage {
 				}
 			}
 			
-			if($this->Pictures()->count()){
-				$pictures = $this->Pictures();
+			if($this->Images()->count()){
+				$pictures = $this->Images();
 				foreach($pictures as $picture) {
 					$picture->delete();
 				}
@@ -273,6 +273,13 @@ class MLSListing extends DataObjectAsPage {
 			
 			parent::onBeforeDelete();
 		}
+		
+	function requireDefaultRecords() {
+	
+		Folder::find_or_make('Homes/MLS');
+	
+		parent::requireDefaultRecords();
+	}
 	
 	/**
 	 * Accessor methods
@@ -347,7 +354,7 @@ class MLSListing extends DataObjectAsPage {
 	}
 	
 	public function GetCover() {
-		return $this->Pictures()->First() ? $this->Pictures()->First() : false;
+		return $this->Images()->First() ? $this->Images()->First() : false;
 	}
 	
 	public function MonthlyPrice(){

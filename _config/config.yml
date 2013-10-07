@@ -5,3 +5,6 @@ ListingsPage:
 SiteConfig:
   extensions:
     - RealEstateSiteConfig
+Image:
+  extensions:
+    - RMSImageExtension
