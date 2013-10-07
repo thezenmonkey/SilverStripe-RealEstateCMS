@@ -69,11 +69,7 @@ class Listing extends Page implements HiddenClass {
 		'SVHeading' => 'Varchar(25)',
 		'SVPitch' => 'Varchar(25)',
 		'SVZoom' => 'Varchar(25)',
-		// REMOVE OPEN HOUSE DATA
-		//open house data
-		'OpenHouseDate' => 'Date',
-		'OpenHouseStart' => 'Time',
-		'OpenHouseEnd' => 'Time',
+		
 		//feature sheet data
 		'AdditionalMLS' => "Varchar(100)",
 		'KeyPoints' => "HTMLText",
