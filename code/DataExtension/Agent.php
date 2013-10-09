@@ -34,7 +34,6 @@ class Agent extends DataExtension {
 		 );
 		 
 		 static $has_many = array(
-		 	"Images" => "Image",
 		 	"Testimonials" => "Testimonial",
 		 );
 		 
