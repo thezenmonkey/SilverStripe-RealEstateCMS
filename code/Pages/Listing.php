@@ -110,6 +110,7 @@ class Listing extends Page implements HiddenClass {
 		'FeatureSheet' => 'File',
 		'Folder' => 'Folder',
 		'City' => 'MunicipalityPage',
+		'Agent' => 'Member'
 	);
 	
 	
