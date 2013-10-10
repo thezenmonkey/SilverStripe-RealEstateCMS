@@ -1,4 +1,4 @@
-{
+	{
 	"name": "thezenmonkey/rms",
 	"description": "Realestate Management System based on SilverStripe",
 	"require": {
@@ -10,7 +10,7 @@
 	    "unclecheese/betterbuttons": "dev-master",
 	    "simonwelsh/gridfieldrelationhandler": "dev-master",
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
-	    "arambalakjian/dataobjectaspage",
+	    "arambalakjian/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
 	    'colymba/gridfield-bulk-editing-tools': "dev-master"
 	},
