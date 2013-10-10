@@ -10,8 +10,8 @@
 	    "unclecheese/betterbuttons": "dev-master",
 	    "simonwelsh/gridfieldrelationhandler": "dev-master",
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
-	    "arambalakjian/dataobjectaspage": "dev-master",
-	    "silverstripe/widgets": "master",
+	    "arambalakjian/dataobjectaspage": "master",
+	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master"
 	},
 	"config": {
