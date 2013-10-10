@@ -20,7 +20,9 @@
 	        "type": "vcs",
 	        "url": "git@github.com:micschk/silverstripe-excludechildren.git",
 	        "type" : "vcs",
-		        "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git"
+		    "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git",
+		    "type" : "vcs",
+		    "url" : "git@github.com:icecaster/silverstripe-largeblog.git"
 	        }
 	    ],
 	"config": {
