@@ -12,7 +12,7 @@
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
 	    "arambalakjian/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
-	    'colymba/gridfield-bulk-editing-tools': "dev-master"
+	    "colymba/gridfield-bulk-editing-tools": "dev-master"
 	},
 	"config": {
 		"process-timeout": 600	
