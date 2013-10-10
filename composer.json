@@ -1,6 +1,16 @@
 	{
 	"name": "thezenmonkey/rms",
 	"description": "Realestate Management System based on SilverStripe",
+	"repositories": [
+	        {
+	        "type": "vcs",
+	        "url": "git@github.com:micschk/silverstripe-excludechildren.git",
+	        "type" : "vcs",
+		    "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git",
+		    "type" : "vcs",
+		    "url" : "git@github.com:icecaster/silverstripe-largeblog.git"
+	        }
+	    ],
 	"require": {
 		"php": ">=5.3.2",
 		"silverstripe/cms": "3.1.0",
@@ -15,16 +25,6 @@
 	    "heyday/silverstripe-menumanager": "dev-master",
 	    "icecaster/largeblog": "master"
 	},
-	"repositories": [
-	        {
-	        "type": "vcs",
-	        "url": "git@github.com:micschk/silverstripe-excludechildren.git",
-	        "type" : "vcs",
-		    "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git",
-		    "type" : "vcs",
-		    "url" : "git@github.com:icecaster/silverstripe-largeblog.git"
-	        }
-	    ],
 	"config": {
 		"process-timeout": 600	
 	},
