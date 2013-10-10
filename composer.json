@@ -4,16 +4,27 @@
 	"require": {
 		"php": ">=5.3.2",
 		"silverstripe/cms": "3.1.0",
-		"silverstripe/framework": "3.1.0",
-		"silverstripe-themes/simple": "*",
+		"silverstripe/framework": "3.1.0",	
 		"silverstripe/blog": "*",
 	    "unclecheese/betterbuttons": "dev-master",
 	    "simonwelsh/gridfieldrelationhandler": "dev-master",
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
 	    "silverstripe/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
-	    "colymba/gridfield-bulk-editing-tools": "master"
+	    "colymba/gridfield-bulk-editing-tools": "master",
+	    "heyday/silverstripe-menumanager": "dev-master",
+	    "icecaster/largeblog": "master",
 	},
+	"repositories": [
+	        {
+	        "type": "vcs",
+	        "url": "git@github.com:micschk/silverstripe-excludechildren.git"
+	        },
+	        {
+		        "type" : "vcs",
+		        "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git"
+	        }
+	    ],
 	"config": {
 		"process-timeout": 600	
 	},
