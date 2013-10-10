@@ -23,7 +23,7 @@
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
 	    "heyday/silverstripe-menumanager": "dev-master",
-	    "icecaster/largeblog": "master"
+	    "icecaster/largeblog": "dev-master"
 	},
 	"config": {
 		"process-timeout": 600	
