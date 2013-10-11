@@ -12,8 +12,7 @@
 	    "silverstripe/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
-	    "heyday/silverstripe-menumanager": "dev-master"//,
-	    //"icecaster/largeblog": "master"
+	    "heyday/silverstripe-menumanager": "dev-master"
 	},
 	"repositories": [
 	        {
