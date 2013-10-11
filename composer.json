@@ -15,16 +15,6 @@
 	    "heyday/silverstripe-menumanager": "dev-master",
 	    "thezenmonkey/gallery": "rms-version"
 	},
-	"repositories": [
-	        {
-	        "type": "vcs",
-	        "url": "git@github.com:micschk/silverstripe-excludechildren.git",
-	        "type" : "vcs",
-		    "url" : "git@github.com:thezenmonkey/silverstripe-gallery.git",
-		    "type" : "vcs",
-		    "url" : "git@github.com:icecaster/silverstripe-largeblog.git"
-	        }
-	    ],
 	"config": {
 		"process-timeout": 600	
 	},
