@@ -1,5 +1,5 @@
 	{
-	"name": "realestate",
+	"name": "thezenmonkey/realestate",
 	"description": "Realestate Management System based on SilverStripe",
 	"type": "silverstripe-module"
 	"require": {
