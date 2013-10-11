@@ -14,7 +14,7 @@
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
 	    "heyday/silverstripe-menumanager": "dev-master",
-	    "thezenmonkey/silverstripe-gallery": "1.5.0-dev"
+	    "thezenmonkey/gallery": "1.5.0-dev"
 	},
 	"config": {
 		"process-timeout": 600	
