@@ -1,7 +1,7 @@
 	{
 	"name": "thezenmonkey/realestate",
 	"description": "Realestate Management System based on SilverStripe",
-	"type": "silverstripe-module"
+	"type": "silverstripe-module",
 	"require": {
 		"php": ">=5.3.2",
 		"silverstripe/cms": "3.1.0",
