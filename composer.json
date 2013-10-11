@@ -13,7 +13,7 @@
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
 	    "heyday/silverstripe-menumanager": "dev-master",
-	    "frankmullenger/gallery": "master"
+	    "frankmullenger/gallery": "RMS-Version"
 	},
 	"repositories": [
 	        {
