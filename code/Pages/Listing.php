@@ -153,7 +153,7 @@ class Listing extends Page implements HiddenClass {
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	Requirements::javascript("RealEstate/javascript/cmsmap.js");
-	 	Requirements::css("RealEstate/css/realestatecms.css");
+	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
 	 	
 	 	$fields->removeFieldsFromTab('Root.Main', array(
