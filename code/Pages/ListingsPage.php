@@ -52,7 +52,7 @@ class ListingsPage extends Page
 		$fields = parent::getCMSFields();
 		$fields->removeByName('City');
 		
-		$cityField = new DropdownField('City', 'City', City::get()->map('ID', 'Title'));
+		$cityField = new DropdownField('City', 'City', MunicipalityPage::get()->map('ID', 'Title'));
         $cityField->setEmptyString('(Select one)');
 		
 		if($this->ParentID != 0) {
