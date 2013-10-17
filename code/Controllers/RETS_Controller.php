@@ -16,6 +16,7 @@ class RETS_Controller extends Controller {
 		global $_RETS_SERVER_INFO;
 		$rets_login_url = $_RETS_SERVER_INFO['URL'];
 		$params = Controller::getURLParams();
+		// Create Log
 		$log = new RMSProcess();
 		$log->Title = "MLS Update";
 		$log->Value = $params['ID'];
@@ -78,7 +79,7 @@ class RETS_Controller extends Controller {
 		$listingEdited = array();
 		
 		foreach ($property_classes as $class) {
-				$log->Events()->add(array("Title" => "Start Class Query", "Value" => $class));
+				$log->Events()->add(RMSLogging::createEvent("Start Class Query", $class));
 		        echo "+ Property:{$class}<br>\n";
 		        
 		        $todaysDate = date("Y-m-d");
@@ -99,33 +100,33 @@ class RETS_Controller extends Controller {
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(array("Title" => "Query", "Value" => $query));
-			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => 500));
+			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
+			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => 100)); //set to 100 for testing
 		        } elseif ($params['ID'] == "check") {
 			        $query = "(Status = A)";
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(array("Title" => "Query", "Value" => $query));
+			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
 			        $search = $rets->SearchQuery("Property", $class, $query);
 			        
 		        } else {
-			        $query = /*"(idx_dt = {$previous_start_time}+),*/"(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+			        $query = "(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(array("Title" => "Query", "Value" => $query));
+			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
 			        $search = $rets->SearchQuery("Property", $class, $query);
 		        }
 			    
 		
 		        if ($rets->NumRows($search) > 0) {
-						$log->Events()->add(array("Title" => "RETS returns", "Value" => $rets->NumRows($search)));
+						$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
 		                // print filename headers as first line
 		                $fields_order = $rets->SearchGetFields($search);
 		                //fputcsv($fh, $fields_order);
 						if ($params['ID'] != "check") {
-							$log->Events()->add(array("Title" => "Start MLS Listing Create"));
+							$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Create"));
 						}
 		                // process results
 		                while ($record = $rets->FetchRow($search)) {
@@ -142,9 +143,13 @@ class RETS_Controller extends Controller {
 		                        }
 		                        //fputcsv($fh, $this_record);
 		                }
+		                
+		                if ($params['ID'] != "check") {
+							$log->Events()->add(RMSLogging::createEvent("End MLS Listing Create"));
+						}
 		
 		        } else {
-			        $log->Events()->add(array("Title" => "RETS Fail", "Value" => $rets->Error()));
+			        $log->Events()->add(RMSLogging::createEvent("RETS Fail", $rets->Error()));
 			        print_r($rets->Error());
 		        }
 		
@@ -164,24 +169,25 @@ class RETS_Controller extends Controller {
 		
 		//Debug::show($listingEdited);
 		if ($params['ID'] == "check") {
-	        $log->Events()->add(array("Title" => "Start MLS Listing Cleanup"));
+	        $log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
 	        $this->MLSClean($clean);
 	        $event = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
-	        $event->Duration = time() - $event->Created;
+	        $event->Duration = time() - strtotime($event->Created) ;
 	        $event->write();
         } else {
-	        $log->Events()->add(array("Title" => "Start MLS Image Download"));
+	        $log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
 	        $this->MLSImageUpdate($listingEdited, $rets);
 	        $event = $log->Events()->filter(array("Title" => "Start MLS Image Download"))->First();
-	        $event->Duration = time() - $event->Created;
+	        $event->Duration = time() - strtotime($event->Created);
 	        $event->write();
         }
 		
 		
 		echo "+ Disconnecting<br>\n";
-		$log->Events()->add(array("Title" => "Disconenect from RETS server"));
+		$log->Events()->add(RMSLogging::createEvent("Disconenect from RETS server"));
 		$rets->Disconnect();
-		$log->Duration = time() - $log->Created;
+		$log->Events()->add(RMSLogging::createEvent("Complete"));
+		$log->Duration = time() - strtotime($log->Created);
 		$log->write();
 		
 	}
@@ -439,7 +445,7 @@ class RETS_Controller extends Controller {
 			}
 		}
 		if($MLSListing->CityID != 0){
-			$hood = Neighbourhood::get()->where("Name = '".$listingHood."'")->First();
+			$hood = NeighbourhoodPage::get()->where("Title = '".$listingHood."'")->First();
 			if($hood){
 				$MLSlisting->NeighbourhoodID = $hood->ID;
 			}
@@ -457,7 +463,7 @@ class RETS_Controller extends Controller {
 			}
 		}
 		
-		// write listing
+		// write listing (added destroy)
 		if($MLSListing->isVersioned) {
 			if($listState == "new") {
 				echo "+ Writing MLSListing <br>\n";
@@ -465,15 +471,18 @@ class RETS_Controller extends Controller {
 				
 				$MLSListing->write();
 				$mlsID = $MLSListing->ID;
+				$MLSListing->destroy();
 			} else {
 				echo "+ Writing Without Version MLSListing <br>\n";
 				$MLSListing->write();
 				$mlsID = $stageMLSListing->ID;
+				$$MLSListing->destroy();
 				}
 		} else {
 			echo "+ Writing MLSListing <br>\n";
 			$MLSListing->write();
 			$mlsID = $MLSListing->ID;
+			$MLSListing->destroy();
 		}
 		
 		
@@ -516,6 +525,7 @@ class RETS_Controller extends Controller {
 				$listingRoom->MLSListingID = $mlsID; 
 				echo "Writing ".$roomName."<br>\n";
 				$listingRoom->write();
+				$listingRoom->destroy();
 				
 			}
 			
@@ -547,6 +557,7 @@ class RETS_Controller extends Controller {
 					$image = Image::get()->filter("Filename", "assets/Homes/MLS/image-{$listing}-{$i}.jpg")->First();
 					$image->MLSListingID = $MLSlisting->ID;
 					$image->write();
+					$image->destroy();
 				} else {
 					echo " + assets/Homes/MLS/image-{$listing}-{$i}.jpg for Images NOT FOUND <br> \n";
 				}
@@ -644,6 +655,7 @@ class RETS_Controller extends Controller {
 						                $image->Cover = 1;
 					                }
 					                $image->write();
+					                $image->destroy();
 				                } elseif (Image::get()->filter("Filename", "assets/Homes/MLS/image-{$listing}-{$number}.jpg")->First()->MLSListingID != $MLSlisting->ID) {
 					                echo "+ getting image object <br>/n";
 					                $image = Image::get()->filter("Filename", "assets/Homes/MLS/image-{$listing}-{$number}.jpg")->First();
@@ -653,6 +665,7 @@ class RETS_Controller extends Controller {
 						                $image->Cover = 1;
 					                }
 					                $image->write();
+					                $image->destroy();
 				                }
 				        }
 				        else {
@@ -811,6 +824,7 @@ class RETS_Controller extends Controller {
 							                $image->Cover = 1;
 						                }
 						                $image->write();
+						                $image->destroy();
 					                }
 					                
 					        }
