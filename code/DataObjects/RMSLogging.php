@@ -52,11 +52,35 @@ class RMSProcess extends RMSLogging {
 	);
 	
 	private static $summary_fields = array(
-		"Title",
-		"Value",
-		"Created",
-		"Time"
+		"Title" => array(
+			"title" => 'Process'
+		),
+		"Value" => array(
+			"title" => 'Value'
+		),
+		"Created" => array(
+			"title" => 'Started'
+		),
+		"Time" => array(
+			"title" => 'Total Time'
+		)
 	);
+	
+	public function getCMSFields() {
+		$fields = parent::getCMSFIelds();
+		
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Title", "Process"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Value", "Details"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Created", "Started"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create('Time', "Total Time"));
+		$fields->removeByName("Duration");
+		
+		$gridField = new GridField('Events', 'Events', $this->Events(), GridFieldConfig_RecordViewer::create());
+		
+		$fields->addFieldToTab("Root.Main", $gridField);
+		
+		return $fields;
+	}
 	
 	public function onBeforeDelete() {
 		$events = $this->Events();
@@ -80,9 +104,29 @@ class RMSEvent extends RMSLogging {
 	);
 	
 	private static $summary_fields = array(
-		"Title",
-		"Value",
-		"Created",
-		"Time"
+		"Title" => array(
+			"title" => 'Event'
+		),
+		"Value" => array(
+			"title" => 'Details'
+		),
+		"Created" => array(
+			"title" => 'Started'
+		),
+		"Time" => array(
+			"title" => 'Total Time'
+		)
 	);
+	
+	public function getCMSFields() {
+		$fields = parent::getCMSFIelds();
+		
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Title", "Event"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Value", "Details"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create("Created", "Started"));
+		$fields->addFieldToTab("Root.Main", ReadonlyField::create('Time', "Total Time"));
+		$fields->removeByName("Duration");
+		
+		return $fields;
+	}
 }
