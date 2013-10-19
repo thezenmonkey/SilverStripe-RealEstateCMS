@@ -79,7 +79,7 @@ class RETS_Controller extends Controller {
 		$listingEdited = array();
 		
 		foreach ($property_classes as $class) {
-				$log->Events()->add(RMSLogging::createEvent("Start Class Query", $class));
+				$log->Events()->add(RMSLogging::createEvent("Start". $class. "Query"));
 		        echo "+ Property:{$class}<br>\n";
 		        
 		        $todaysDate = date("Y-m-d");
@@ -170,9 +170,10 @@ class RETS_Controller extends Controller {
 		//Debug::show($listingEdited);
 		if ($params['ID'] == "check") {
 	        $log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
-	        $this->MLSClean($clean);
-	        $event = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
-	        $event->Duration = time() - strtotime($event->Created) ;
+	        $cleanCount = $this->MLSClean($clean);
+	        $startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
+	        $event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
+	        $event->Duration = time() - strtotime($startEvent	->Created) ;
 	        $event->write();
         } else {
 	        $log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
@@ -192,17 +193,35 @@ class RETS_Controller extends Controller {
 		
 	}
 	
+	
+	// Clean MLS listings and return number delteted.
 	public function MLSClean($clean) {
-		$mlsListings = MLSListing::get();
+		// Use RAW sql query since its faster than returning DataObjects
+		$sqlQuery = new SQLQuery();
+		$sqlQuery->setFrom('MLSListing');
+		$sqlQuery->setSelect('ID');
+		$sqlQuery->addSelect('MLS');
 		
-		foreach ($mlsListings as $MLSlisting) {
-			if (in_array($MLSlisting->MLS, $clean)) {
-				echo "+ Available<br>\n";
-			} else {
-				echo "+ ".$MLSlisting->MLS." Unavailble<br>\n";
-				$MLSlisting->delete();
+		// Get the raw SQL (optional)
+		$rawSQL = $sqlQuery->sql();
+		// Execute and return a Query object
+		$result = $sqlQuery->execute();
+		$i = 0;
+		// Iterate over results
+		foreach($result as $row) {
+			// Check if record exists in the clean list
+			if(!in_array($row['MLS'],$clean)) {
+				// if not get the DataObject
+				$listing = MLSListing::get()->byID($row['ID']);
+				if ($listing) {
+					// Delete it and increase counter
+					$listing->delete();
+					$i++; 
+				} 
 			}
 		}
+		
+		return $i;
 	}
 	
 	
