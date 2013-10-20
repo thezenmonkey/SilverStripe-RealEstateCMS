@@ -533,13 +533,24 @@ class Listing extends Page implements HiddenClass {
 	
 	function onBeforeDelete() {
 	
-		if($this->FolderID != 0 && !$this->isPublished()){
+		if($this->FolderID != 0){
 			$folder = Folder::get()->byID($this->FolderID);
 			
 			if($folder) {
 				$folder->delete();	
 			}
 		}
+		
+		$rooms = $this->Rooms();
+		if($rooms->count()) {
+			foreach ($rooms as $room) $room->delete();
+		}
+		
+		$openHouses = $this->OpenHouseDates();
+		if($openHouses->count()){
+			foreach ($openHouses as $openHouse) $openHouse->delete();
+		}
+		
 		parent::onBeforeDelete();
 	}
 
@@ -801,6 +812,17 @@ class Listing extends Page implements HiddenClass {
 
 class Listing_Controller extends Page_Controller {
 
+	public function init() {
+		parent::init();
+		
+		if($this->Status == "Unavailable") {
+			Session::set("UnavailListing", array("Price" => $this->Price, "Lat" => $this->Lat, "Lon" => $this->Lon, "City" => $this->City, "Town" => $this->Town));
+			$redirect = SiteTree::get_by_link("listing-unavailable");
+			$this->redirect($redirect->Link(), 301);
+			return;
+		}
+	}
+	
 	public function index() { 
 		if ($this->Status == "Sold") { 
 			return $this->renderWith(array('SoldListing','Page')); 
