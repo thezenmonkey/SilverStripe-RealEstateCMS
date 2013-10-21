@@ -215,7 +215,7 @@ class RETS_Controller extends Controller {
 		while ($counter > 0) {
 			set_time_limit ( 30 );
 			$row = $result->nextRecord();
-			if(!in_array($row['MLS'],$mlsnums)) {
+			if(!in_array($row['MLS'],$clean)) {
 				echo $row['MLS']." Not in list<br>\n";
 				$listing = MLSListing::get()->byID($row['ID']);
 				if ($listing) {
@@ -230,7 +230,7 @@ class RETS_Controller extends Controller {
 			$counter--;
 			$i++;
 		}
-		return $i;
+		return $i;	
 	}
 	
 	
