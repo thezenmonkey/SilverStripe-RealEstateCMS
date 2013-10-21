@@ -196,31 +196,40 @@ class RETS_Controller extends Controller {
 	
 	// Clean MLS listings and return number delteted.
 	public function MLSClean($clean) {
-		// Use RAW sql query since its faster than returning DataObjects
 		$sqlQuery = new SQLQuery();
 		$sqlQuery->setFrom('MLSListing');
 		$sqlQuery->setSelect('ID');
 		$sqlQuery->addSelect('MLS');
-		
+		$sqlQuery->addSelect('PropType');
+		$sqlQuery->addWhere("PropType = 'Condo'");
+		 
 		// Get the raw SQL (optional)
 		$rawSQL = $sqlQuery->sql();
+		
 		// Execute and return a Query object
 		$result = $sqlQuery->execute();
+		$deleteList = array();
+		
+		$counter = $result->numRecords();
 		$i = 0;
-		// Iterate over results
-		foreach($result as $row) {
-			// Check if record exists in the clean list
-			if(!in_array($row['MLS'],$clean)) {
-				// if not get the DataObject
+		while ($counter > 0) {
+			set_time_limit ( 30 );
+			$row = $result->nextRecord();
+			if(!in_array($row['MLS'],$mlsnums)) {
+				echo $row['MLS']." Not in list<br>\n";
 				$listing = MLSListing::get()->byID($row['ID']);
 				if ($listing) {
-					// Delete it and increase counter
+					echo "listing found<br>\n";
 					$listing->delete();
-					$i++; 
+					echo "listing deleted<br>\n";  
 				} 
+			
+			} else {
+				echo $row['MLS']." IS in list<br>\n";
 			}
+			$counter--;
+			$i++;
 		}
-		
 		return $i;
 	}
 	
