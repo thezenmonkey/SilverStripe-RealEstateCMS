@@ -443,10 +443,9 @@ class RETS_Controller extends Controller {
 			!empty($MLSRecord['Rm12_out']) ? array_push($roomArray, array($MLSRecord['Rm12_out'] => array ("length" => $MLSRecord['Rm12_len'], "width" => $MLSRecord['Rm12_wth'], "desc" => $MLSRecord['Rm12_dc1_out']." ".$MLSRecord['Rm12_dc2_out']." ".$MLSRecord['Rm12_dc3_out'], "level" => $MLSRecord['Level12']))) : ''; //room 12
 		}
 		
-		$listingCity = $MLSListing->Municipality;
-		$listingHood = $MLSListing->Community;
+		$listingCity = Convert::raw2sql($MLSListing->Municipality);
+		$listingHood = Convert::raw2sql($MLSListing->Community);
 		$listingStatus = $MLSListing->MLSStatus;
-		
 		// END TREB
 		
 		// Link MLS Listing to Existing Cities and Neighbourhoods
