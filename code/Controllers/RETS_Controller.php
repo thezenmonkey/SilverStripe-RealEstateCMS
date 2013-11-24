@@ -173,7 +173,7 @@ class RETS_Controller extends Controller {
 	        $cleanCount = $this->MLSClean($clean);
 	        $startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
 	        $event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
-	        $event->Duration = time() - strtotime($startEvent	->Created) ;
+	        $event->Duration = time() - strtotime($startEvent->Created) ;
 	        $event->write();
         } else {
 	        $log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
