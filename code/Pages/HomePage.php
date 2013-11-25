@@ -3,37 +3,12 @@
 class HomePage extends Page implements HiddenClass {
 
 	static $db = array(
-		//"LeaderCopy" => "HTMLText",
-		//'SqueezePageCTA' => "Text"
+		
 	);
 
 	static $has_many = array(
-		//"FeatureBlocks" => "FeatureBlock",
+		
 	);
-	
-	
-	/*
-public function getCMSFields() {
-		$fields = parent::getCMSFields();
-		
-		$fields->insertBefore(new TextField("LeaderCopy", "Leader"), "Content");
-		$fields->insertBefore(new TextField("SqueezePageCTA", "Squeeze Page CTA"), "Content");
-		
-		$featureManagerConfig = GridFieldConfig_RelationEditor::create();
-		$featureManagerConfig->addComponents(
-			new GridFieldSortableRows('Order')
-		);
-		$featureManager = new GridField(
-	 		"FeatureBlock", "FeatureBlocks",
-	 		$this->FeatureBlocks(), 
-	 		$featureManagerConfig
-	 	);
-	 	
-	 	$fields->insertAfter($featureManager, "Content");
-		
-		return $fields;
-	}
-*/
 
 	/**
 	 * Change the home page to HomePage type

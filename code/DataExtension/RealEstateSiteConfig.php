@@ -28,12 +28,14 @@ class RealEstateSiteConfig extends DataExtension {
 		"LandTrasfer" => "Decimal",
 		"DownPayment" => "Int",
 		'MLSMin' => 'Int',
-		'MLSMax' => 'Int'
+		'MLSMax' => 'Int',
+		"ContactFormFrom" => "Varchar"
 	);
 	
 	private static $has_one = array(
 		"Picture" => "Image",
-		"DefaultCity" => "MunicipalityPage"
+		"DefaultCity" => "MunicipalityPage",
+		"DefaultThankYou" => "ThankYouPage"
 	);
 	
 	
@@ -85,6 +87,15 @@ class RealEstateSiteConfig extends DataExtension {
 		
 		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMin", "Minimum Price for MLS download"));
 		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMax", "Maximum Price for MLS download"));
+		
+		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("ContactFormFrom", "Contact Form From")->setDescription('Depending on server and email configuration this may need to be set to prevent form submission going to spam'));
+		$thankYouPages = ThankYouPage::get();
+		if($thankYouPages->count()) {
+			$fields->addFieldToTab(
+				"Root.DefaultSettings", 
+				DropdownField::create("DefaultThankYou", "Default Thank You Page:", $thankYouPages->map('ID', 'Title'))
+			);
+		}
 	 	
 	}
 }
