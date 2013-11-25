@@ -15,7 +15,6 @@
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
 	    "heyday/silverstripe-menumanager": "dev-master",
-	    //"thezenmonkey/gallery": "dev-RMS-Version",
 	    "micschk/silverstripe-excludechildren": "dev-master",
 	    "icecaster/largeblog": "dev-master"
 	},
