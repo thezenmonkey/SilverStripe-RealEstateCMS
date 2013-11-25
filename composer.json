@@ -14,9 +14,7 @@
 	    "silverstripe/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
-	    "heyday/silverstripe-menumanager": "dev-master",
-	    "micschk/silverstripe-excludechildren": "dev-master",
-	    "icecaster/largeblog": "dev-master"
+	    "heyday/silverstripe-menumanager": "dev-master"
 	},
 	"config": {
 		"process-timeout": 600	
