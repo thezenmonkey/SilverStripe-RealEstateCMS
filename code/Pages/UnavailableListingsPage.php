@@ -1,6 +1,6 @@
 <?php
 
-class UnavailableListingsPage extends Page {
+class UnavailableListingsPage extends Page implements HiddenClass {
 	
 	/**
 	 * Static vars
@@ -49,6 +49,7 @@ class UnavailableListingsPage extends Page {
 				$listingPage->Title = "Listing Unavailable";
 				$listingPage->URLSegment = "listing-unavailable";
 				$listingPage->Sort = 1;
+				$listingPage->ShowInMenus = 0;
 				$listingPage->write();
 				$listingPage->publish('Stage', 'Live');
 				$listingPage->flushCache();

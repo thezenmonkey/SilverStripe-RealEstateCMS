@@ -7,7 +7,7 @@
  */
 
 
-class MLSListingsPage extends DataObjectAsPageHolder 
+class MLSListingsPage extends DataObjectAsPageHolder implements HiddenClass
 {
 	/**
 	 * Static vars

@@ -4,9 +4,9 @@ class SimpleContactForm extends Form {
 	
 	public function __construct($controller, $name) {
         $fields = new FieldList(
-            TextField::create("Name")->setAttribute('required', true),
-            EmailField::create("Email")->setAttribute('type', 'email')->setAttribute('required', true),
-            TextareaField::create("Company", "Message")->setAttribute('required', true)->setAttribute('autocomplete', 'no'),
+            TextField::create("Name"),
+            EmailField::create("Email")->setAttribute('type', 'email'),
+            TextareaField::create("Company", "Message")->setAttribute('autocomplete', 'no'),
             TextareaField::create("EmailMessage", "Company")->addExtraClass("honeypot")->setAttribute('autocomplete', 'no')
         );
         
@@ -14,7 +14,7 @@ class SimpleContactForm extends Form {
 	        $fields->insertAfter( HiddenField::create("TimeLog", '', time()), 'EmailMessage' );
         }
         
-        $actions = new FieldList(FormAction::create("doSubmit")->setTitle("Submit"));
+        $actions = new FieldList(FormAction::create("doSubmit")->setTitle("Submit")->addExtraClass('button')->setUseButtonTag(true));
          
         parent::__construct($controller, $name, $fields, $actions);
     }
@@ -30,11 +30,10 @@ class SimpleContactForm extends Form {
 	    //basic spam protection
 	    if( $data['EmailMessage']  ) {
 			$form->addErrorMessage('Message', 'We may have mistakenly marked your message as spam, please contact us via phone or email', 'warning');
-			//Controller::curr()->redirectBack();
+			Controller::curr()->redirectBack();
 		}
 		Debug::show($data);
 		$siteConfig = SiteConfig::current_site_config();
-		Debug::show($siteConfig);
 		if($siteConfig->ContactFormFrom){
 			$From = $siteConfig->ContactFormFrom;
 		} else {
@@ -45,8 +44,7 @@ class SimpleContactForm extends Form {
 		$Subject = "Website Contact From ".$data['Name'];
 		$Body = $data['Company']."<br>\n ".$data['Email'];
 		$email = new Email($From, $To, $Subject,$Body, null, null, "rick@designplusawesome.com");
-		//$email->send();
-		//print_r($email->debug());
+		$email->send();
 		$redirect = false;
 		if($siteConfig->DefaultThankYouID != 0 && !$data['CustomThankYou']) {
 			$redirect = ThankYouPage::get()->byID($siteConfig->DefaultThankYouID);
@@ -55,10 +53,10 @@ class SimpleContactForm extends Form {
 		}
 		
 		if($redirect){
-			//Controller::curr()->redirect($redirect->URLSegment);
+			Controller::curr()->redirect($redirect->URLSegment);
 		} else {
-			$form->addErrorMessage('Name', 'Thank you, someone from our office will contact you shortly', 'success');
-			//Controller::curr()->redirectBack();
+			$form->addErrorMessage('Message', 'Thank you, someone from our office will contact you shortly', 'success');
+			Controller::curr()->redirectBack();
 		}
 		
 		

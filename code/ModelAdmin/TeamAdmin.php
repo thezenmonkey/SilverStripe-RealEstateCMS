@@ -10,11 +10,10 @@ class TeamAdmin extends ModelAdmin {
 	private static $managed_models = array(
 		'Member',
 		'Testimonial',
-		'Partner'
 	);
 
 	static $url_segment = 'team';
 	static $menu_title = 'Team';
-	static $menu_icon = 'mysite/images/our_team.png';
+	static $menu_icon = 'realestate/images/our_team.png';
 	
 }

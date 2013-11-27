@@ -27,6 +27,7 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	    
 	   // LeftAndMain::require_javascript("RealEstate/javascript/cmsmap.js");
 	    Requirements::javascript("realestate/javascript/jquery.ui.map.full.min.js");
+	    Requirements::css("realestate/css/realestatecms.css");
 	}
 	
 	public function getList() {
