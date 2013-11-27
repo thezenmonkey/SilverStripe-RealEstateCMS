@@ -8,3 +8,7 @@ SiteConfig:
 File:
   extensions:
     - RMSImageExtension
+    - RMSFileExtension
+Page:
+  extensions:
+    - 'Gallery_PageExtension'

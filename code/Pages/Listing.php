@@ -164,6 +164,13 @@ class Listing extends Page implements HiddenClass {
 			'Street'
 	 	));
 	 	
+		$fields->removeFieldsFromTab('Root.Gallery', array(
+			'Images'
+	 	));
+	 	$fields->removeByName("Gallery");
+
+	 	
+	 	
 	 	//DataLists for Dropdown Maps
 	 	$cities = MunicipalityPage::get();
 	 	
@@ -294,9 +301,11 @@ class Listing extends Page implements HiddenClass {
 		if ($this->ID != 0){
 			
 			
-			$galleryField = GalleryUploadField::create('Images', 'Images')
+			/*
+$galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedImages())
 				->setFolderName("/Homes/".$this->Folder()->Name)
 				->addExtraClass('stacked');
+*/
 			
 			$featuresheetField = new UploadField('FeatureSheet');
 			$featuresheetField->setFolderName("/Homes/".$this->Folder()->Name);
@@ -312,7 +321,7 @@ class Listing extends Page implements HiddenClass {
 			 				->setFolderName("/Homes/".$this->Folder()->Name)
 		 			)->addExtraClass('leftcol'),
 		 			CompositeField::create( 
-		 				$galleryField
+		 				//$galleryField
 		 			)->addExtraClass('rightcol')
 		 		)->addExtraClass('clearfix'),
 		 		
@@ -554,7 +563,16 @@ class Listing extends Page implements HiddenClass {
 		parent::onBeforeDelete();
 	}
 
-
+	public function providePermissions() { 
+		return array( 
+			'LISTING_VIEW' => 'Read listing', 
+			'LISTING_EDIT' => 'Edit listing', 
+			'LISTING_DELETE' => 'Delete listing', 
+			'LISTING_CREATE' => 'Create listings', 
+			'LISTING_VIEWEXT' => 'Read listing extended info', 
+		); 
+	} 
+	
 	/**
 	 * Accessor methods
 	 * ----------------------------------*/
@@ -900,4 +918,14 @@ class Listing_Controller extends Page_Controller {
 	 	
 	 }
 	
+}
+
+class Listing_Images extends DataObject {
+
+    static $db = array (
+        'PageID' => 'Int',
+        'ImageID' => 'Int',
+        'Caption' => 'Text',
+        'SortOrder' => 'Int'
+    );
 }
