@@ -301,11 +301,9 @@ class Listing extends Page implements HiddenClass {
 		if ($this->ID != 0){
 			
 			
-			/*
-$galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedImages())
+			$galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedImages())
 				->setFolderName("/Homes/".$this->Folder()->Name)
 				->addExtraClass('stacked');
-*/
 			
 			$featuresheetField = new UploadField('FeatureSheet');
 			$featuresheetField->setFolderName("/Homes/".$this->Folder()->Name);
@@ -321,7 +319,7 @@ $galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedIma
 			 				->setFolderName("/Homes/".$this->Folder()->Name)
 		 			)->addExtraClass('leftcol'),
 		 			CompositeField::create( 
-		 				//$galleryField
+		 				$galleryField
 		 			)->addExtraClass('rightcol')
 		 		)->addExtraClass('clearfix'),
 		 		
@@ -581,22 +579,6 @@ $galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedIma
 		return $this->City()->Title;
 	}
 	
-	
-	
-	public function Images() {
-		return $this->getManyManyComponents(
-			'Images',
-			'',
-			"\"Page_Images\".\"SortOrder\" ASC"
-		);
-	}
-	
-	public function ImagesCaptions() {
-		$captions = Page_Images::get()
-			->where("\"PageID\" = '{$this->ID}'")
-			->map('ImageID', 'Caption')
-			->toArray();
-	}
 
 	 
 

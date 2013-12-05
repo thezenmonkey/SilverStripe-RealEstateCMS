@@ -9,6 +9,6 @@ File:
   extensions:
     - RMSImageExtension
     - RMSFileExtension
-Page:
+Listing:
   extensions:
     - 'Gallery_PageExtension'
