@@ -88,3 +88,24 @@ div#Form_ItemEditForm_CityID_chzn, div#Form_ItemEditForm_Type_chzn {
 div.relationhandler {
 	margin-bottom: 16px;
 }
+
+
+.galleryupload .ss-uploadfield-item-uploador {
+	clear: left;
+}
+
+.galleryupload .ss-uploadfield-dropzone {
+	width: 100%;
+}
+
+.galleryupload  .ss-uploadfield-item-info {
+	
+}
+
+.galleryupload .field.stacked label {
+	float: left
+}
+
+.galleryupload .ss-uploadfield-addfile .ss-uploadfield-fromcomputer {
+	clear: none;
+}
