@@ -9,15 +9,21 @@ class ListingAdmin extends DataObjectAsPageAdmin {
    
 	public static $managed_models = array(
 		'Listing' => array("title" => 'Listings'),
-		'MLSListing' => array("title" => 'MLS Listings')
+		'MLSListing' => array("title" => 'MLS Listings'),
+		'UnavailableListing' => array("title" => 'Unavailble Listings')
 	);
 
 	static $url_segment = 'listings';
 	static $menu_title = 'Listings';
 	static $menu_icon = 'realestate/images/home.png';
 	
+	public function onBeforeInit() {
+		Versioned::reading_stage('Stage');
+	}
+	
 	public function init() 
 	{
+	    Versioned::reading_stage('Stage');
 	    parent::init();
 		
 	    //map interface JS
@@ -33,9 +39,12 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	public function getList() {
 		$list = parent::getList();
 		// Always limit by model class, in case you're managing multiple
+		
 		if($this->modelClass == 'Listing') {
+			//$list = Versioned::get_by_stage('Listing', 'Stage');
 			$list->sort(array('Status' => 'ASC','Street' => 'ASC'));
 		}
 		return $list;
 	}
+	
 }
