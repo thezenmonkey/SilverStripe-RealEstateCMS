@@ -47,7 +47,13 @@ class Community extends Page {
 	 * Accessor methods
 	 * ----------------------------------*/
 	
-	
+	public function getName() {
+		if($this->ClassName = "NeighbourhoodPage") {
+			return $this->Municipality()->Title." - ".$this->Title;
+		} else {
+			return $this->Title;
+		}
+	} 
 	
 	/**
 	 * Controller actions	
