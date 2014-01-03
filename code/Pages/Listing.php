@@ -507,7 +507,10 @@ class Listing extends Page implements HiddenClass {
 				$this->MetaTitle = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
 				$this->Title = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
 				$this->MetaDescription = $this->Title." sold by ".$config->BusinessName;
-			}	
+			}
+			
+			if($this->Status == "Available" || $this->Status == "Sold" && $this->ClassName != "Listing") $this->ClassName = "Listing";
+			if($this->Status == "Unavailable" && $this->ClassName != "UnavailableListing") $this->ClassName = "UnavailableListing";
 			
 		}
 		
@@ -648,8 +651,14 @@ class Listing extends Page implements HiddenClass {
 	public function MonthlyPrice(){
 		$siteConfig = SiteConfig::current_site_config();
 		
+		if($siteConfig->DownPayment != 0) {
+			$down = $siteConfig->DownPayment/100;
+		} else {
+			$down = 0.2;
+		}
+		
 		if($this->Price){
-			$borrowed = $this->Price - ceil($this->Price*($siteConfig->DownPayment/100));
+			$borrowed = $this->Price - ceil($this->Price * $down);
 			$int = ($siteConfig->InterestRate/100)/12;
 			$term = 360;
 			setlocale(LC_MONETARY, 'en_CA');
@@ -661,7 +670,29 @@ class Listing extends Page implements HiddenClass {
 	
 	public function DownPayment() {
 		$siteConfig = SiteConfig::current_site_config();
-		return ceil($this->Price*($siteConfig->DownPayment/100));
+		if($siteConfig->DownPayment != 0) {
+			$down = $siteConfig->DownPayment/100;
+		} else {
+			$down = 0.2;
+		}
+		
+		return ceil($this->Price * $down);
+	}
+	
+	public function InterestRate() {
+		$siteConfig = SiteConfig::current_site_config();
+		
+		return $siteConfig->InterestRate;
+	}
+	
+	public function DefaultDown() {
+		$siteConfig = SiteConfig::current_site_config();
+		
+		if($siteConfig->DownPayment != 0) {
+			return $siteConfig->DownPayment;
+		} else {
+			return 20;
+		}
 	}
 	
 	
@@ -825,11 +856,10 @@ class Listing_Controller extends Page_Controller {
 	
 	public function index() { 
 		if ($this->Status == "Sold") { 
-			return $this->renderWith(array('SoldListing','Page')); 
+			return $this->renderWith(array('SoldListing', 'Listing', 'Page')); 
 		} 
 			else return $this->renderWith(array('Listing','Page')); 
-	
-	}	
+	}		
 	
 	public function ListingRequestForm() {
 		return new ListingRequestForm($this, 'ListingRequestForm');
