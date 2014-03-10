@@ -32,7 +32,7 @@ class Listing extends Page implements HiddenClass {
 	
 	private static $db = array(
 		//basic sale data
-		'Status' => "Enum('Available,Sold,Unavailable')",
+		'Status' => "Enum('Available,Sold,Closed,Unavailable')",
 		'Feature' => 'Boolean',
 		'IsNew' => 'Boolean',
 		'MLS' => "Varchar(100)",
@@ -152,7 +152,7 @@ class Listing extends Page implements HiddenClass {
 	 	
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
-	 	Requirements::javascript("RealEstate/javascript/cmsmap.js");
+	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
 	 	
@@ -510,7 +510,7 @@ class Listing extends Page implements HiddenClass {
 			}
 			
 			if($this->Status == "Available" || $this->Status == "Sold" && $this->ClassName != "Listing") $this->ClassName = "Listing";
-			if($this->Status == "Unavailable" && $this->ClassName != "UnavailableListing") $this->ClassName = "UnavailableListing";
+			if( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing") $this->ClassName = "UnavailableListing";
 			
 		}
 		
@@ -595,7 +595,13 @@ class Listing extends Page implements HiddenClass {
 	/**
 	 * Template accessors
 	 * ----------------------------------*/
-
+	 
+	public function CoverImage() {
+		 $images = $this->OrderedImages();
+		 
+		 return $images->count() ? $images->First() : false;
+	 }
+	 
 	/**
 	 *Return Money Formated Values for Price 
 	 *
@@ -700,24 +706,32 @@ class Listing extends Page implements HiddenClass {
 		return new ListingRequestForm($this, 'RequestForm');
 	}
 	 
-	function RelatedProperties() {
+	function RelatedProperties($count = 4) {
 	 	$method = $_GET["method"];
 	 	$value = $_GET["value"];
+	 	$siteConfig = SiteConfig::current_site_config();
+	 	
+	 	if($siteConfig->RelatedPriceRange != 0) {
+		 	$varience = $siteConfig->RelatedPriceRange;
+	 	} else {
+		 	$varience = 50000;
+	 	}
+	 	
 	 	if($method == "price") {
 	 		$items = Listing::get()->filter(array(
 	 			"CityID" => $this->CityID,
 	 			"Status" => "Available",
-	 			"Price:LessThan" => $value + 50000,
-	 			"Price:GreaterThan" => $value - 50000
-	 		))->limit(5);
+	 			"Price:LessThan" => $value + $varience,
+	 			"Price:GreaterThan" => $value - $varience
+	 		))->limit($count);
 	 	} elseif ($method == "neighbourhood") {
 	 		if($this->NeighbourhoodID != 0) {
-		 		$items = Listing::get()->filter(array("NeighbourhoodID" => $this->NeighbourhoodID, "Status:not" => 'Unavailable'))->limit(5);
+		 		$items = Listing::get()->filter(array("NeighbourhoodID" => $this->NeighbourhoodID, "Status" => 'Available'))->limit($count);
 	 		} else {
-		 		$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status:not" => 'Unavailable'))->limit(5);
+		 		$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status" => 'Available'))->limit($count);
 	 		}
 	 	} else {
-		 	$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status:not" => 'Unavailable'))->limit(5);
+		 	$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status" => 'Available'))->limit($count);
 	 	}
 	 	if($items) {
 	 		return $items;
@@ -865,18 +879,26 @@ class Listing_Controller extends Page_Controller {
 		return new ListingRequestForm($this, 'ListingRequestForm');
 	}
 	
-	function RelatedProperties() {
+	function RelatedPropertiesAll($count = 4) {
 	 	$method = $_GET["method"];
 	 	$value = $_GET["value"];
+	 	$siteConfig = SiteConfig::current_site_config();
+	 	
+	 	if($siteConfig->RelatedPriceRange != 0) {
+		 	$varience = $siteConfig->RelatedPriceRange;
+	 	} else {
+		 	$varience = 50000;
+	 	}
+	 	
 	 	$set = new ArrayList();
 	 	if($method == "price") {
 	 		$filter = array(
-	 			"Price:LessThan" => $value + 50000,
-	 			"Price:GreaterThan" => $value - 50000,
+	 			"Price:LessThan" => $value + $varience,
+	 			"Price:GreaterThan" => $value - $varience,
 	 			"CityID" => $this->CityID,
 	 			"Status" => "Available"
 	 		);
-	 		foreach(Listing::get()->filter($filter)->exclude('ID', $this->ID)->limit(4) as $obj) $set->push($obj);
+	 		foreach(Listing::get()->filter($filter)->exclude('ID', $this->ID)->limit($count) as $obj) $set->push($obj);
 	 	} elseif ($method == "neighbourhood") {
 	 		$filter = array(
 	 			"CityID" => $this->CityID,
@@ -887,18 +909,18 @@ class Listing_Controller extends Page_Controller {
 		 		foreach($items as $item) {
 			 		$this->getDistance($item->Lat, $item->Lon) <= 15 ? $set->push($item) : false;
 		 		}
-		 		$set->count() && $set->count() > 4 ? $set = $set->limit(4) : false;
+		 		$set->count() && $set->count() > $count ? $set = $set->limit($count) : false;
 	 		}
 	 		
 	 	}
 	 	
 	 	
-	 	if(!$set->count() || $set->count() < 4) {
-		 	$limit = 4 - $set->count();
+	 	if(!$set->count() || $set->count() < $count) {
+		 	$limit = $count - $set->count();
 		 	if($method == "price") {
 		 		$filter = array(
-		 			"ListPrice:LessThan" => $value + 50000,
-		 			"ListPrice:GreaterThan" => $value - 50000,
+		 			"ListPrice:LessThan" => $value + $varience,
+		 			"ListPrice:GreaterThan" => $value - $varience,
 		 			"CityID" => $this->CityID
 		 		);
 		 		foreach(MLSListing::get()->filter($filter)->limit($limit) as $obj) $set->push($obj);
