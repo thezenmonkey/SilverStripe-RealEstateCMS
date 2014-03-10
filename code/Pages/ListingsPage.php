@@ -25,7 +25,7 @@ class ListingsPage extends Page
 	private static $allowed_children = array("Listing", "ListingsPage");
 	
 
-
+	
 	/**
 	 * Object vars
 	 * ----------------------------------*/
@@ -42,7 +42,65 @@ class ListingsPage extends Page
 	 * Data model
 	 * ----------------------------------*/
 
-
+	/**
+	 * Get All Avaibalbe Listings (Status = Available)
+	 *
+	 * @return DataList
+	 */
+	
+	public function AvailableListings() {
+		 $listings = Listing::get()->filter(array("Status" => "Available"))->sort(array("Feature" => "DESC", "ID" => "DESC"));
+		 
+		 return $listings->count() ? $listings : false;
+	}
+	
+	
+	/**
+	 * Get All Listings Marked as Sold but Not Closed
+	 *
+	 * @return DatList
+	 */
+	public function SoldListings() {
+		$listings = Listing::get()->filter(array("Status" => "Sold"))->sort(array("ID" => "DESC"));
+		
+		return $listings->count() ? $listings : false;
+	}
+	
+	
+	/**
+	 * Get All Listings Marked as Closed
+	 *
+	 * @return DatList
+	 */
+	public function ClosedListings() {
+		$listings = Listing::get()->filter(array("Status" => "Closed"))->sort(array("ID" => "DESC"));
+		
+		return $listings->count() ? $listings : false;
+	}
+	
+	
+	/**
+	 * Get All Listings Available AND Sold
+	 *
+	 * @return DataList
+	 */
+	public function AllListings() {
+		$listings = Listing::get()->filter(array("Status:Not" => "Unavailable"))->sort(array("Status" => "ASC", "ID" => "DESC"));
+		
+		return $listings->count() ? $listings : false;
+	}
+	
+	
+	/**
+	 * Retun ALLlistings in the system regardless of Status
+	 *
+	 * @return DataList
+	 */
+	public function MasterListings() {
+		$listings = Listing::get();
+		
+		return $listings->count() ? $listings : false;
+	}
 
 	/**
 	 * Common methods
