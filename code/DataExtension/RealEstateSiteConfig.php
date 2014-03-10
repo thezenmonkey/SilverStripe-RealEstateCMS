@@ -25,8 +25,8 @@ class RealEstateSiteConfig extends DataExtension {
 		//Real Estate Defaults
 		"DefaultProvince" => "Varchar",
 		"InterestRate" => "Decimal",
-		"LandTrasfer" => "Decimal",
 		"DownPayment" => "Int",
+		"RelatedPriceRange" => "Int",
 		'MLSMin' => 'Int',
 		'MLSMax' => 'Int',
 		"ContactFormFrom" => "Varchar"
@@ -72,7 +72,6 @@ class RealEstateSiteConfig extends DataExtension {
 	 	//Defaults
 	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("InterestRate", "Interest Rate")->setDescription('Used to calculate Monthly Payments'));
 	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("DownPayment", "Down Payment")->setDescription('Used to calculate Monthly Payments'));
-	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("LandTrasfer", "Land Transfer Tax Rate")->setDescription('Only needed if Have a Land Tranfer Tax Caluclator'));
 	 	$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("DefaultProvince", "Default Province for All Listings"));
 	 	
 	 	$cityList = MunicipalityPage::get();
@@ -84,7 +83,7 @@ class RealEstateSiteConfig extends DataExtension {
 					->setDescription('Set for your Primary Selling Location to save time when adding listings')
 			);
 		}
-		
+		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("RelatedPriceRange", "Related Properties Price Range +/-")->setDescription('Set to customize price variance for related properties'));
 		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMin", "Minimum Price for MLS download"));
 		$fields->addFieldToTab("Root.DefaultSettings", Textfield::create("MLSMax", "Maximum Price for MLS download"));
 		
