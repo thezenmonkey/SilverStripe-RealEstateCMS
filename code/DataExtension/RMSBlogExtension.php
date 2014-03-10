@@ -6,7 +6,7 @@
  */
 
 /**
- * Extend BlogEntry to inlude community
+ * Extend BlogEntry to include community
  */
 
 class RMSBlogExtension extends DataExtension {
@@ -27,46 +27,50 @@ class RMSBlogExtension extends DataExtension {
 	private static $many_many = array(
 		"Communities" => "Community"
 	);
-	
+
 	public function updateCMSFields(FieldList $fields) {
 		
-		$fields->insertAfter(TreeMultiselectField::create("Communities","Communities","MunicipalityPage","ID","Title"), "Tags");
+		$fields->insertAfter(TreeMultiselectField::create("Communities","Communities","Community","ID","Title")->setSourceObject("Community"), "Tags");
+		//$blogTree = BlogHolder::get()->First();
+		//$fields->addFieldToTab("Root.Main", ReadonlyField::create("ParentID", "Parent"));
+		
 		
 	}
-
 	
-	/**
-	 * Get Listings based on tags
-	 *
-	 * @param boolean - check City Titles
-	 * @param booleran - check neighbourhood titles
-	 * @param int - number to return
-	 * @return DataList() 
-	 * 
-	 * @todo Actually Test it
-	 */
-	
-	/*
-public function GetListings($getCity, $getHood, $limit = null) {
-		$tags = preg_split(" *, *", trim($this->owner->Tags));
+	public function Listings($count = null) {
+		$communities = $this->owner->Communities()->filter(array("ClassName"=>"NeighbourhoodPage"));
+		if($communities->count()) {
+			$listings = new ArrayList();
+			foreach($communities as $community) {
+				
+				$localList = $community->Listings()->filter(array("Status" => "Available"));
+				
+				if($localList->count()){
+					foreach($localList as $listing) {
+						$listings->push($listing);
+					}
+					
+				}
+			}
+			return $listings->count() ? $listings : false;
+			
+		} else {
+			return false;
+		}
 		
-		$filter = array();
-		
-		$getCity ? $filter = array_merge(array('City.Title' => $tags, 'Town' => $tags)) : false;
-		$getHood ? $filter = array_merge(array('Neigbourhood.Title' => $tags)) : false;
-		
-		$filter2 = array();
-		
-		$listings = Listing::get()->filterAny($filter)->exclude('Status', 'Unavailable');
-		
-		return $listings->count() ? $listing->limit($limit) : false;
 		
 	}
-*/
-}
+	public function onBeforeWrite() {
+		if ( !$this->owner->ParentID || $this->owner->ParentID == 0 ) {
+			$blogTree = BlogHolder::get()->First();
+			$this->setParent($blogTree->ID);
+		}
+		
+		parent::onBeforeWrite();
+	}}
 
 /**
- * Extend Community to inlude BlogEntry
+ * Extend Community to include BlogEntry
  */
 
 class BlogCommunityExtension extends DataExtension {
@@ -86,10 +90,4 @@ class BlogCommunityExtension extends DataExtension {
 	private static $belongs_many_many = array(
 		"BlogEntries" => "BlogEntry"
 	);
-	
-	/*
-public function updateCMSFields(FieldList $fields) {
-		
-	}
-*/
 }
