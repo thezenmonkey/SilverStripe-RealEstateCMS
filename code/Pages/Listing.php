@@ -583,6 +583,10 @@ class Listing extends Page implements HiddenClass {
 		return $this->City()->Title;
 	}
 	
+	public function getProvince() {
+		$siteConfig = SiteConfig::current_site_config();
+		return $siteConfig->DefaultProvince;
+	}
 
 	 
 
