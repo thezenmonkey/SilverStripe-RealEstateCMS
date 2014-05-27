@@ -49,26 +49,25 @@ class Agent extends DataExtension {
 		 * Common methods
 		 * ----------------------------------*/
 	public function updateCMSFields(FieldList $fields) {
-		$fields = parent::getCMSFIelds();
 		
 		$fields->removeFieldFromTab ( "Root", "Pictures");
 		$fields->removeFieldFromTab ( "Root", "Folder");
+		$fields->removeFieldFromTab ( "Root", "SortOrder");
 		
-		$fields->insertBefore(TextField::create("JobTitle", "Job Title"), "FirstName");
-		$fields->insertAfter(UploadField::create("Headshot")->setFolderName("/assets/Agents/".$this->Folder()->Name));
-		$fields->insertBefore(TextField::create("PhoneNumber"), "Headshot");
-		$fields->insertBefore(TextField::create("Cell"), "PhoneNumber");
+		$fields->insertAfter(TextField::create("JobTitle", "Job Title"), "Surname");
+		$fields->insertAfter(TextField::create("PhoneNumber"), "Password");
+		$fields->insertAfter(TextField::create("Cell"), "PhoneNumber");
 		$fields->insertAfter(HTMLEditorField::create("Bio"), "Cell");
-		//$fields->insertAfter(GalleryUploadField::create('Pictures')->setFolderName("/assets/Agents/".$this->Folder()->Name), "Content");
 		
-		return $fields;
-		
+		if($this->owner->FolderID != 0) {
+			$fields->insertAfter(UploadField::create("Headshot")->setFolderName("/Uploads/Agents/".$this->owner->Folder()->Name), "Password");
+		}
 	}
 	
 	function onBeforeWrite() {
 		
 			
-		if ($this->FolderID == 0) {
+		if ($this->owner->FolderID == 0) {
 		
 		
 			/**
@@ -76,9 +75,9 @@ class Agent extends DataExtension {
 			* Finds and attached the FolderID after its created
 			*/
 			$filter = URLSegmentFilter::create();
-			$folderName = $filter->filter($this->Title);
+			$folderName = $filter->filter($this->owner->Title);
 			$folderExists = Folder::find_or_make('Uploads/Agents/'.$folderName.'/');
-			$this->FolderID = $folderExists->ID;
+			$this->owner->FolderID = $folderExists->ID;
 		}
 		
 		parent::onBeforeWrite();
