@@ -31,10 +31,19 @@ class RMSBlogExtension extends DataExtension {
 	public function updateCMSFields(FieldList $fields) {
 		
 		$fields->insertAfter(TreeMultiselectField::create("Communities","Communities","Community","ID","Title")->setSourceObject("Community"), "Tags");
-		//$blogTree = BlogHolder::get()->First();
-		//$fields->addFieldToTab("Root.Main", ReadonlyField::create("ParentID", "Parent"));
 		
-		
+		if ($this->owner->ParentID == 0) {
+			$blogHolder = BlogHolder::get();
+			
+			if($blogHolder->count() > 1) {
+				$fields->insertAfter(DropdownField::create("ParentID","Blog", $blogHolder->map("ID","Title"), $this->owner->ParentID), "MenuTitle");
+			} else {
+				$fields->insertAfter(HiddenField::create("ParentID","Blog ID", $blogHolder->First()->ID), "MenuTitle");
+			}
+			
+		} else {
+			$fields->insertAfter(HiddenField::create("ParentID","Blog ID", $this->owner->ParentID), "MenuTitle");
+		}
 	}
 	
 	public function Listings($count = null) {
@@ -60,14 +69,17 @@ class RMSBlogExtension extends DataExtension {
 		
 		
 	}
-	public function onBeforeWrite() {
+	/*
+public function onBeforeWrite() {
 		if ( !$this->owner->ParentID || $this->owner->ParentID == 0 ) {
 			$blogTree = BlogHolder::get()->First();
-			$this->setParent($blogTree->ID);
+			$this->owner->setParent($blogTree);
 		}
 		
 		parent::onBeforeWrite();
-	}}
+	}
+*/
+}
 
 /**
  * Extend Community to include BlogEntry
