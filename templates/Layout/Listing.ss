@@ -4,6 +4,12 @@
 		<h1>$Title</h1>
 		<div class="content">$Content</div>
 		<div>
+			$FindNear(43.7549940,-79.7293227, 5).Count <br>
+			<ol>
+				<% loop $FindNear(43.7549940,-79.7293227, 5) %>
+					<li>$Title, $Distance km</li>
+				<% end_loop %>
+			</ol>
 			<h2>$ClassName</h2>
 			<p>
 			<% if $Status %>Status: $Status<br><% end_if %>
@@ -164,6 +170,7 @@
 			no next open house date<br>
 			<% end_if %>
 		</div>
+		
 	</article>
 		$Form
 		$PageComments
