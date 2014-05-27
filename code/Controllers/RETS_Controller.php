@@ -12,10 +12,16 @@ class RETS_Controller extends Controller {
 		'ImageUpdate' => 'ADMIN'
 	);
 	
+	private static $url_handlers = array(
+        'MLSUpdate/$Action/$ID/$Name' => 'MLSUpdate'
+    );
+	
 	public function MLSUpdate() {
 		global $_RETS_SERVER_INFO;
 		$rets_login_url = $_RETS_SERVER_INFO['URL'];
 		$params = Controller::getURLParams();
+		//rets config;
+		$bridge = $this->config()->RETSBridge;
 		// Create Log
 		$log = new RMSProcess();
 		$log->Title = "MLS Update";
@@ -101,7 +107,7 @@ class RETS_Controller extends Controller {
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
-			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => 100)); //set to 100 for testing
+			        $search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing
 		        } elseif ($params['ID'] == "check") {
 			        $query = "(Status = A)";
 		
@@ -137,7 +143,7 @@ class RETS_Controller extends Controller {
 		                                
 		                        }
 		                        if ($params['ID'] != "check") {
-		                        	array_push($listingEdited, $this->createMLSListing($record, $class, "TREB"));
+		                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
 		                        } else {
 			                        array_push($clean, $record['Ml_num']);
 		                        }
@@ -278,7 +284,11 @@ class RETS_Controller extends Controller {
 		}
 		
 		
-		// TREB CONVERSION FUNCTIONS
+		$MLSlisting = $board::Convert($MLSListing, $class, $MLSRecord);
+		$roomArray = $board::generateRoomArray($MLSRecord);
+		
+		/*
+// TREB CONVERSION FUNCTIONS
 		if($class == "ResidentialProperty" && $board == "TREB") {
 			$MLSListing->Acreage = $MLSRecord['Acres'];
 			$MLSListing->AddlMonthlyFees = $MLSRecord['Addl_mo_fee'];
@@ -442,6 +452,7 @@ class RETS_Controller extends Controller {
 			
 			!empty($MLSRecord['Rm12_out']) ? array_push($roomArray, array($MLSRecord['Rm12_out'] => array ("length" => $MLSRecord['Rm12_len'], "width" => $MLSRecord['Rm12_wth'], "desc" => $MLSRecord['Rm12_dc1_out']." ".$MLSRecord['Rm12_dc2_out']." ".$MLSRecord['Rm12_dc3_out'], "level" => $MLSRecord['Level12']))) : ''; //room 12
 		}
+*/
 		
 		$listingCity = Convert::raw2sql($MLSListing->Municipality);
 		$listingHood = Convert::raw2sql($MLSListing->Community);
@@ -515,7 +526,10 @@ class RETS_Controller extends Controller {
 		
 		//create Room() for new listings
 		if($listState == "new") {
-			foreach($roomArray as $room) {
+			$this->createRooms($roomArray, $mlsID);
+			
+			/*
+foreach($roomArray as $room) {
 				//$listingRoom = new Room();
 				
 				$roomName = key($room);
@@ -555,6 +569,7 @@ class RETS_Controller extends Controller {
 				$listingRoom->destroy();
 				
 			}
+*/
 			
 		}
 		
@@ -573,6 +588,60 @@ class RETS_Controller extends Controller {
 	}
 	
 	
+	/**
+	 * Create Rooms for New Listing
+	 *
+	 * @param $roomArray List of Rooms from the MLS Object
+	 * @param $mlsID ID of MLSListing Object
+	 */
+	
+	public function createRooms($roomArray = null, $mlsID = null) {
+		 if($roomArray) {
+			 foreach($roomArray as $room) {
+				//$listingRoom = new Room();
+				
+				$roomName = key($room);
+				
+				if (!Room::get()->filter(
+					array(
+						"MLSListingID" => $mlsID, 
+						"Name" => $roomName, 
+						"Level" => $room[$roomName]['level'],
+						"Width" => $room[$roomName]['width'],
+						"Length" => $room[$roomName]['length']
+					)
+				)->count()) {
+					$listingRoom = new Room();
+				} else {
+					$listingRoom = Room::get()->filter(
+						array(
+							"MLSListingID" => $mlsID, 
+							"Name" => $roomName, 
+							"Level" => $room[$roomName]['level'],
+							"Width" => $room[$roomName]['width'],
+							"Length" => $room[$roomName]['length']
+						)
+					)->First();
+				}
+				
+				
+				$listingRoom->Name = $roomName;
+				$listingRoom->Level = $room[$roomName]['level'];
+				$listingRoom->Width = $room[$roomName]['width'];
+				$listingRoom->Length = $room[$roomName]['length'];
+				$listingRoom->Note = $room[$roomName]['desc'];
+				
+				$listingRoom->MLSListingID = $mlsID; 
+				echo "Writing ".$roomName."<br>\n";
+				$listingRoom->write();
+				$listingRoom->destroy();
+				
+			}
+			 
+			 
+		 }	
+		
+	} 
 
 	
 	public function ImageUpdate() {
