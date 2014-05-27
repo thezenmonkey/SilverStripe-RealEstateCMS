@@ -152,6 +152,7 @@ class Listing extends Page implements HiddenClass {
 	 	
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
+	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
 	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
@@ -602,12 +603,6 @@ class Listing extends Page implements HiddenClass {
 		 return $images->count() ? $images->First() : false;
 	 }
 	 
-	/**
-	 *Return Money Formated Values for Price 
-	 *
-	 * @return Formated Price
-	 */
-	 
 	public function AbsoluteURLEncoded() {
 		return urlencode($this->BaseHref().$this->URLSegment);
 	}
@@ -630,6 +625,25 @@ class Listing extends Page implements HiddenClass {
 		return ( 3959 * acos( cos( deg2rad($lat) ) * cos( deg2rad( $this->Lat ) ) * cos( deg2rad($this->Lon ) - deg2rad($lon) ) + sin( deg2rad($lat) ) * sin( deg2rad( $this->Lat ) ) ) );
 	}
 	
+	
+	/**
+	 * Fin Nearby Listing
+	 *
+	 * @param $lat GPS Latitude
+	 * @param $lon GPS Longitude
+	 * @param $distance distandce in Km 
+	 * @return ArrayList
+	 */
+	public function FindNear($lat, $lon, $distance = '25', $limit = null) {
+		
+		if($lat && $lon) {
+			return RMSController::FindNear($lat, $lon, $distance, $limit);
+		} else {
+			return false;
+		}
+		
+	}
+	
 	/**
 	 * Return Money Formated Values  
 	 *
@@ -638,7 +652,7 @@ class Listing extends Page implements HiddenClass {
 	
 	public function FormattedPrice() {
 		setlocale(LC_MONETARY, 'en_CA');
-		if($this->Price){
+		if($this->Price && $this->Price != 0){
 			return money_format('%.0n', $this->Price);
 		} else {
 			return false;
@@ -646,7 +660,7 @@ class Listing extends Page implements HiddenClass {
 	}
 	
 	public function FormattedTaxes() {
-		if($this->Taxes){
+		if($this->Taxes && $this->Price != 0){
 			setlocale(LC_MONETARY, 'en_CA');
 			return money_format('%.0n', $this->Taxes);
 		} else {
@@ -663,7 +677,7 @@ class Listing extends Page implements HiddenClass {
 			$down = 0.2;
 		}
 		
-		if($this->Price){
+		if(($this->Price && $this->Price != 0) && $siteConfig->InterestRate != 0){
 			$borrowed = $this->Price - ceil($this->Price * $down);
 			$int = ($siteConfig->InterestRate/100)/12;
 			$term = 360;
@@ -681,8 +695,11 @@ class Listing extends Page implements HiddenClass {
 		} else {
 			$down = 0.2;
 		}
-		
-		return ceil($this->Price * $down);
+		if($this->Taxes && $this->Price != 0){ 
+			return ceil($this->Price * $down);
+		} else {
+			return false;
+		}
 	}
 	
 	public function InterestRate() {
