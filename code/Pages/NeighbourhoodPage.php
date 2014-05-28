@@ -31,7 +31,7 @@ class NeighbourhoodPage extends Community {
 	
 
 	private static $has_one = array (
-		
+		"MunicipalityPage" => "MunicipalityPage"
 	);
 	
 	private static $has_many = array (

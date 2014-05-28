@@ -39,7 +39,8 @@ class MunicipalityPage extends Community {
 	);
 	
 	private static $has_many = array (
-		"Listings" => "Listing"
+		"Listings" => "Listing",
+		"MLSListings" => "MLSListings"
 	);
 	
 	/**

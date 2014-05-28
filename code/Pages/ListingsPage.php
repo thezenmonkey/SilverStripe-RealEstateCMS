@@ -85,7 +85,7 @@ class ListingsPage extends Page
 	 * @return DataList
 	 */
 	public function AllListings() {
-		$listings = Listing::get()->filter(array("Status:Not" => "Unavailable"))->sort(array("Status" => "ASC", "ID" => "DESC"));
+		$listings = Listing::get()->filter(array("Status" => array("Available","Sold")))->sort(array("Status" => "ASC", "ID" => "DESC"));
 		
 		return $listings->count() ? $listings : false;
 	}
@@ -98,6 +98,36 @@ class ListingsPage extends Page
 	 */
 	public function MasterListings() {
 		$listings = Listing::get();
+		
+		return $listings->count() ? $listings : false;
+	}
+	
+	/**
+	 * Retun MLS Listings 
+	 *
+	 * @param $count number of listings to return
+	 * @return DataList
+	 */
+	public function AllMLSListings($count = 10) {
+		
+		$listings = MLSListing::get()->limit($count);
+		
+		return $listings->count() ? $listings : false;
+	}
+	
+	/**
+	 * Retun Only Featured MLS Listings 
+	 *
+	 * @param $count number of listings to return
+	 * @return DataList
+	 */
+	public function FeaturedMLSListings($count = null) {
+		
+		if($count) {
+			$listings = MLSListing::get()->filter(array("IsFeatured" => 1))->limit($count);
+		} else {
+			$listings = MLSListing::get()->filter(array("IsFeatured" => 1));
+		}
 		
 		return $listings->count() ? $listings : false;
 	}
@@ -192,25 +222,36 @@ class ListingsPage extends Page
 	 }
 
 	 public function GetCities() {
-		 return City::get()->sort("ID");
+		 return MunicipalityPage::get()->sort("ID");
 	 }
 	 
 	 public function ThisCity($City) {
-		 return City::get()->byID($City);
+		 return MunicipalityPage::get()->byID($City);
 	 }
 	 
-	 public function TownTest() {
+	 public function TownListings() {
 		$sqlQuery = new SQLQuery();
 		$sqlQuery->setFrom('Listing');
+		$sqlQuery->setWhere('CityID = 0');
 		$sqlQuery->selectField('Town');
 		$sqlQuery->setDistinct(true);
 		$result = $sqlQuery->execute();
+		
 		$townList = array();
 		foreach($result as $row){
 			array_push($townList, $row['Town']);
 		}
 		 
 		$filterList = (array_filter($townList));
+		
+		if($filterList) {
+			
+			$listings = Listing::get()->filter(array("Town" => $filter));
+			return $listings->count() ? $listings : false;
+			
+		} else {
+			return false;
+		}
 	 }
 	 
 	 public function OverAMillion() {
