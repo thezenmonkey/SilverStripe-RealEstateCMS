@@ -579,8 +579,8 @@ class Listing extends Page implements HiddenClass {
 	 * Accessor methods
 	 * ----------------------------------*/
 	
-	public function getCity(){
-		return $this->City()->Title;
+	public function getTown(){
+		return $this->City() ? $this->City()->Title : $this->Town;
 	}
 	
 	public function getProvince() {
@@ -728,8 +728,10 @@ class Listing extends Page implements HiddenClass {
 	}
 	 
 	function RelatedProperties($count = 4) {
-	 	$method = $_GET["method"];
+	 	/*
+$method = $_GET["method"];
 	 	$value = $_GET["value"];
+*/
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
