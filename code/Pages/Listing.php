@@ -510,9 +510,11 @@ class Listing extends Page implements HiddenClass {
 				$this->MetaDescription = $this->Title." sold by ".$config->BusinessName;
 			}
 			
-			if($this->Status == "Available" || $this->Status == "Sold" && $this->ClassName != "Listing") $this->ClassName = "Listing";
-			if( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing") $this->ClassName = "UnavailableListing";
-			
+			if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName != "Listing") {
+				$this->ClassName = "Listing";
+			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
+				$this->ClassName = "UnavailableListing";
+			}
 		}
 		
 		
