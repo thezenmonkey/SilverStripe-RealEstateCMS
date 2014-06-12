@@ -52,16 +52,29 @@ class HomePage_Controller extends Page_Controller
 	}
 	
 	
-	public function LatestPost(){
-		return $post = BlogEntry::get()->sort("Date", "ASC")->First() ? $post : false;
+	public function LatestPosts($count = 6){
+		$post = BlogEntry::get()->sort("Date", "DESC");
+		
+		if(is_null($count)) {
+			return $post->count() ? $post : false;
+		}  else {
+			return $post->count() ? $post->limit($count) : false; 
+		}
 	}
 	
 	public function GetTestimonial() {
 		return $testimonial = Testimonial::get()->sort("Created", "DESC")->First() ? $testimonial : false;
 	}
 	
-	public function FeaturedHomes() {
-		return $listings = Listing::get()->filter(array("Sold" => 0, "Unavailable" => 0, "Feature" => 1))->count() ? $listings : false;
+	public function FeaturedHomes($count = null) {
+		
+		$listings = Listing::get()->filter(array("Status" => "Available", "Feature" => 1));
+		
+		if(is_null($count)) {
+			return $listings->count() ? $listings : false;
+		}  else {
+			return $listings->count() ? $listings->limit($count) : false; 
+		}
 	}
 	
 	
