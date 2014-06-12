@@ -17,7 +17,7 @@ class ListingUtils {
 		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
 			$sqlQuery = new SQLQuery();
 			$sqlQuery->setFrom($class);
-			$sqlQuery->setSelect('ID');
+			//$sqlQuery->setSelect('ID');
 			if($class == "Listing") {
 				$sqlQuery->addWhere("Status = 'Available'");
 			}
@@ -30,6 +30,35 @@ class ListingUtils {
 			return false;
 		}
 		
+	}
+	
+	public static function BoundsQuery($class, $bounds) {
+		$db = DB::getConn();
+		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
+			$sqlQuery = new SQLQuery();
+			$sqlQuery->setFrom($class);
+			$sqlQuery->setSelect('ID,Lat,Lon');
+			if($class == "Listing") {
+				$sqlQuery->addWhere("Status = 'Available'");
+			}
+			$south = $bounds['south'];
+			$north = $bounds['north'];
+			$west = $bounds['east'];
+			$east = $bounds['west'];
+			
+			$sqlQuery->addWhere("Lat > $south AND Lat < $north AND Lon < $west AND Lon > $east");
+			
+			$results = $sqlQuery->execute();
+			$itemList = new ArrayList();
+			foreach($results as $row){
+				$itemList->push($row);
+				//array_push($itemList, $row);
+			}
+			return $itemList;
+			
+		} else {
+			return false;
+		}
 	}
 	
 }
