@@ -3,7 +3,8 @@
 class RMSController extends ContentController {
 	
 	private static $allowed_actions = array (
-		'FindNear'
+		'FindNear',
+		'AjaxMapSearch'
 	);
 	
 	/**
@@ -50,6 +51,22 @@ class RMSController extends ContentController {
 			return false; //no $lat and $lon
 		}
 		
+	}
+	
+	public function AjaxMapSearch($request) {
+		
+		$north = Convert::raw2sql($_GET["north"]);
+		$south = Convert::raw2sql($_GET["south"]);
+		$east = Convert::raw2sql($_GET["east"]);
+		$west = Convert::raw2sql($_GET["west"]);
+		
+		if ($north && $south && $east && $west) {
+			$set = new ArrayList();
+			
+			
+		} else {
+			return false;
+		}
 	}
 	
 	
