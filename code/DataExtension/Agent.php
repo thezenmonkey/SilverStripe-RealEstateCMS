@@ -43,6 +43,8 @@ class Agent extends DataExtension {
 		 	"Headshot" => "Image",
 		 	'Folder' => 'Folder',
 		 );
+		 
+		 static $default_sort = array('SortOrder');
 	
 	
 		/**
@@ -62,6 +64,7 @@ class Agent extends DataExtension {
 		if($this->owner->FolderID != 0) {
 			$fields->insertAfter(UploadField::create("Headshot")->setFolderName("/Uploads/Agents/".$this->owner->Folder()->Name), "Password");
 		}
+		$fields->addFieldToTab("Root.Main", TextField::create("SortOrder"));
 	}
 	
 	function onBeforeWrite() {
@@ -83,6 +86,19 @@ class Agent extends DataExtension {
 		parent::onBeforeWrite();
 	}
 	
+	function requireDefaultRecords() {
+		if(!Group::get()->filter(array("Code" => "team-member"))->First()){
+			$group = new Group();
+			$group->Title = "Team Member";
+			$group->Code = "team-member";
+			$group->Sort = 2;
+			$group->write();
+			$group->flushCache();
+			DB::alteration_message('Team Member Group created', 'created');
+		}
+	
+		parent::requireDefaultRecords();
+	}
 	
 		/**
 		 * Accessor methods
