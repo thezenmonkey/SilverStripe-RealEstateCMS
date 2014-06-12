@@ -20,7 +20,7 @@ class MLSListing extends DataObjectAsPage {
 	static $summary_fields = array(
 		"Title",
 		"Municipality",
-		"ListPrice",
+		"Price",
 		"IsFeatured",
 		"MLS"
 	);
@@ -45,7 +45,7 @@ class MLSListing extends DataObjectAsPage {
 	
 	static $db = array(
 		'IsFeatured' => "Boolean",
-		'PropType' => "Enum('House,Condo,Commercial')",
+		'ListingType' => "Enum('House,Condo,Commercial')",
 		'Shares' => "Varchar(6)",
 		'Acreage' => "Varchar(8)",
 		'AddlMonthlyFees' => "Varchar(10)",
@@ -98,7 +98,7 @@ class MLSListing extends DataObjectAsPage {
 		'LeaseTerm' => "Varchar()",
 		'LegalDescription' => "Varchar(40)",
 		'ListBrokerage' => "Varchar(60)",
-		'ListPrice' => "Int",
+		'Price' => "Int",
 		'Locker' => "Varchar(17)",
 		'LockerNum' => "Varchar(17)",
 		'LotDepth' => "Decimal(9,2)",
@@ -184,7 +184,7 @@ class MLSListing extends DataObjectAsPage {
 	public function getCMSFields() {
 	 	$fields = parent::getCMSFields();
 	 	
-	 	$fields->insertBefore ( new HeaderField('AddressHead','Address Info',2), 'PropType' );
+	 	$fields->insertBefore ( new HeaderField('AddressHead','Address Info',2), 'ListingType' );
 	 	
 	 	$fields->makeReadOnly();
 	 	
@@ -318,11 +318,7 @@ class MLSListing extends DataObjectAsPage {
 	
 	public function FormattedPrice() {
 		setlocale(LC_MONETARY, 'en_CA');
-		return $this->ListPrice != 0 ? money_format('%.0n', $this->ListPrice) : false;
-	}
-	
-	public function Price() {
-		return $this->ListPrice;
+		return $this->Price != 0 ? money_format('%.0n', $this->Price) : false;
 	}
 	
 	public function PriceClass(){
@@ -349,17 +345,13 @@ class MLSListing extends DataObjectAsPage {
 		return $this->Taxes != 0 ? money_format('%.0n', $this->Taxes) : false;
 	}
 	
-	public function Type() {
-		return $this->PropType;
-	}
-	
 	public function GetCover() {
 		return $this->Images()->First() ? $this->Images()->First() : false;
 	}
 	
 	public function MonthlyPrice(){
-		if($this->ListPrice){
-			$borrowed = $this->ListPrice - ceil($this->ListPrice*0.2);
+		if($this->Price){
+			$borrowed = $this->Price - ceil($this->Price*0.2);
 			$int = 0.0289/12;
 			$term = 360;
 			setlocale(LC_MONETARY, 'en_CA');
@@ -414,8 +406,8 @@ class MLSListing extends DataObjectAsPage {
 		 	$limit = 4 - $set->count();
 		 	if($method == "price") {
 		 		$filter = array(
-		 			"ListPrice:LessThan" => $value + 50000,
-		 			"ListPrice:GreaterThan" => $value - 50000,
+		 			"Price:LessThan" => $value + 50000,
+		 			"Price:GreaterThan" => $value - 50000,
 		 			"Municipality" => $this->Municipality
 		 		);
 		 		foreach(MLSListing::get()->filter($filter)->limit($limit) as $obj) $set->push($obj);

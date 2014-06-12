@@ -61,7 +61,7 @@ class TREBConvert {
 			$MLSListing->CentralVac = $MLSRecord['Central_vac'];
 			$MLSListing->LeaseTerm = $MLSRecord['Lease_term'];
 			$MLSListing->Maintenance = $MLSRecord['Maint'];
-			$MLSListing->PropType = 'Condo';
+			$MLSListing->ListingType = 'Condo';
 			
 			
 		}
@@ -103,7 +103,7 @@ class TREBConvert {
 		$MLSListing->LaundryLevel = $MLSRecord['Laundry_lev'];
 		
 		$MLSListing->ListBrokerage = $MLSRecord['Rltr'];
-		$MLSListing->ListPrice = $MLSRecord['Lp_dol'];
+		$MLSListing->Price = $MLSRecord['Lp_dol'];
 		$MLSListing->MapNum = $MLSRecord['Mmap_page'];
 		$MLSListing->MapColumnnNum = $MLSRecord['Mmap_col'];
 		$MLSListing->MapRow = $MLSRecord['Mmap_row'];

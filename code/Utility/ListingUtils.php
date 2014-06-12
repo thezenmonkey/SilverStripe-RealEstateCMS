@@ -37,7 +37,7 @@ class ListingUtils {
 		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
 			$sqlQuery = new SQLQuery();
 			$sqlQuery->setFrom($class);
-			$sqlQuery->setSelect('ID,Lat,Lon');
+			$sqlQuery->setSelect('ID,Lat,Lon,ListingType,Price');
 			if($class == "Listing") {
 				$sqlQuery->addWhere("Status = 'Available'");
 			}
