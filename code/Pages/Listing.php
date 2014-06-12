@@ -53,6 +53,7 @@ class Listing extends Page implements HiddenClass {
 		'Price' => 'Int',
 		'Taxes' => 'Varchar',
 		'TaxYear' => 'Int',
+		'CondoFee' => 'Int',
 		'HideMonthly' => 'Boolean',
 		//lot size
 		'LotLength' => 'Varchar',
@@ -262,6 +263,7 @@ class Listing extends Page implements HiddenClass {
 	 			NumericField::create("Price")->addExtraClass('stacked noborder'),
 	 			NumericField::create("Taxes")->addExtraClass('stacked noborder'),
 	 			TextField::create("TaxYear", "Tax Assessment Year")->addExtraClass('stacked noborder'),
+	 			NumericField::create("CondoFee")->addExtraClass('stacked noborder'),
 	 			CheckboxField::create("HideMonthly", "Hide Monthly Price"),
 	 		)
 	 	)->addExtraClass("finDeets");
@@ -885,7 +887,7 @@ class Listing_Controller extends Page_Controller {
 	public function init() {
 		parent::init();
 		
-		if($this->Status == "Unavailable") {
+		if($this->Status == "Unavailable" || $this->Status == "Closed") {
 			Session::set("UnavailListing", array("Price" => $this->Price, "Lat" => $this->Lat, "Lon" => $this->Lon, "City" => $this->City, "Town" => $this->Town));
 			$redirect = SiteTree::get_by_link("listing-unavailable");
 			$this->redirect($redirect->Link(), 301);
