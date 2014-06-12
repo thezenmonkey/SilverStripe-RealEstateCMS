@@ -206,8 +206,8 @@ class RETS_Controller extends Controller {
 		$sqlQuery->setFrom('MLSListing');
 		$sqlQuery->setSelect('ID');
 		$sqlQuery->addSelect('MLS');
-		$sqlQuery->addSelect('PropType');
-		$sqlQuery->addWhere("PropType = 'Condo'");
+		//$sqlQuery->addSelect('PropType');
+		//$sqlQuery->addWhere("PropType = 'Condo'");
 		 
 		// Get the raw SQL (optional)
 		$rawSQL = $sqlQuery->sql();
