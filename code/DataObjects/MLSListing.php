@@ -134,7 +134,7 @@ class MLSListing extends DataObjectAsPage {
 		'Province' => "Varchar(16)",
 		'RemarksForClients' => "Text",
 		'Retirement' => "Boolean",
-		'Rooms' => "Varchar(10)",
+		'TotalRooms' => "Varchar(10)",
 		'RoomsPlus' => "Varchar(10)",
 		'SaleLease' => "Varchar(9)",
 		'SellerPropertyInfoStatement' => "Varchar(10)",
