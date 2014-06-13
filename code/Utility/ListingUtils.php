@@ -17,22 +17,45 @@ class ListingUtils {
 		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
 			$sqlQuery = new SQLQuery();
 			$sqlQuery->setFrom($class);
-			//$sqlQuery->setSelect('ID');
 			if($class == "Listing") {
 				$sqlQuery->addWhere("Status = 'Available'");
 			}
+			
+			
 			$sqlQuery->selectField('( 6371 * acos( cos( radians('.$lat.') ) * cos( radians( "Lat" ) ) * cos( radians( "Lon" ) - radians('.$lon.') ) + sin( radians('.$lat.') ) * sin( radians( "Lat" ) ) ) )', 'Distance');
 			$sqlQuery->setHaving("Distance < ".$distance);
 			
-			$items = $sqlQuery->execute()->map();
-			return $items ? $items : false;
+			$results = $sqlQuery->execute();
+			$itemList = new ArrayList();
+			foreach($results as $row){
+				$row['ClassName'] = $class;
+				$itemList->push($row);
+			}
+			return $itemList;
+			
 		} else {
 			return false;
 		}
 		
 	}
 	
+	/**
+	 * Generate ArrayList of Searched Properties
+	 *
+	 * @param $class DataObject Class to Search
+	 * @param $bounds = Array of map bounds: Requires north, south east and west keys
+	 * @return ArrayList()
+	 */
 	public static function BoundsQuery($class, $bounds) {
+		$foundlistings = Session::get('FoundListings');
+		if(!$foundlistings) {
+			$foundlistings = array($class => array());
+		}
+		//Debug::show($foundlistings);
+		if($foundlistings && !array_key_exists($class,$foundlistings) ){
+			$foundlistings[$class] = array();
+		}
+		
 		$db = DB::getConn();
 		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
 			$sqlQuery = new SQLQuery();
@@ -51,9 +74,20 @@ class ListingUtils {
 			$results = $sqlQuery->execute();
 			$itemList = new ArrayList();
 			foreach($results as $row){
+				/*
+if( !in_array($row['ID'],$foundlistings[$class]) ) {
+					array_push($foundlistings[$class],$row['ID']);
+					$row['ClassName'] = $class;
+					$itemList->push($row);
+				}
+*/
+				$row['ClassName'] = $class;
 				$itemList->push($row);
-				//array_push($itemList, $row);
+				
 			}
+			
+			Session::set('FoundListings', $foundlistings);
+			//Debug::show(Session::get('FoundListings'));
 			return $itemList;
 			
 		} else {
