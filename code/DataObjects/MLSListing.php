@@ -12,7 +12,7 @@ class MLSListing extends DataObjectAsPage {
 	 * Static vars
 	 * ----------------------------------*/
 	//The class of the page which will list this DataObject
-	static $listing_page_class = 'MLSListingsPage';
+	static $listing_page_class = 'ListingsPage';
 	//Class Naming (optional but reccomended)
 	static $plural_name = 'MLSListings';
 	static $singular_name = 'MLSListing';
