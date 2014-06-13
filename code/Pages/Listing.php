@@ -236,7 +236,7 @@ class Listing extends Page implements HiddenClass {
 	 	$detailField = CompositeField::create(
 	 		array (
 	 			HeaderField::create("Property Details",2),
-	 			DropdownField::create('ListingType','Listing Type',singleton('Listing')->dbObject('Type')->enumValues())->addExtraClass('stacked noborder'),
+	 			DropdownField::create('ListingType','Listing Type',singleton('Listing')->dbObject('ListingType')->enumValues())->addExtraClass('stacked noborder'),
 	 			TextField::create("TotalArea", "Total Approximate Area")->addExtraClass('stacked noborder'),
 	 			CompositeField::create(
 	 				TextField::create("NumberBed", "# Bedrooms")->addExtraClass('stacked oneThird noborder'),
