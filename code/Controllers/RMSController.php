@@ -1,10 +1,11 @@
 <?php
 
-class RMSController extends ContentController {
+class RMSController extends Controller {
 	
 	private static $allowed_actions = array (
 		'FindNear',
-		'AjaxMapSearch'
+		'AjaxMapSearch',
+		'AjaxListing'
 	);
 	
 	/**
@@ -55,18 +56,71 @@ class RMSController extends ContentController {
 	
 	public function AjaxMapSearch($request) {
 		
-		$north = Convert::raw2sql($_GET["north"]);
-		$south = Convert::raw2sql($_GET["south"]);
-		$east = Convert::raw2sql($_GET["east"]);
-		$west = Convert::raw2sql($_GET["west"]);
+		$classes = array('Listing','MLSListing');
 		
-		if ($north && $south && $east && $west) {
+		$searchType = $_GET["type"];
+		
+		if($searchType == "bounds") {
+			$north = Convert::raw2sql($_GET["north"]);
+			$south = Convert::raw2sql($_GET["south"]);
+			$east = Convert::raw2sql($_GET["east"]);
+			$west = Convert::raw2sql($_GET["west"]);
+			
 			$set = new ArrayList();
 			
 			
-		} else {
-			return false;
+			if ($north && $south && $east && $west) {
+				foreach($classes as $class) {
+					$set->merge(ListingUtils::BoundsQuery($class, array('north' => $north, 'south' => $south, 'east' => $east, 'west' => $west)) );
+				}
+				
+			}
 		}
+		
+		//If No Listings Return a 404
+	    if(!$set->Count()) return new HTTPResponse("Not found", 404);
+	     
+	    // Use HTTPResponse to pass custom status messages
+	    $this->response->setStatusCode(200, "Found " . $set->Count() . " elements");
+	 	$this->response->addHeader('Content-Type', 'application/json');
+	 	
+	 	return json_encode($set->toNestedArray());
+	}
+	
+	public function AjaxListing($request) {
+		
+		if(!isset($_GET["class"]) || !isset($_GET["id"])) return new HTTPResponse("Not found", 404);
+		
+		$class = $_GET["class"];
+		$id = $_GET["id"];
+		
+		
+		$listing = $class::get()->byID($id);
+		
+		//If No Listings Return a 404
+	    if(!$listing) return new HTTPResponse("Not found", 404);
+	     
+	    // Use HTTPResponse to pass custom status messages
+	    $this->response->setStatusCode(200, "Found " . 1 . " elements");
+	    if(isset($_GET["return"]) && $_GET["return"] == "json") {
+			if($listing->ClassName == "Listing"){
+				$listing->URLSegment = "listings/".$listing->URLSegment;
+			} else {
+				$listing->URLSegment = "listings/show/".$listing->URLSegment;
+			}
+		    
+		    //Debug::show($listing);
+		    $this->response->addHeader('Content-Type', 'application/json');
+		 	$f = new JSONDataFormatter();
+		 	//Debug::show($set);
+		 	return $f->convertDataObject($listing);
+	    }
+	 	
+	 	
+	 	$vd = new ViewableData();
+	    return $vd->customise(array(
+	      "Result" => $listing
+	    ))->renderWith('AjaxListing');
 	}
 	
 	
