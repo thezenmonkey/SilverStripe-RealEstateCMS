@@ -121,7 +121,7 @@ class TREBConvert {
 		$MLSListing->Province = $MLSRecord['County'];
 		$MLSListing->RemarksForClients = $MLSRecord['Ad_text'];
 		$MLSListing->Retirement = $MLSRecord['Retirement'];
-		$MLSListing->Rooms = $MLSRecord['Rms'];
+		$MLSListing->TotalRooms = $MLSRecord['Rms'];
 		$MLSListing->RoomsPlus = $MLSRecord['Rooms_plus'];
 		$MLSListing->SaleLease = $MLSRecord['S_r'];
 		$MLSListing->SpecialDesignation = $MLSRecord['Spec_des1_out'].(!empty($MLSRecord['Spec_des2_out']) ? ", ".$MLSRecord['Spec_des2_out'].(!empty($MLSRecord['Spec_des3_out']) ? ", ".$MLSRecord['Spec_des3_out'].(!empty($MLSRecord['Spec_des4_out']) ? ", ".$MLSRecord['Spec_des4_out'].(!empty($MLSRecord['Spec_des5_out']) ? ", ".$MLSRecord['Spec_des5_out'].(!empty($MLSRecord['Spec_des6_out']) ? ", ".$MLSRecord['Spec_des6_out'] : '') : '') : '') : '') : '');
