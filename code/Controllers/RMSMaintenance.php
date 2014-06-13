@@ -7,7 +7,7 @@ class RMSMaintenance extends Controller {
 	);
 	
 	private static $url_handlers = array(
-        'Test' => 'Test'
+        'Test/$Action/$ID/$Name' => 'Test'
     );
 	
 	public function Test(SS_HTTPRequest $request) {
