@@ -7,7 +7,7 @@
  */
 
 
-class ListingsPage extends Page 
+class ListingsPage extends DataObjectAsPageHolder 
 {
 	/**
 	 * Static vars
@@ -286,9 +286,12 @@ class ListingsPage extends Page
 
 
 
-class ListingsPage_Controller extends Page_Controller 
+class ListingsPage_Controller extends DataObjectAsPageHolder_Controller 
 {
-	
+	//This needs to know be the Class of the DataObject you want this page to list
+	static $item_class = 'MLSListing';
+	//Set the sort for the items (defaults to Created DESC)
+	static $item_sort = 'Created DESC';
 	
 	function showgallery() {
 	
