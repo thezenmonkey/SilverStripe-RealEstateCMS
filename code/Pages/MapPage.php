@@ -65,9 +65,6 @@ class MapPage extends Page {
 	 * Object methods
 	 * ----------------------------------*/
 
-	 public function Items() {
-		 return ListingUtils::BoundsQuery("MLSListing", array('north' => 43.71007507416407, 'south' => 43.211681801365906, 'east' => -78.93882785156251, 'west' => -80.42198214843751));
-	 }
 	
 
 	
