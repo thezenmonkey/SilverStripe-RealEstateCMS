@@ -12,7 +12,7 @@ class ListingUtils {
 	 * @param $distance distandce in Km 
 	 * @return Array ($ID => $Distence from query point)
 	 */
-	public static function DistanceQuery($class, $lat, $lon, $distance = 25) {
+	public static function DistanceQuery($class, $lat, $lon, $distance = 25, $filter = null) {
 		$db = DB::getConn();
 		if($db->hasField($class, 'Lat') && $db->hasField($class, 'Lon')) {
 			$sqlQuery = new SQLQuery();
@@ -21,6 +21,9 @@ class ListingUtils {
 				$sqlQuery->addWhere("Status = 'Available'");
 			}
 			
+			if($filter) {
+				$sqlQuery->addWhere($filter);
+			}
 			
 			$sqlQuery->selectField('( 6371 * acos( cos( radians('.$lat.') ) * cos( radians( "Lat" ) ) * cos( radians( "Lon" ) - radians('.$lon.') ) + sin( radians('.$lat.') ) * sin( radians( "Lat" ) ) ) )', 'Distance');
 			$sqlQuery->setHaving("Distance < ".$distance);
@@ -46,7 +49,7 @@ class ListingUtils {
 	 * @param $bounds = Array of map bounds: Requires north, south east and west keys
 	 * @return ArrayList()
 	 */
-	public static function BoundsQuery($class, $bounds) {
+	public static function BoundsQuery($class, $bounds, $filter = null) {
 		$foundlistings = Session::get('FoundListings');
 		if(!$foundlistings) {
 			$foundlistings = array($class => array());
@@ -63,6 +66,9 @@ class ListingUtils {
 			$sqlQuery->setSelect('ID,Lat,Lon,ListingType,Price');
 			if($class == "Listing") {
 				$sqlQuery->addWhere("Status = 'Available'");
+			}
+			if($filter) {
+				$sqlQuery->addWhere($filter);
 			}
 			$south = $bounds['south'];
 			$north = $bounds['north'];

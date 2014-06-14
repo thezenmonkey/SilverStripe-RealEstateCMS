@@ -3,7 +3,6 @@
 	<div id="Map" style="height:500px">
 	
 	</div>
-	$Items.Debug
 </div>
 <style>
 	.cluster {background-color: rgba(0,0,0,0.3); padding:0.5em;}
@@ -56,10 +55,10 @@ $(document).ready(function($) {
 							if(query) {
 								$.getJSON(query, function(data){
 									PopulateMap(data);
-								});
+								}).fail(function(){alert("No Listings in This View")});
 							}
 							
-						}						
+						}					
 					}
 				}
 		  }

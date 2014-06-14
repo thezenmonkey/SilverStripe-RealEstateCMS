@@ -60,6 +60,20 @@ class RMSController extends Controller {
 		
 		$searchType = $_GET["type"];
 		
+		$filter = null;
+		
+		$min = (isset($_GET["min"])) ? $_GET["min"] : false; 
+		$max = (isset($_GET["max"])) ? $_GET["max"] : false; 
+		
+		
+		if($min && $max) {
+			$filter = "Price >= $min AND Price <= $max";
+		} elseif ($min && !$max) {
+			$filter = "Price >= $min";
+		} elseif (!$min && $max) {
+			$filter = "Price <= $max";
+		}
+		
 		if($searchType == "bounds") {
 			$north = Convert::raw2sql($_GET["north"]);
 			$south = Convert::raw2sql($_GET["south"]);
@@ -71,7 +85,7 @@ class RMSController extends Controller {
 			
 			if ($north && $south && $east && $west) {
 				foreach($classes as $class) {
-					$set->merge(ListingUtils::BoundsQuery($class, array('north' => $north, 'south' => $south, 'east' => $east, 'west' => $west)) );
+					$set->merge(ListingUtils::BoundsQuery($class, array('north' => $north, 'south' => $south, 'east' => $east, 'west' => $west), $filter) );
 				}
 				
 			}
