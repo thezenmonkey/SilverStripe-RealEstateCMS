@@ -732,34 +732,19 @@ class Listing extends Page implements HiddenClass {
 	}
 	 
 	function RelatedProperties($count = 4) {
-	 	/*
-$method = $_GET["method"];
-	 	$value = $_GET["value"];
-*/
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
 		 	$varience = $siteConfig->RelatedPriceRange;
 	 	} else {
 		 	$varience = 50000;
-	 	}
+	 	} 		$items = Listing::get()->filter(array(
+ 			"CityID" => $this->CityID,
+ 			"Status" => "Available",
+ 			"Price:LessThan" => $this->Price + 50000,
+ 			"Price:GreaterThan" => $this->Price - 50000
+ 		))->limit($count);
 	 	
-	 	if($method == "price") {
-	 		$items = Listing::get()->filter(array(
-	 			"CityID" => $this->CityID,
-	 			"Status" => "Available",
-	 			"Price:LessThan" => $value + $varience,
-	 			"Price:GreaterThan" => $value - $varience
-	 		))->limit($count);
-	 	} elseif ($method == "neighbourhood") {
-	 		if($this->NeighbourhoodID != 0) {
-		 		$items = Listing::get()->filter(array("NeighbourhoodID" => $this->NeighbourhoodID, "Status" => 'Available'))->limit($count);
-	 		} else {
-		 		$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status" => 'Available'))->limit($count);
-	 		}
-	 	} else {
-		 	$items = Listing::get()->filter(array("CityID" => $this->CityID, "Status" => 'Available'))->limit($count);
-	 	}
 	 	if($items) {
 	 		return $items;
 	 	} else {
