@@ -2,10 +2,10 @@
 
 class TREBConvert {
 	
-	public function Convert($MLSListing, $class, $MLSRecord) {
+	static public function Convert($MLSListing, $class, $MLSRecord) {
 		
 		// TREB CONVERSION FUNCTIONS
-		if($class == "ResidentialProperty" && $board == "TREB") {
+		if($class == "ResidentialProperty") {
 			$MLSListing->Acreage = $MLSRecord['Acres'];
 			$MLSListing->AddlMonthlyFees = $MLSRecord['Addl_mo_fee'];
 			$MLSListing->Drive = $MLSRecord['Drive'];
@@ -34,7 +34,7 @@ class TREBConvert {
 			
 			//$MLSListing->LeaseTerm = $MLSRecord['Lease'];
 			
-		} elseif ($class == "CondoProperty" && $board == "TREB") {
+		} elseif ($class == "CondoProperty") {
 			
 			$MLSListing->BuildingInsuranceIncluded = $MLSRecord['Insur_bldg'];
 			$MLSListing->Shares = $MLSRecord['Share_perc'];
@@ -143,7 +143,7 @@ class TREBConvert {
 	}
 	
 	
-	public function generateRoomArray($MLSRecord) {
+	static public function generateRoomArray($MLSRecord) {
 		$roomArray = array();
 		!empty($MLSRecord['Rm1_out']) ? array_push($roomArray, array($MLSRecord['Rm1_out'] => array ("length" => $MLSRecord['Rm1_len'], "width" => $MLSRecord['Rm1_wth'], "desc" => $MLSRecord['Rm1_dc1_out']." ".$MLSRecord['Rm1_dc2_out']." ".$MLSRecord['Rm1_dc3_out'], "level" => $MLSRecord['Level1']))) : ''; //room 1
 		
@@ -163,7 +163,7 @@ class TREBConvert {
 		
 		
 		
-		if($class == "ResidentialProperty" && $board == "TREB") {
+		
 			!empty($MLSRecord['Rm9_out']) ? array_push($roomArray, array($MLSRecord['Rm9_out'] => array ("length" => $MLSRecord['Rm9_len'], "width" => $MLSRecord['Rm9_wth'], "desc" => $MLSRecord['Rm9_dc1_out']." ".$MLSRecord['Rm9_dc2_out']." ".$MLSRecord['Rm9_dc3_out'], "level" => $MLSRecord['Level9']))) : ''; //room 9
 			
 			!empty($MLSRecord['Rm10_out']) ? array_push($roomArray, array($MLSRecord['Rm10_out'] => array ("length" => $MLSRecord['Rm10_len'], "width" => $MLSRecord['Rm10_wth'], "desc" => $MLSRecord['Rm10_dc1_out']." ".$MLSRecord['Rm10_dc2_out']." ".$MLSRecord['Rm10_dc3_out'], "level" => $MLSRecord['Level10']))) : ''; //room 10
@@ -171,7 +171,7 @@ class TREBConvert {
 			!empty($MLSRecord['Rm11_out']) ? array_push($roomArray, array($MLSRecord['Rm11_out'] => array ("length" => $MLSRecord['Rm11_len'], "width" => $MLSRecord['Rm11_wth'], "desc" => $MLSRecord['Rm11_dc1_out']." ".$MLSRecord['Rm11_dc2_out']." ".$MLSRecord['Rm11_dc3_out'], "level" => $MLSRecord['Level11']))) : ''; //room 11
 			
 			!empty($MLSRecord['Rm12_out']) ? array_push($roomArray, array($MLSRecord['Rm12_out'] => array ("length" => $MLSRecord['Rm12_len'], "width" => $MLSRecord['Rm12_wth'], "desc" => $MLSRecord['Rm12_dc1_out']." ".$MLSRecord['Rm12_dc2_out']." ".$MLSRecord['Rm12_dc3_out'], "level" => $MLSRecord['Level12']))) : ''; //room 12
-		}
+		
 		
 		return $roomArray;
 		

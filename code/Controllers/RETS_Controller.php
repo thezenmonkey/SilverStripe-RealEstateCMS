@@ -16,6 +16,8 @@ class RETS_Controller extends Controller {
         'MLSUpdate/$Action/$ID/$Name' => 'MLSUpdate'
     );
 	
+	
+	
 	public function MLSUpdate() {
 		global $_RETS_SERVER_INFO;
 		$rets_login_url = $_RETS_SERVER_INFO['URL'];
@@ -102,12 +104,12 @@ class RETS_Controller extends Controller {
 		        
 		        if($params['ID'] == "all") {
 		        	
-			        $query = "(Status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+			        $query = "(status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
-			        $search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing
+			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => '500')); //set to 100 for testing array('Limit' => 100)
 		        } elseif ($params['ID'] == "check") {
 			        $query = "(Status = A)";
 		
@@ -128,11 +130,17 @@ class RETS_Controller extends Controller {
 		
 		        if ($rets->NumRows($search) > 0) {
 						$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
+						echo "   + RETS returns". $rets->NumRows($search);
 		                // print filename headers as first line
 		                $fields_order = $rets->SearchGetFields($search);
 		                //fputcsv($fh, $fields_order);
 						if ($params['ID'] != "check") {
-							$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Create"));
+							if(class_exists('CustomMLSFilter')) {
+								$log->Events()->add(RMSLogging::createEvent("Start Filtered MLS Listing Create"));
+							} else {
+								$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Create"));
+							}
+							
 						}
 		                // process results
 		                while ($record = $rets->FetchRow($search)) {
@@ -143,7 +151,15 @@ class RETS_Controller extends Controller {
 		                                
 		                        }
 		                        if ($params['ID'] != "check") {
-		                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
+		                        	if(class_exists('CustomMLSFilter')) {
+			                        	if(CustomMLSFilter::ImportFilter($record)) {
+				                        	echo "   + RETS returns". $class;
+				                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
+			                        	}
+		                        	} else {
+			                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
+		                        	}
+		                        	
 		                        } else {
 			                        array_push($clean, $record['Ml_num']);
 		                        }
@@ -155,7 +171,8 @@ class RETS_Controller extends Controller {
 						}
 		
 		        } else {
-			        $log->Events()->add(RMSLogging::createEvent("RETS Fail", $rets->Error()));
+			        
+			        $log->Events()->add(RMSLogging::createEvent("RETS Fail", implode(" ",$rets->Error()) ));
 			        print_r($rets->Error());
 		        }
 		
@@ -198,7 +215,6 @@ class RETS_Controller extends Controller {
 		$log->write();
 		
 	}
-	
 	
 	// Clean MLS listings and return number delteted.
 	public function MLSClean($clean) {

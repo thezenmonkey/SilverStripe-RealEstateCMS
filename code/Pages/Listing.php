@@ -726,10 +726,6 @@ class Listing extends Page implements HiddenClass {
 		}
 	}
 	
-	
-	function ContactForm() {
-		return new ListingRequestForm($this, 'RequestForm');
-	}
 	 
 	function RelatedProperties($count = 4) {
 	 	$siteConfig = SiteConfig::current_site_config();
@@ -887,80 +883,29 @@ class Listing_Controller extends Page_Controller {
 			else return $this->renderWith(array('Listing','Page')); 
 	}		
 	
-	public function ListingRequestForm() {
-		return new ListingRequestForm($this, 'ListingRequestForm');
+	public function ContactForm() {
+		return new ListingRequestForm($this, 'ContactForm');
 	}
 	
-	function RelatedPropertiesAll($count = 4) {
-	 	$method = $_GET["method"];
-	 	$value = $_GET["value"];
+	function RelatedProperties($count = 4) {
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
 		 	$varience = $siteConfig->RelatedPriceRange;
 	 	} else {
 		 	$varience = 50000;
+	 	} 		$items = Listing::get()->filter(array(
+ 			"CityID" => $this->CityID,
+ 			"Status" => "Available",
+ 			"Price:LessThan" => $this->Price + 50000,
+ 			"Price:GreaterThan" => $this->Price - 50000
+ 		))->limit($count);
+	 	
+	 	if($items) {
+	 		return $items;
+	 	} else {
+	 		return false;
 	 	}
-	 	
-	 	$set = new ArrayList();
-	 	if($method == "price") {
-	 		$filter = array(
-	 			"Price:LessThan" => $value + $varience,
-	 			"Price:GreaterThan" => $value - $varience,
-	 			"CityID" => $this->CityID,
-	 			"Status" => "Available"
-	 		);
-	 		foreach(Listing::get()->filter($filter)->exclude('ID', $this->ID)->limit($count) as $obj) $set->push($obj);
-	 	} elseif ($method == "neighbourhood") {
-	 		$filter = array(
-	 			"CityID" => $this->CityID,
-	 			"Status" => "Available"
-	 		);
-	 		$items = Listing::get()->filter($filter)->exclude('ID', $this->ID);
-	 		if($items->count()){
-		 		foreach($items as $item) {
-			 		$this->getDistance($item->Lat, $item->Lon) <= 15 ? $set->push($item) : false;
-		 		}
-		 		$set->count() && $set->count() > $count ? $set = $set->limit($count) : false;
-	 		}
-	 		
-	 	}
-	 	
-	 	
-	 	if(!$set->count() || $set->count() < $count) {
-		 	$limit = $count - $set->count();
-		 	if($method == "price") {
-		 		$filter = array(
-		 			"ListPrice:LessThan" => $value + $varience,
-		 			"ListPrice:GreaterThan" => $value - $varience,
-		 			"CityID" => $this->CityID
-		 		);
-		 		foreach(MLSListing::get()->filter($filter)->limit($limit) as $obj) $set->push($obj);
-		 	} elseif ($method == "neighbourhood") {
-		 		$newSet = new ArrayList();
-		 		$filter = array(
-		 			"CityID" => $this->CityID
-		 		);
-		 		$newItems = MLSListing::get()->filter($filter);
-		 		if($newItems->count()){
-			 		foreach($newItems as $item){
-			 			$this->getDistance($item->Lat, $item->Lon) <= 15 ? $newSet->push($item) : false;
-			 		}
-			 		$newSet->count() && $newSet->count() > $limit ? $newSet = $newSet->limit($limit) : false;
-			 		foreach($newSet as $obj ) $set->push($obj);
-		 		}
-		 	}
-		}
-	 	
-	    if(!$set) return new HTTPResponse("Not found", 404);
-	     
-	    // Use HTTPResponse to pass custom status messages
-	    $this->response->setStatusCode(200, "Found " . $set->Count() . " elements");
-	 	
-		$vd = new ViewableData();
-	    return $vd->customise(array(
-	      "Results" => $set
-	    ))->renderWith('AjaxRelated');
 	 	
 	 }
 	

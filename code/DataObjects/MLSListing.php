@@ -345,7 +345,7 @@ class MLSListing extends DataObjectAsPage {
 		return $this->Taxes != 0 ? money_format('%.0n', $this->Taxes) : false;
 	}
 	
-	public function GetCover() {
+	public function CoverImage() {
 		return $this->Images()->First() ? $this->Images()->First() : false;
 	}
 	
@@ -365,81 +365,32 @@ class MLSListing extends DataObjectAsPage {
 		return ucwords(strtolower($this->ListBrokerage));
 	}
 	
+	public function Town() {
+		return $this->City()->Title;
+	}
 	
 	
-	 function RelatedProperties() {
-	 	$method = $_GET["method"];
-	 	$value = $_GET["value"];
-	 	$set = new ArrayList();
+	 function RelatedProperties($count = 4) {
+	 	$siteConfig = SiteConfig::current_site_config();
 	 	
-	 	if($this->CityID != 0) {
-		 	
-			if($method == "price") {
-		 		$filter = array(
-		 			"Price:LessThan" => $value + 50000,
-		 			"Price:GreaterThan" => $value - 50000,
-		 			"CityID" => $this->CityID,
-		 			"Sold" => 0
-		 		);
-		 		foreach(Listing::get()->filter($filter)->limit(4) as $obj) $set->push($obj);
-		 	} elseif ($method == "neighbourhood") {
-		 		$filter = array(
-		 			"CityID" => $this->CityID,
-		 			"Sold" => 0
-		 		);
-		 		$items = Listing::get()->filter($filter);
-		 		if($items->count()){
-			 		foreach($items as $item) {
-				 		$this->getDistance($item->Lat, $item->Lon) <= 15 ? $set->push($item) : false;
-			 		}
-			 		$set->count() && $set->count() > 4 ? $set = $set->limit(4) : false;
-		 		}
-		 		
-		 	} 	
-		 	
-		 	
+	 	if($siteConfig->RelatedPriceRange != 0) {
+		 	$varience = $siteConfig->RelatedPriceRange;
+	 	} else {
+		 	$varience = 50000;
 	 	}
 	 	
+ 		$items = Listing::get()->filter(array(
+ 			"CityID" => $this->CityID,
+ 			"Status" => "Available",
+ 			"Price:LessThan" => $this->Price + 50000,
+ 			"Price:GreaterThan" => $this->Price - 50000
+ 		))->limit($count);
 	 	
-	 	
-	 	if(!$set->count() || $set->count() < 4) {
-		 	$limit = 4 - $set->count();
-		 	if($method == "price") {
-		 		$filter = array(
-		 			"Price:LessThan" => $value + 50000,
-		 			"Price:GreaterThan" => $value - 50000,
-		 			"Municipality" => $this->Municipality
-		 		);
-		 		foreach(MLSListing::get()->filter($filter)->limit($limit) as $obj) $set->push($obj);
-		 	} elseif ($method == "neighbourhood") {
-		 		$newSet = new ArrayList();
-		 		$filter = array(
-		 			"Municipality" => $this->Municipality
-		 		);
-		 		$newItems = MLSListing::get()->filter($filter);
-		 		if($newItems->count()){
-			 		foreach($newItems as $item){
-			 			$this->getDistance($item->Lat, $item->Lon) <= 15 ? $newSet->push($item) : false;
-			 		}
-			 		$newSet->count() && $newSet->count() > $limit ? $newSet = $newSet->limit($limit) : false;
-			 		foreach($newSet as $obj ) $set->push($obj);
-		 		}
-		 	}
-		 	
-		 	
-		 	
-		 	
+	 	if($items) {
+	 		return $items;
+	 	} else {
+	 		return false;
 	 	}
-	 	
-	    if(!$set) return new HTTPResponse("Not found", 404);
-	     
-	    // Use HTTPResponse to pass custom status messages
-	    $this->response->setStatusCode(200, "Found " . $set->Count() . " elements");
-	 	
-		$vd = new ViewableData();
-	    return $vd->customise(array(
-	      "Results" => $set
-	    ))->renderWith('AjaxRelated');
 	 	
 	 }
 	 
@@ -448,7 +399,7 @@ class MLSListing extends DataObjectAsPage {
 	}
 	
 	public function DownPayment() {
-		return ceil($this->Price()*0.2);
+		return ceil($this->Price*0.2);
 	}
 	
 	

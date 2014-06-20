@@ -201,7 +201,8 @@ class ListingsPage extends DataObjectAsPageHolder
 	 * Template accessors
 	 * ----------------------------------*/
 
-	 public function GetMLS($number) {
+	 /*
+public function GetMLSNumber($number) {
 		 
 		 if($number == "all") {
 			 return MLSListing::get()->sort("Municipality");
@@ -220,14 +221,17 @@ class ListingsPage extends DataObjectAsPageHolder
 			return  $set;
 		 }
 	 }
+*/
 
 	 public function GetCities() {
 		 return MunicipalityPage::get()->sort("ID");
 	 }
 	 
-	 public function ThisCity($City) {
+	 /*
+public function ThisCity($City) {
 		 return MunicipalityPage::get()->byID($City);
 	 }
+*/
 	 
 	 public function TownListings() {
 		$sqlQuery = new SQLQuery();
@@ -293,6 +297,10 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 	//Set the sort for the items (defaults to Created DESC)
 	static $item_sort = 'Created DESC';
 	
+	
+	
+	
+	
 	function showgallery() {
 	
 		if(($item = $this->getCurrentItem())) {
@@ -318,6 +326,10 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 		} else {
 			return $this->httpError(404);
 		}
+	}
+	
+	public function ContactForm() {
+		return new ListingRequestForm($this, 'ContactForm');
 	}
 	
 	

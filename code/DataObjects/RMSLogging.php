@@ -8,21 +8,21 @@ class RMSLogging extends DataObject {
 		"Duration" => "Text"
 	);
 	
-	function createEvent($title = null, $value = null) {
+	static public function createEvent($title = null, $value = null) {
 		$event = new RMSEvent();
 		$event->Title = $title;
 		$event->Value = $value;
 		return $event;
 	}
 	
-	function ensure2Digit($number) {
+	static public function ensure2Digit($number) {
 	    if($number < 10) {
 	        $number = '0' . $number;
 	    }
 	    return $number;
 	}
 	
-	function getTime() {
+	static public function getTime() {
 		if($this->Duration){
 			$ss = $this->Duration;
 			$s = $this->ensure2Digit($ss%60);
