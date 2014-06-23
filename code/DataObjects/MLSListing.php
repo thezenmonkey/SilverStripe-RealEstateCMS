@@ -402,6 +402,9 @@ class MLSListing extends DataObjectAsPage {
 		return ceil($this->Price*0.2);
 	}
 	
+	public function getSummary() {
+		return $this->obj('Content')->Summary(20)."...";
+	}
 	
 	
 	
