@@ -864,7 +864,9 @@ class Listing extends Page implements HiddenClass {
 
 
 class Listing_Controller extends Page_Controller {
-
+	
+	private static $allowed_actions = array("ContactForm");
+	
 	public function init() {
 		parent::init();
 		

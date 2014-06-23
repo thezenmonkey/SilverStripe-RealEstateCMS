@@ -297,6 +297,7 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 	//Set the sort for the items (defaults to Created DESC)
 	static $item_sort = 'Created DESC';
 	
+	public static $allowed_actions = array("ContactForm");
 	
 	
 	
