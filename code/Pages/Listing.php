@@ -847,9 +847,6 @@ class Listing extends Page implements HiddenClass {
 	public function getMunicipality() {
 		return $this->Town ? $this->Town : $this->City()->Title;
 	}
-
-	 
-
 	
 
 
@@ -884,7 +881,13 @@ class Listing_Controller extends Page_Controller {
 	}		
 	
 	public function ContactForm() {
-		return new ListingRequestForm($this, 'ContactForm');
+		$form = new ListingRequestForm($this, 'ContactForm');
+		
+		if($form->hasExtension('FormSpamProtectionExtension')) {
+		    $form->enableSpamProtection();
+		}
+		
+		return $form;
 	}
 	
 	function RelatedProperties($count = 4) {

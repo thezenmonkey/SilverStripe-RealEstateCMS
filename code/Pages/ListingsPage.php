@@ -329,7 +329,13 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 	}
 	
 	public function ContactForm() {
-		return new ListingRequestForm($this, 'ContactForm');
+		$form = new ListingRequestForm($this, 'ContactForm');
+		
+		if($form->hasExtension('FormSpamProtectionExtension')) {
+		    $form->enableSpamProtection();
+		}
+		
+		return $form;
 	}
 	
 	
