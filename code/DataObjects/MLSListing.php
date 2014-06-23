@@ -223,7 +223,7 @@ class MLSListing extends DataObjectAsPage {
 			//change urls and titles segment to include city
 				$filter = URLSegmentFilter::create();
 				
-				$this->URLSegment = $filter->filter($this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality);
+				$this->URLSegment = $filter->filter($this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality." ".$this->PostalCode." ".$this->MLS);
 				$this->MetaTitle = $this->Address." ". $this->Municipality;
 				$this->Title = $this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality;
 			
