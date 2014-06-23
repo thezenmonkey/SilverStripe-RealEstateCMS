@@ -8,13 +8,18 @@
 class RETS_Controller extends Controller {
 	
 	private static $allowed_actions = array(
-		'MLSUpdate' => 'ADMIN',
+		'MLSUpdate' => "->RETSSecurityCheck",
 		'ImageUpdate' => 'ADMIN'
 	);
 	
 	private static $url_handlers = array(
         'MLSUpdate/$Action/$ID/$Name' => 'MLSUpdate'
     );
+	
+	public function RETSSecurityCheck() {
+        return Director::is_cli() || Permission::check('ADMIN');
+    }
+	
 	
 	
 	
