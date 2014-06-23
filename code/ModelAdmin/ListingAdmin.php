@@ -7,6 +7,11 @@
  */
 class ListingAdmin extends DataObjectAsPageAdmin {
    
+   private static $allowed_actions = array(
+   		'EditorToolbar'
+   );
+   
+   
 	public static $managed_models = array(
 		'Listing' => array("title" => 'Listings'),
 		'MLSListing' => array("title" => 'MLS Listings'),
@@ -40,10 +45,12 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 		$list = parent::getList();
 		// Always limit by model class, in case you're managing multiple
 		
-		if($this->modelClass == 'Listing') {
+		/*
+if($this->modelClass == 'Listing') {
 			//$list = Versioned::get_by_stage('Listing', 'Stage');
 			$list->sort(array('Status' => 'ASC','Street' => 'ASC'));
 		}
+*/
 		return $list;
 	}
 	
