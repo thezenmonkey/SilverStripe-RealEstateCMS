@@ -133,6 +133,7 @@ class Listing extends Page implements HiddenClass {
 	
 	
 	private static $summary_fields = array(
+		'FrontCover',
 		'Address',
 		'Municipality',
 		'MLS',
@@ -592,7 +593,9 @@ class Listing extends Page implements HiddenClass {
 		return $siteConfig->DefaultProvince;
 	}
 
-	 
+	function getFrontCover() {
+		if($this->OrderedImages()->exists()) return $this->OrderedImages()->First()->SetWidth(100); 
+	}	 
 
 
 	/**

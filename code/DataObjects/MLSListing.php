@@ -18,6 +18,7 @@ class MLSListing extends DataObjectAsPage {
 	static $singular_name = 'MLSListing';
 	
 	static $summary_fields = array(
+		'FrontCover',
 		"Title",
 		"Municipality",
 		"Price",
@@ -347,6 +348,10 @@ class MLSListing extends DataObjectAsPage {
 	
 	public function CoverImage() {
 		return $this->Images()->First() ? $this->Images()->First() : false;
+	}
+	
+	function getFrontCover() {
+		if($this->Images()->exists()) return $this->Images()->First()->SetWidth(100); 
 	}
 	
 	public function MonthlyPrice(){
