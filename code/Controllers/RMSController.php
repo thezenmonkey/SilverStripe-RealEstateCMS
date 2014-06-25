@@ -5,7 +5,8 @@ class RMSController extends Controller {
 	private static $allowed_actions = array (
 		'FindNear',
 		'AjaxMapSearch',
-		'AjaxListing'
+		'AjaxListing',
+		'iCal'
 	);
 	
 	/**
@@ -135,6 +136,52 @@ class RMSController extends Controller {
 	    return $vd->customise(array(
 	      "Result" => $listing
 	    ))->renderWith('AjaxListing');
+	}
+	
+	/**
+	 * Create iCal event for Open House and send to browser
+	 *
+	 * @return .ics file
+	 * TODO Configuarable Description and Additon of Agent to $title  
+	 */
+	
+	public function iCal($request) {
+		if(!isset($_GET["id"]))  return new HTTPResponse("Not found", 404);
+		
+		$id = $_GET["id"];
+		
+		$openHouse = OpenHouseDate::get()->byID($id);
+		if(!$openHouse)  return new HTTPResponse("Not found", 404);
+		
+		$URLFilter = URLSegmentFilter::create();
+		
+		$title = "Open House";
+		$startTime = $openHouse->obj('OpenHouseDate')->Format('Y-m-d')." ".$openHouse->OpenHouseStart;
+		$endTime = $openHouse->obj('OpenHouseDate')->Format('Y-m-d')." ".$openHouse->OpenHouseEnd;
+		$description = "";
+		
+		$data = "BEGIN:VCALENDAR\nVERSION:2.0\nMETHOD:PUBLISH\nBEGIN:VEVENT\nDTSTART:".date("Ymd\THis\Z",strtotime($startTime))."\nDTEND:".date("Ymd\THis\Z",strtotime($endTime))."\nLOCATION:".$openHouse->Listing()->Title."\nTRANSP: OPAQUE\nSEQUENCE:0\nUID:\nDTSTAMP:".date("Ymd\THis\Z")."\nSUMMARY:".$title."\nDESCRIPTION:".$description."\nPRIORITY:1\nCLASS:PUBLIC\nBEGIN:VALARM\nTRIGGER:-PT10080M\nACTION:DISPLAY\nDESCRIPTION:Reminder\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n";
+		
+		$URLSegment = $URLFilter->filter($title);
+		
+		header("Cache-Control: private");
+		header("Content-Description: File Transfer");
+		header("Content-Type: text/calendar");
+		header("Content-Transfer-Encoding: binary");
+		$filename = $URLSegment. '.ics';
+		if(stristr($_SERVER['HTTP_USER_AGENT'], "MSIE")) {
+ 			header("Content-disposition: filename=" . $filename . "; attachment;");
+  		} else {
+ 			header("Content-disposition: attachment; filename=" . $filename);
+  		}
+		$this->response->setStatusCode(200, "Found " . 1 . " elements");
+		$this->response->addHeader('Content-Type', 'text/calendar');
+		$this->response->addHeader('Content-Disposition', 'attachment; filename="'.$filename.'"');
+		$this->response->addHeader('Content-Length', strlen($data));
+		$this->response->addHeader('Connection', 'close');
+		echo $data;
+		
+		
 	}
 	
 	
