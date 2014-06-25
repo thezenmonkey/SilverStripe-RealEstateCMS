@@ -26,7 +26,9 @@ class MLSListing extends DataObjectAsPage {
 		"MLS"
 	);
 	
-	
+	private static $searchable_fields = array(
+		'Title' => array("title" => "Address")
+	);
 	
 	/**
 	 * Object vars
