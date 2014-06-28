@@ -32,49 +32,49 @@ class Listing extends Page implements HiddenClass {
 	
 	private static $db = array(
 		//basic sale data
-		'Status' => "Enum('Available,Sold,Closed,Unavailable')",
-		'Feature' => 'Boolean',
-		'IsNew' => 'Boolean',
-		'MLS' => "Varchar(100)",
-		'ListingType' => "Enum('Residential,Condo,Commercial')",
-		'SaleOrRent' => "Enum('Sale,Lease')",
+		'Status' => "Enum('Available,Sold,Closed,Unavailable')", //Listing Availabilty (see onBeforeWrite)
+		'Feature' => 'Boolean', //Flag to define if the listing is considerd a "Feature Listing"
+		'IsNew' => 'Boolean', //Flag to define if a listing is considerd New
+		'MLS' => "Varchar(100)", //MLS number for primary board (see AddiionalMLS)
+		'ListingType' => "Enum('Residential,Condo,Commercial')", //Type of property based of TREB IDX classification
+		'SaleOrRent' => "Enum('Sale,Lease')", //If listing is classified as a For Sale or For Rent
 		//basic address data
-		'Address' => 'Varchar',
-		'Unit' => 'Varchar',
-		'Town' => 'Varchar',
-		'PostalCode' => 'Varchar(7)',
-		'Street' => 'Varchar',
+		'Address' => 'Varchar', //Street Address
+		'Unit' => 'Varchar', //Optional Unit Number
+		'Town' => 'Varchar', //Stores City/Town for properties outside of key market
+		'PostalCode' => 'Varchar(7)', //Zip or POstal Code
+		'Street' => 'Varchar', //Generated Value strips building number off address (used for sorting)
 		//basic home details
-		'TotalArea' => 'Text',
-		'NumberBed' => 'Varchar',
-		'NumberBath' => 'Varchar',
-		'NumberRooms' => 'Varchar',
+		'TotalArea' => 'Text', //Square footage/meters of home
+		'NumberBed' => 'Varchar', //Number of Bedrooms
+		'NumberBath' => 'Varchar', //Number of Bathrooms
+		'NumberRooms' => 'Varchar', //Total Number of Rooms
 		//baisc financial data
-		'Price' => 'Int',
-		'Taxes' => 'Varchar',
-		'TaxYear' => 'Int',
-		'CondoFee' => 'Int',
-		'HideMonthly' => 'Boolean',
+		'Price' => 'Int', //Listing Price
+		'Taxes' => 'Varchar', //Assessed Property Tax
+		'TaxYear' => 'Int',  //Year of Property TAx Assessment
+		'CondoFee' => 'Int', //Fee for Condo Buildings
+		'HideMonthly' => 'Boolean', //Flag to hide Calulated Mortgage Payment 
 		//lot size
-		'LotLength' => 'Varchar',
-		'LotWidth' => 'Varchar',
-		'LotAcreage' => 'Varchar',
-		'Irregular' => 'Boolean',
+		'LotLength' => 'Varchar', //Length of Lot
+		'LotWidth' => 'Varchar',  //width of Lot
+		'LotAcreage' => 'Varchar', //Total Acrege
+		'Irregular' => 'Boolean', //Flag if lot is irresgular
 		
-		'Headline' => 'Text',
-		'Summary' => 'HTMLText',
+		'Headline' => 'Text', //Teaser headline for template (Listing Item or Listing Page)
+		'Summary' => 'HTMLText', //Short Summary Text which can be used on Listing Item or Listing Page
 		
 		//mapping data
-		'Lat' => 'Varchar',
-		'Lon' => 'Varchar',
-		'SVHeading' => 'Varchar(25)',
-		'SVPitch' => 'Varchar(25)',
-		'SVZoom' => 'Varchar(25)',
+		'Lat' => 'Varchar', //Genreated Geocoded Latitude (see onBeforeWrite)
+		'Lon' => 'Varchar', //Genreated Geocoded Longitude (see onBeforeWrite)
+		'SVHeading' => 'Varchar(25)', //Street View Heading
+		'SVPitch' => 'Varchar(25)', //Street View Pitch
+		'SVZoom' => 'Varchar(25)', //STreet View Zoom Level
 		
 		//feature sheet data
-		'AdditionalMLS' => "Varchar(100)",
-		'KeyPoints' => "HTMLText",
-		'Vendors' => "Varchar(100)",
+		'AdditionalMLS' => "Varchar(100)", //USed to store MLS nubmers for additional boards (useful for MLSListing Dublicate checks)
+		'KeyPoints' => "HTMLText", //Key Selling features of Home
+		'Vendors' => "Varchar(100)", 
 		'Possession' => 'Varchar',
 		'Lockbox' => 'Boolean',
 		'Fireplaces' => 'Varchar',
@@ -99,7 +99,7 @@ class Listing extends Page implements HiddenClass {
 		'Mortgage' => 'Varchar(100)',
 		
 		//Extra Features
-		'VideoURL' => 'HTMLVarchar(255)',
+		'VideoURL' => 'HTMLVarchar(255)', //YouTube/Vimeo oEmbed URL
 		
 		//onbeforewritehack
 		'CityIDHolder' => 'Varchar(100)'
@@ -107,22 +107,22 @@ class Listing extends Page implements HiddenClass {
 	);
 	
 	private static $has_one = array(
-		'Neighbourhood' => 'NeighbourhoodPage',
-		'FeatureSheet' => 'File',
-		'Folder' => 'Folder',
-		'City' => 'MunicipalityPage',
-		'Agent' => 'Member'
+		'Neighbourhood' => 'NeighbourhoodPage', //Optional Neighbourhood Page (see code/Pages/NeighbourhoodPage.php)
+		'FeatureSheet' => 'File', //PDF/DOC feature sheet
+		'Folder' => 'Folder', //Generated Folder for to organize related file uploads  
+		'City' => 'MunicipalityPage', //City Page (see code/Pages/MunicipailtyPage.php)
+		'Agent' => 'Member' //Listing Agent (see code/DataExtensions/Agent.php)
 	);
 	
 	
 	private static $has_many = array(
-		'Rooms' => 'Room',
-		"OpenHouseDates" => "OpenHouseDate",
-		"Floorplans" => "File"
+		'Rooms' => 'Room', //Optional Rooms (see code/DataObjects/Room.php)
+		"OpenHouseDates" => "OpenHouseDate", //Open House (see code/DataObjects/OpenHouseDate.php)
+		"Floorplans" => "File" //Floorplans PDF or JPG
 	);
 	
 	private static $many_many = array(
-		'Schools' => 'School'
+		'Schools' => 'School' //Local Schools (see code/DataObjects/NeighbourhoodFeature.php)
 	);
 	
 	private static $searchable_fields = array(
@@ -493,24 +493,24 @@ class Listing extends Page implements HiddenClass {
 			if($this->Status == "Available") {
 				//$this->URLSegment = $URLFilter->filter($this->Address." ".(!empty($this->Unit) ? $this->Unit." ").$this->City()->Title);
 				if ($this->Unit) {
-					$this->URLSegment = $URLFilter->filter($this->Address." Unit ".$this->Unit." ".($this->Town ? $this->Town : $this->City()->Title));
-					$this->MetaTitle = $this->Address." Unit ".$this->Unit." ". ($this->Town ? $this->Town : $this->City()->Title)." MLS ".$this->MLS;
-					$this->Title = $this->Address." Unit ".$this->Unit." ". ($this->Town ? $this->Town : $this->City()->Title);
+					$this->URLSegment = $URLFilter->filter($this->Address." Unit ".$this->Unit." ".$this->Town);
+					$this->MetaTitle = $this->Address." Unit ".$this->Unit." ". $this->Town." MLS ".$this->MLS;
+					$this->Title = $this->Address." Unit ".$this->Unit." ". $this->Town." ".$this->PostalCode;
 				} else {
-					$this->URLSegment = $URLFilter->filter($this->Address." ".($this->Town ? $this->Town : $this->City()->Title));
-					$this->MetaTitle = $this->Address." ". ($this->Town ? $this->Town : $this->City()->Title)." MLS ".$this->MLS;
-					$this->Title = $this->Address." ". ($this->Town ? $this->Town : $this->City()->Title);
+					$this->URLSegment = $URLFilter->filter($this->Address." ".$this->Town);
+					$this->MetaTitle = $this->Address." ". $this->Town." MLS ".$this->MLS;
+					$this->Title = $this->Address." ". $this->Town;
 				}
 				if (!$this->MetaDescription) {
-					$this->MetaDescription = $this->Title." | ".strip_tags($this->Summary);
+					$this->MetaDescription = $this->Town." Homes for Sale ".$this->Title." | ".strip_tags($this->Summary);
 				}
 				
 			} else {
 				$config = SiteConfig::current_site_config(); 
-				$this->URLSegment = $URLFilter->filter($this->MLS." ".($this->Town ? $this->Town : $this->City()->Title));
-				$this->MetaTitle = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
-				$this->Title = $this->MLS." ". ($this->Town ? $this->Town : $this->City()->Title);
-				$this->MetaDescription = $this->Title." sold by ".$config->BusinessName;
+				$this->URLSegment = $URLFilter->filter($this->MLS." ".$this->Town);
+				$this->MetaTitle = $this->MLS." ". $this->Town;
+				$this->Title = $this->MLS." ". $this->Town ;
+				$this->MetaDescription = "Homes for Sale in ".$this->Town." ".$this->Title." sold by ".$config->BusinessName;
 			}
 			
 			if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName != "Listing") {
