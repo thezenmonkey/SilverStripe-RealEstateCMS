@@ -108,7 +108,7 @@ class ListingsPage extends DataObjectAsPageHolder
 	 * @param $count number of listings to return
 	 * @return DataList
 	 */
-	public function AllMLSListings($count = 10) {
+	public function MLSListings($count = 10) {
 		
 		$listings = MLSListing::get()->limit($count);
 		
@@ -258,6 +258,8 @@ public function ThisCity($City) {
 		}
 	 }
 	 
+	 
+	 //Client Specific
 	 public function OverAMillion() {
 		 $set = new ArrayList();
 		
@@ -268,7 +270,8 @@ public function ThisCity($City) {
 		
 		return $set->count() ? $set : false;
 	 }
-	 
+	 	
+	 //Client Specific
 	 public function UnderAMillion() {
 		 $set = new ArrayList();
 		
