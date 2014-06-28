@@ -308,11 +308,11 @@ class MLSListing extends DataObjectAsPage {
 	}
 	
 	public function LotLength() {
-		return $this->LotDepth != "0.00" ? $this->LotDepth : false;
+		return $this->LotDepth != "0.00" ? floor($this->LotDepth) : false;
 	}
 	
 	public function LotWidth() {
-		return $this->LotFront != "0.00" ? $this->LotFront : false;
+		return $this->LotFront != "0.00" ? floor($this->LotFront) : false;
 	}
 	
 	public function LotAcreage() {
@@ -374,6 +374,10 @@ class MLSListing extends DataObjectAsPage {
 	
 	public function Town() {
 		return $this->City()->Title;
+	}
+	
+	public function SiteConfig() {
+		return SiteConfig::current_site_config();
 	}
 	
 	
