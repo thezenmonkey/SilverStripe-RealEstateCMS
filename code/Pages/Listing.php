@@ -154,7 +154,7 @@ class Listing extends Page implements HiddenClass {
 	 	
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
-	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
+	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyCRMWuSPxE8ZrOrUSc9sJzHghKilvr7LkI");
 	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
@@ -631,14 +631,14 @@ class Listing extends Page implements HiddenClass {
 	
 	
 	//MOVE TO A UTILITY CLASS
-	//checks if Pased Item is with 15 miles of this DataObject
+	//checks if Pased Item is with 15 miles of this DataObject Has Been moved to ListingUtils
 	public function getDistance($lat,$lon) {
 		return ( 3959 * acos( cos( deg2rad($lat) ) * cos( deg2rad( $this->Lat ) ) * cos( deg2rad($this->Lon ) - deg2rad($lon) ) + sin( deg2rad($lat) ) * sin( deg2rad( $this->Lat ) ) ) );
 	}
 	
 	
 	/**
-	 * Fin Nearby Listing
+	 * Find Nearby Listing (Redundant)
 	 *
 	 * @param $lat GPS Latitude
 	 * @param $lon GPS Longitude
@@ -775,7 +775,7 @@ class Listing extends Page implements HiddenClass {
 	    ));
 	 }
 	
-	
+	// Dan Cooper Specifc TODO REMOVE
 	function ShowListingsPage() {
 		return ListingsPage::get()->where("City = ".$this->CityID)->count() ? ListingsPage::get()->where("City = ".$this->CityID)->First() : false;
 	}
@@ -847,6 +847,8 @@ class Listing extends Page implements HiddenClass {
 		
 	}
 	
+	
+	//DUplicate od getTown
 	public function getMunicipality() {
 		return $this->Town ? $this->Town : $this->City()->Title;
 	}
