@@ -23,4 +23,5 @@ The listing is system is built up of a number of key Page Types, Data Objects, D
 * [Listing Admin](listing-admin): Custom Admin to manage listing outside of the standard site tree
 ### Bridges
 The RETS controller is abstracted to allow for easy swapping of bridges to interface with different Real Estate Boards. Currently configured bridges:
+
 * [TREB](treb-convert): Toronto Real Estate Board IDX feed
