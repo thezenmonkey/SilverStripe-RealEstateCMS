@@ -45,12 +45,10 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 		$list = parent::getList();
 		// Always limit by model class, in case you're managing multiple
 		
-		/*
-if($this->modelClass == 'Listing') {
+		if($this->modelClass == 'Listing') {
 			//$list = Versioned::get_by_stage('Listing', 'Stage');
-			$list->sort(array('Status' => 'ASC','Street' => 'ASC'));
+			$list = $list->sort(array('Feature' => "DESC",'Status' => 'ASC','Street' => 'ASC'));
 		}
-*/
 		return $list;
 	}
 	

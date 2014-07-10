@@ -136,11 +136,10 @@ class Listing extends Page implements HiddenClass {
 		'FrontCover',
 		'Address',
 		'City.Title',
+		'Status',
 		'MLS',
 		'ListingType',
-		'Feature',
-		//'Sold',
-		//'City'
+		'Feature'
 	);
 	
 	//private static $default_sort = "Street ASC";
