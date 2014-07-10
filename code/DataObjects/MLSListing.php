@@ -373,7 +373,7 @@ class MLSListing extends DataObjectAsPage {
 	}
 	
 	public function Town() {
-		return $this->City()->Title;
+		return ($this->CityID != 0) ? $this->City()->Title : $this->Municipality;
 	}
 	
 	public function SiteConfig() {
