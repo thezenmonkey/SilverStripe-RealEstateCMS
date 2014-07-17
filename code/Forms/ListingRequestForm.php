@@ -72,7 +72,7 @@ class ListingRequestForm extends Form {
 		
 		$To = $siteConfig->SiteEmail;
 		$Subject = "Viewing Request ".$data['Address']." From ".$data['Name'];
-		$Body = $data['Company']."<br>\n ".$data['Email'];
+		$Body = nl2br($data['Company'])."<br>\n ".$data['Email'];
 		
 		$email = new Email($From, $To, $Subject,$Body);
 		$email->send();
