@@ -32,7 +32,7 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	    parent::init();
 		
 	    //map interface JS
-	    Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
+	    //Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
 	    //Requirements::javascript("mysite/js/jquery-1.7.2.min.js");
 	    
 	    
