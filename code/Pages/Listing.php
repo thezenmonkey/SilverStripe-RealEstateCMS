@@ -903,15 +903,33 @@ class Listing_Controller extends Page_Controller {
 		 	$varience = $siteConfig->RelatedPriceRange;
 	 	} else {
 		 	$varience = 50000;
-	 	} 		$items = Listing::get()->filter(array(
+	 	}
+	 	
+	 	$items = new ArrayList();
+	 	
+	 	$ownItems = Listing::get()->filter(array(
  			"CityID" => $this->CityID,
  			"Status" => "Available",
  			"Price:LessThan" => $this->Price + 50000,
  			"Price:GreaterThan" => $this->Price - 50000
+ 		))->exclude("ID", $this->ID)->limit($count);
+	 	
+	 	if($ownItems && $ownItems->count()) {
+		 	$items->merge($ownItems);
+	 	}
+	 	
+	 	$mlsItems = MLSListing::get()->filter(array(
+ 			"CityID" => $this->CityID,
+ 			"Price:LessThan" => $this->Price + 50000,
+ 			"Price:GreaterThan" => $this->Price - 50000
  		))->limit($count);
 	 	
-	 	if($items) {
-	 		return $items;
+	 	if($mlsItems && $mlsItems->count()) {
+		 	$items->merge($mlsItems);
+	 	}
+	 	
+	 	if($items->count()) {
+	 		return $items->limit($count);
 	 	} else {
 	 		return false;
 	 	}

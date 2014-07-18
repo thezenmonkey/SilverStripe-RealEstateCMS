@@ -80,13 +80,6 @@ class ListingUtils {
 			$results = $sqlQuery->execute();
 			$itemList = new ArrayList();
 			foreach($results as $row){
-				/*
-if( !in_array($row['ID'],$foundlistings[$class]) ) {
-					array_push($foundlistings[$class],$row['ID']);
-					$row['ClassName'] = $class;
-					$itemList->push($row);
-				}
-*/
 				$row['ClassName'] = $class;
 				$itemList->push($row);
 				
@@ -99,6 +92,77 @@ if( !in_array($row['ID'],$foundlistings[$class]) ) {
 		} else {
 			return false;
 		}
+	}
+	
+	public function RelatedListings($class, $id, $count) {
+		$siteConfig = SiteConfig::current_site_config();
+	 	
+	 	if($siteConfig->RelatedPriceRange != 0) {
+		 	$varience = $siteConfig->RelatedPriceRange;
+	 	} else {
+		 	$varience = 50000;
+	 	}
+	 	
+	 	if($class == "Listing") {
+		 	$item = Listing::get()->byID($id);
+	 	} else {
+		 	$item = MLSListing::get()->byID($id);
+	 	}
+	 	
+	 	
+	 	$items = new ArrayList();
+		
+		if($class = "Listing") {
+			
+			$listingItems = Listing::get()->filter(array(
+				"CityID" => $item->CityID,
+				"Status" => "Available",
+				"Price:LessThan " => $item->Price + 50000,
+				"Price:GreaterThan" => $item->Price - 50000
+			))->exclude('ID', $id)->limit($count);
+		} else {
+			 $listingItems = Listing::get()->filter(array(
+				"CityID" => $item->CityID,
+				"Status" => "Available",
+				"Price:LessThan" => $item->Price + 50000,
+				"Price:GreaterThan" => $item->Price - 50000
+			))->limit($count);
+		}
+	 	
+	 	if($listingItems && $listingItems->count()){
+		 	$items->merge($listingItems);
+	 	}
+	 	
+	 	$includeMLS = $this->config()->get('InlcudeMLS');
+	 	
+	 	if($includeMLS) {
+		 	
+		 	if($class = "MLSListing") {
+				$mlsItems = MLSListing::get()->filter(array(
+					"CityID" => $item->CityID,
+					"Price:LessThan " => $item->Price + 50000,
+					"Price:GreaterThan" => $item->Price - 50000
+				))->exclude('ID', $id)->limit($count);
+			} else {
+				 $mlsItems = MLSListing::get()->filter(array(
+					"CityID" => $item->CityID,
+					"Price:LessThan" => $item->Price + 50000,
+					"Price:GreaterThan" => $item->Price - 50000
+				))->limit($count);
+			}
+			
+			if($mlsItems && $mlsItems->count()) {
+				$items->merge($mlsItems);
+			}
+			
+	 	}	 	
+	 	
+	 	if($items->count()) {
+	 		return $items->limit($count);
+	 	} else {
+	 		return false;
+	 	}
+
 	}
 	
 }
