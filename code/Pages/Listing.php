@@ -513,9 +513,9 @@ class Listing extends Page implements HiddenClass {
 			}
 			
 			if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName != "Listing") {
-				$this->ClassName = "Listing";
+				$this->newClassInstance("Listing");
 			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
-				$this->ClassName = "UnavailableListing";
+				$this->newClassInstance("UnavailableListing");
 			}
 		}
 		

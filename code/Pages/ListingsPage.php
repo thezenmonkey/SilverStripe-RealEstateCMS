@@ -224,7 +224,7 @@ public function GetMLSNumber($number) {
 */
 
 	 public function GetCities() {
-		 return MunicipalityPage::get()->sort("ID");
+		 return MunicipalityPage::get();
 	 }
 	 
 	 /*

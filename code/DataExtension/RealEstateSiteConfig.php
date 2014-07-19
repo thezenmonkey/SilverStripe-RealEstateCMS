@@ -4,7 +4,7 @@ class RealEstateSiteConfig extends DataExtension {
 	
 	private static $db = array(
 		//Business Info
-		'BusinessName' => 'Varchar',
+		'BusinessName' => 'Varchar(255)',
 		'StreetAddress' => 'Varchar',
 		'City' => 'Varchar',
 		'Province' => 'Varchar',
