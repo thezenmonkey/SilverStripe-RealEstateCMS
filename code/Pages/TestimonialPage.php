@@ -64,6 +64,15 @@ class TestimonialPage extends Page {
 		return $Testimonials->count() ? $Testimonials : false;
 	}
 	
+	public function TeamMembers() {
+		$team = Member::get()->filterByCallback(
+			function($item){
+				return $item->inGroup('team-member');
+			}
+		);
+		return $team->count() ? $team : false;
+	}
+	
 	/**
 	 * Object methods
 	 * ----------------------------------*/
