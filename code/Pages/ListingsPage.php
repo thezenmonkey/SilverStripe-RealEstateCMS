@@ -300,9 +300,36 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 	//Set the sort for the items (defaults to Created DESC)
 	static $item_sort = 'Created DESC';
 	
-	public static $allowed_actions = array("ContactForm");
+	public static $allowed_actions = array("ContactForm", "show");
 	
-	
+	public function show()
+	{
+		if($item = $this->getCurrentItem())
+		{
+			if ($item->canView())
+			{
+				$data = array(
+					'Item' => $item,
+					'Breadcrumbs' => $item->Breadcrumbs(),
+					'MetaTags' => $item->MetaTags(),
+					'BackLink' => base64_decode($this->request->getVar('backlink'))
+				);
+				
+				return $this->customise(new ArrayData($data));
+			}
+			else
+			{
+				return Security::permissionFailure($this);
+			}
+		}
+		else
+		{
+			//return $this->httpError(404);
+			$redirect = SiteTree::get_by_link("listing-unavailable");
+			$this->redirect($redirect->Link(), 301);
+			return;
+		}
+	}
 	
 	
 	function showgallery() {
