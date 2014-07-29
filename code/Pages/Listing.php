@@ -38,6 +38,7 @@ class Listing extends Page implements HiddenClass {
 		'MLS' => "Varchar(100)", //MLS number for primary board (see AddiionalMLS)
 		'ListingType' => "Enum('Residential,Condo,Commercial')", //Type of property based of TREB IDX classification
 		'SaleOrRent' => "Enum('Sale,Lease')", //If listing is classified as a For Sale or For Rent
+		'CloseDate' => 'Date',
 		//basic address data
 		'Address' => 'Varchar', //Street Address
 		'Unit' => 'Varchar', //Optional Unit Number
@@ -126,8 +127,11 @@ class Listing extends Page implements HiddenClass {
 	);
 	
 	private static $searchable_fields = array(
-		'Address',
-		'MLS'
+		'Title' => array("title" => "Address"),
+		'MLS',
+		'NumberBed',
+		'NumberBath',
+		'Price'
 	);
 	
 	
@@ -470,19 +474,6 @@ class Listing extends Page implements HiddenClass {
 			}
 		}
 		
-		
-		if($this->ID == 0 || $this->FolderID == 0) {
-			/**
-			* Find or Create Folder under assets/Homes named $address-$city 
-			* Finds and attached the FolderID after its created
-			*/
-			$filter = URLSegmentFilter::create();
-			$folderName = $filter->filter($this->Address." ".($this->Town ? $this->Town : $this->City()->Title));
-			$folderExists = Folder::find_or_make('Homes/'.$folderName.'/');
-			$this->FolderID = $folderExists->ID;
-		}
-		
-		
 		$URLFilter = URLSegmentFilter::create();
 		
 		if($this->isChanged("Status") || $this->isChanged("Unit") || $this->isChanged("CityID") || $this->isChanged("Town") || $this->isChanged("Address") || !$this->ID == 0 ) {
@@ -490,8 +481,27 @@ class Listing extends Page implements HiddenClass {
 			$this->Street = trim(str_replace(range(0,9),'', $this->Address));
 			
 			if($this->Status == "Available") {
-				//$this->URLSegment = $URLFilter->filter($this->Address." ".(!empty($this->Unit) ? $this->Unit." ").$this->City()->Title);
-				if ($this->Unit) {
+				
+				if($this->CityID != 0) {
+					$city = MunicipalityPage::get()->byID($this->CityID);
+				}
+				
+				$this->Title = (!empty($this->Address) ? $this->Address." " : '').
+					(!empty($this->UnitNum) ? "Unit ".$this->UnitNum." " : '').
+					($city ? $city->Title." " : $this->Town." ").
+					(!empty($this->PostalCode) ? $this->PostalCode." " : '').
+					(!empty($this->MLS) ? $this->MLS." " : '');
+					
+				$this->URLSegment = $URLFilter->filter(
+					(!empty($this->Address) ? $this->Address." " : '').
+					(!empty($this->UnitNum) ? "Unit ".$this->UnitNum." " : '').
+					($city ? $city->Title." " : $this->Town." ").
+					(!empty($this->PostalCode) ? $this->PostalCode." " : '').
+					(empty($this->Address) ? $this->MLS." " : '')
+				);	
+				
+				/*
+if ($this->Unit) {
 					$this->URLSegment = $URLFilter->filter($this->Address." Unit ".$this->Unit." ".$this->Town);
 					$this->MetaTitle = $this->Address." Unit ".$this->Unit." ". $this->Town." MLS ".$this->MLS;
 					$this->Title = $this->Address." Unit ".$this->Unit." ". $this->Town." ".$this->PostalCode;
@@ -500,6 +510,7 @@ class Listing extends Page implements HiddenClass {
 					$this->MetaTitle = $this->Address." ". $this->Town." MLS ".$this->MLS;
 					$this->Title = $this->Address." ". $this->Town;
 				}
+*/
 				if (!$this->MetaDescription) {
 					$this->MetaDescription = $this->Town." Homes for Sale ".$this->Title." | ".strip_tags($this->Summary);
 				}
@@ -517,6 +528,17 @@ class Listing extends Page implements HiddenClass {
 			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
 				$this->newClassInstance("UnavailableListing");
 			}
+		}
+		
+		if($this->ID == 0 || $this->FolderID == 0) {
+			/**
+			* Find or Create Folder under assets/Homes named $address-$city 
+			* Finds and attached the FolderID after its created
+			*/
+			$filter = URLSegmentFilter::create();
+			$folderName = $filter->filter($this->Address." ".($this->Town ? $this->Town : $this->City()->Title));
+			$folderExists = Folder::find_or_make('Homes/'.$folderName.'/');
+			$this->FolderID = $folderExists->ID;
 		}
 		
 		
@@ -859,7 +881,32 @@ class Listing extends Page implements HiddenClass {
 	 * ----------------------------------*/
 	
 	 
-	 
+	public function getCustomSearchContext() {
+        $fields = $this->scaffoldSearchFields(array(
+            'restrictFields' => array(
+            	'Title',
+            	'MLS',
+				'Price',
+				'NumberBed',
+				'NumberBath'
+            )
+        ));
+        $filters = array(
+            'Address' => array(
+            	new PartialMatchFilter('City.Title'),
+            	new PartialMatchFilter('Neighbourhood.Title'),
+            	new PartialMatchFilter('Title')
+            ),
+            'Price' => new WithinRangeFilter('Price'),
+            'NumberBed' => new GreaterThanOrEqualFilter('NumberBed'),
+			'NumberBath' => new GreaterThanOrEqualFilter('NumberBath')
+        );
+        return new SearchContext(
+            $this->class, 
+            $fields, 
+            $filters
+        );
+    }
 
 }
 

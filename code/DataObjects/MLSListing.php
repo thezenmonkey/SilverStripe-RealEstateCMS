@@ -224,11 +224,14 @@ class MLSListing extends DataObjectAsPage {
 			}
 			
 			//change urls and titles segment to include city
+				$this->Title = (!empty($this->Address) ? $this->Address." " : '').
+					(!empty($this->UnitNum) ? " ".$this->UnitNum." " : '').
+					$this->Municipality." ".
+					(!empty($this->PostalCode) ? " ".$this->PostalCode." " : '').
+					$this->MLS;
 				$filter = URLSegmentFilter::create();
-				
-				$this->URLSegment = $filter->filter($this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality." ".$this->PostalCode." ".$this->MLS);
+				$this->URLSegment = $filter->filter($this->Title);
 				$this->MetaTitle = $this->Address." ". $this->Municipality;
-				$this->Title = $this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality;
 			
 			/**
 			 * Clean Values
@@ -423,5 +426,25 @@ class MLSListing extends DataObjectAsPage {
 	/**
 	 * Object methods
 	 * ----------------------------------*/
+	 
+	public function getCustomSearchContext() {
+        $fields = $this->scaffoldSearchFields(array(
+            'restrictFields' => array(
+            	'Content',
+				//'Type',
+				'PowerTrain',
+            )
+        ));
+        $filters = array(
+            'Content' => new PartialMatchFilter('Content'),
+            //'Type' => new ExactMatchFilter('Type'),
+            'PowerTrain' => new ExactMatchFilter('PowerTrain')
+        );
+        return new SearchContext(
+            $this->class, 
+            $fields, 
+            $filters
+        );
+    }
 	
 }
