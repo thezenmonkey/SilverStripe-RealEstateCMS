@@ -15,7 +15,7 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	public static $managed_models = array(
 		'Listing' => array("title" => 'Listings'),
 		'MLSListing' => array("title" => 'MLS Listings'),
-		'UnavailableListing' => array("title" => 'Unavailble Listings')
+		'UnavailableListing' => array("title" => 'Unavailable Listings')
 	);
 
 	static $url_segment = 'listings';
