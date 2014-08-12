@@ -34,6 +34,8 @@ class RealEstateSiteConfig extends DataExtension {
 	
 	private static $has_one = array(
 		"Picture" => "Image",
+		"Branding" => "Image",
+		"BrokerageLogo" => "Image",
 		"DefaultCity" => "MunicipalityPage",
 		"DefaultThankYou" => "ThankYouPage"
 	);
@@ -51,6 +53,8 @@ class RealEstateSiteConfig extends DataExtension {
 		$fields->addFieldToTab("Root.Main", EmailField::create("MainEmail", 'Main Contact Email'));
 		$fields->addFieldToTab("Root.Main", EmailField::create("SiteEmail", 'Email for Contact Forms'));
 		$fields->addFieldToTab("Root.Main", UploadField::create("Picture"));
+		$fields->addFieldToTab("Root.Main", UploadField::create("Branding"));
+		$fields->addFieldToTab("Root.Main", UploadField::create("BrokerageLogo"));
 		
 		$socialField = ToggleCompositeField::create(
 	 		"SocialGroup",
