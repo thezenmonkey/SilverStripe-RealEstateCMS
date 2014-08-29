@@ -30,10 +30,15 @@ class RETS_Controller extends Controller {
 		//rets config;
 		$bridge = $this->config()->RETSBridge;
 		// Create Log
+		
+		/*
 		$log = new RMSProcess();
 		$log->Title = "MLS Update";
 		$log->Value = $params['ID'];
 		$log->write();
+*/
+		
+		
 		if($params['ID'] == "all"){
 			$rets_username = $_RETS_SERVER_INFO['LOGIN_ALL'];
 			$previous_start_time = "2012-01-01T00:00:00";
@@ -92,7 +97,7 @@ class RETS_Controller extends Controller {
 		$listingEdited = array();
 		
 		foreach ($property_classes as $class) {
-				$log->Events()->add(RMSLogging::createEvent("Start". $class. "Query"));
+				//$log->Events()->add(RMSLogging::createEvent("Start". $class. "Query"));
 		        echo "+ Property:{$class}<br>\n";
 		        
 		        $todaysDate = date("Y-m-d");
@@ -113,14 +118,14 @@ class RETS_Controller extends Controller {
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
+			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
 			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => '500')); //set to 100 for testing array('Limit' => 100)
 		        } elseif ($params['ID'] == "check") {
 			        $query = "(Status = A)";
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
+			       // $log->Events()->add(RMSLogging::createEvent("Query", $query));
 			        $search = $rets->SearchQuery("Property", $class, $query);
 			        
 		        } else {
@@ -128,25 +133,25 @@ class RETS_Controller extends Controller {
 		
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
-			        $log->Events()->add(RMSLogging::createEvent("Query", $query));
+			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
 			        $search = $rets->SearchQuery("Property", $class, $query);
 		        }
 			    
 		
 		        if ($rets->NumRows($search) > 0) {
-						$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
+						//$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
 						echo "   + RETS returns". $rets->NumRows($search);
 		                // print filename headers as first line
 		                $fields_order = $rets->SearchGetFields($search);
 		                //fputcsv($fh, $fields_order);
-						if ($params['ID'] != "check") {
+						/*if ($params['ID'] != "check") {
 							if(class_exists('CustomMLSFilter')) {
 								$log->Events()->add(RMSLogging::createEvent("Start Filtered MLS Listing Create"));
 							} else {
 								$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Create"));
 							}
 							
-						}
+						}*/
 		                // process results
 		                while ($record = $rets->FetchRow($search)) {
 		                        $this_record = array();
@@ -171,13 +176,13 @@ class RETS_Controller extends Controller {
 		                        //fputcsv($fh, $this_record);
 		                }
 		                
-		                if ($params['ID'] != "check") {
+		                /*if ($params['ID'] != "check") {
 							$log->Events()->add(RMSLogging::createEvent("End MLS Listing Create"));
-						}
+						}*/
 		
 		        } else {
 			        
-			        $log->Events()->add(RMSLogging::createEvent("RETS Fail", implode(" ",$rets->Error()) ));
+			        //$log->Events()->add(RMSLogging::createEvent("RETS Fail", implode(" ",$rets->Error()) ));
 			        print_r($rets->Error());
 		        }
 		
@@ -197,27 +202,27 @@ class RETS_Controller extends Controller {
 		
 		//Debug::show($listingEdited);
 		if ($params['ID'] == "check") {
-	        $log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
+	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
 	        $cleanCount = $this->MLSClean($clean);
 	        $startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
-	        $event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
-	        $event->Duration = time() - strtotime($startEvent->Created) ;
-	        $event->write();
+	        //$event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
+	        //$event->Duration = time() - strtotime($startEvent->Created) ;
+	        //$event->write();
         } else {
-	        $log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
+	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
 	        $this->MLSImageUpdate($listingEdited, $rets);
-	        $event = $log->Events()->filter(array("Title" => "Start MLS Image Download"))->First();
-	        $event->Duration = time() - strtotime($event->Created);
-	        $event->write();
+	        //$event = $log->Events()->filter(array("Title" => "Start MLS Image Download"))->First();
+	        //$event->Duration = time() - strtotime($event->Created);
+	        //$event->write();
         }
 		
 		
 		echo "+ Disconnecting<br>\n";
-		$log->Events()->add(RMSLogging::createEvent("Disconenect from RETS server"));
+		//$log->Events()->add(RMSLogging::createEvent("Disconenect from RETS server"));
 		$rets->Disconnect();
-		$log->Events()->add(RMSLogging::createEvent("Complete"));
-		$log->Duration = time() - strtotime($log->Created);
-		$log->write();
+		//$log->Events()->add(RMSLogging::createEvent("Complete"));
+		//$log->Duration = time() - strtotime($log->Created);
+		//$log->write();
 		
 	}
 	
