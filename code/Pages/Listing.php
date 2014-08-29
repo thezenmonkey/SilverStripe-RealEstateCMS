@@ -139,7 +139,7 @@ class Listing extends Page implements HiddenClass {
 	private static $summary_fields = array(
 		'FrontCover',
 		'Address',
-		'City.Title',
+		'Town',
 		'Status',
 		'MLS',
 		'ListingType',
