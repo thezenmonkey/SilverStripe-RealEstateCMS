@@ -12,3 +12,6 @@ File:
 Listing:
   extensions:
     - 'Gallery_PageExtension'
+
+ListingUtils:
+  InlcudeMLS: 0
