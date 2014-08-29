@@ -22,23 +22,27 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	static $menu_title = 'Listings';
 	static $menu_icon = 'realestate/images/home.png';
 	
+/*
 	public function onBeforeInit() {
 		Versioned::reading_stage('Stage');
 	}
+*/
 	
 	public function init() 
 	{
-	    Versioned::reading_stage('Stage');
+	   // 
 	    parent::init();
 		
+		Versioned::reading_stage('Stage');
 	    //map interface JS
-	    //Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
+	    Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyCRMWuSPxE8ZrOrUSc9sJzHghKilvr7LkI");
+	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	    //Requirements::javascript("mysite/js/jquery-1.7.2.min.js");
 	    
 	    
 	   // LeftAndMain::require_javascript("RealEstate/javascript/cmsmap.js");
-	    Requirements::javascript("realestate/javascript/jquery.ui.map.full.min.js");
-	    Requirements::css("realestate/css/realestatecms.css");
+	   Requirements::javascript("realestate/javascript/jquery.ui.map.full.min.js");
+	   Requirements::css("realestate/css/realestatecms.css");
 	}
 	
 	public function getList() {
@@ -46,8 +50,8 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 		// Always limit by model class, in case you're managing multiple
 		
 		if($this->modelClass == 'Listing') {
-			//$list = Versioned::get_by_stage('Listing', 'Stage');
-			$list = $list->sort(array('Feature' => "DESC",'Status' => 'ASC','Street' => 'ASC'));
+			$list = Versioned::get_by_stage('Listing', 'Stage');
+			$list = $list->sort(array('Status' => 'ASC','Feature' => "DESC",'Street' => 'ASC'));
 		}
 		return $list;
 	}
