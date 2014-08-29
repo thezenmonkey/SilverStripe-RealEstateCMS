@@ -187,16 +187,136 @@ class MLSListing extends DataObjectAsPage {
 	public function getCMSFields() {
 	 	$fields = parent::getCMSFields();
 	 	
-	 	$fields->insertBefore ( new HeaderField('AddressHead','Address Info',2), 'ListingType' );
 	 	
-	 	$fields->makeReadOnly();
-	 	
+	 	$fields->makeFieldReadonly('ListingType');
+		$fields->makeFieldReadonly('Shares');
+		$fields->makeFieldReadonly('Acreage');
+		$fields->makeFieldReadonly('AddlMonthlyFees');
+		$fields->makeFieldReadonly('Address');
+		$fields->makeFieldReadonly('AirConditioning');
+		$fields->makeFieldReadonly('AllInclusiveRental');
+		$fields->makeFieldReadonly('ApproxAge');
+		$fields->makeFieldReadonly('ApproxSquareFootage');
+		$fields->makeFieldReadonly('AptUnit');
+		$fields->makeFieldReadonly('Area');
+		$fields->makeFieldReadonly('Assessment');
+		$fields->makeFieldReadonly('AssessmentYear');
+		$fields->makeFieldReadonly('Balcony');
+		$fields->makeFieldReadonly('Basement');
+		$fields->makeFieldReadonly('Bedrooms');
+		$fields->makeFieldReadonly('BedroomsPlus');
+		$fields->makeFieldReadonly('BuildingAmenities');
+		$fields->makeFieldReadonly('BuildingInsuranceIncluded');
+		$fields->makeFieldReadonly('CableTVIncluded');
+		$fields->makeFieldReadonly('CACIncluded');
+		$fields->makeFieldReadonly('CentralVac');
+		$fields->makeFieldReadonly('CommonElementsIncluded');
+		$fields->makeFieldReadonly('Community'); //neighbourhood
+		$fields->makeFieldReadonly('CommunityCode');
+		$fields->makeFieldReadonly('CondoCorpNum');
+		$fields->makeFieldReadonly('CondoRegistryOffice');
+		$fields->makeFieldReadonly('CondoTaxesIncluded');
+		$fields->makeFieldReadonly('DirectionsCrossStreets');
+		$fields->makeFieldReadonly('Drive');
+		$fields->makeFieldReadonly('Elevator');
+		$fields->makeFieldReadonly('Exterior');
+		$fields->makeFieldReadonly('EnsuiteLaundry');
+		$fields->makeFieldReadonly('Exposure');
+		$fields->makeFieldReadonly('Extras');
+		$fields->makeFieldReadonly('FarmAgriculture');
+		$fields->makeFieldReadonly('FireplaceStove');
+		$fields->makeFieldReadonly('Fronting');
+		$fields->makeFieldReadonly('Furnished');
+		$fields->makeFieldReadonly('GarageSpaces');
+		$fields->makeFieldReadonly('GarageType');
+		$fields->makeFieldReadonly('HeatIncluded');
+		$fields->makeFieldReadonly('HeatSource');
+		$fields->makeFieldReadonly('HeatType');
+		$fields->makeFieldReadonly('HydroIncluded');
+		$fields->makeFieldReadonly('IDXUpdatedDate');
+		$fields->makeFieldReadonly('Kitchens');
+		$fields->makeFieldReadonly('KitchensPlus');
+		$fields->makeFieldReadonly('LaundryAccess');
+		$fields->makeFieldReadonly('LaundryLevel');
+		$fields->makeFieldReadonly('LeaseTerm');
+		$fields->makeFieldReadonly('LegalDescription');
+		$fields->makeFieldReadonly('ListBrokerage');
+		$fields->makeFieldReadonly('Price');
+		$fields->makeFieldReadonly('Locker');
+		$fields->makeFieldReadonly('LockerNum');
+		$fields->makeFieldReadonly('LotDepth');
+		$fields->makeFieldReadonly('LotFront');
+		$fields->makeFieldReadonly('LotIrregularities');
+		$fields->makeFieldReadonly('LotSizeCode');
+		$fields->makeFieldReadonly('Maintenance');
+		$fields->makeFieldReadonly('MapNum');
+		$fields->makeFieldReadonly('MapColumnnNum');
+		$fields->makeFieldReadonly('MapRow');
+		$fields->makeFieldReadonly('MLS');
+		$fields->makeFieldReadonly('Municipality');
+		$fields->makeFieldReadonly('MunicipalityDistrict');
+		$fields->makeFieldReadonly('MunicpCode');
+		$fields->makeFieldReadonly('OtherStructures');
+		$fields->makeFieldReadonly('OutofAreaMunicipality');
+		$fields->makeFieldReadonly('ParkCostMo');
+		$fields->makeFieldReadonly('ParkingIncluded');
+		$fields->makeFieldReadonly('ParkingLegalDescription');
+		$fields->makeFieldReadonly('ParkingSpaces');
+		$fields->makeFieldReadonly('ParkingSpot1');
+		$fields->makeFieldReadonly('ParkingSpot2');
+		$fields->makeFieldReadonly('ParkingType');
+		$fields->makeFieldReadonly('ParkingType2');
+		$fields->makeFieldReadonly('ParkingDrive');
+		$fields->makeFieldReadonly('PetsPermitted');
+		$fields->makeFieldReadonly('PIN');
+		$fields->makeFieldReadonly('PixUpdatedDate');
+		$fields->makeFieldReadonly('Pool');
+		$fields->makeFieldReadonly('PostalCode');
+		$fields->makeFieldReadonly('PrivateEntrance');
+		$fields->makeFieldReadonly('PropertyFeatures1');
+		$fields->makeFieldReadonly('Province');
+		$fields->makeFieldReadonly('RemarksForClients');
+		$fields->makeFieldReadonly('Retirement');
+		$fields->makeFieldReadonly('TotalRooms');
+		$fields->makeFieldReadonly('RoomsPlus');
+		$fields->makeFieldReadonly('SaleLease');
+		$fields->makeFieldReadonly('SellerPropertyInfoStatement');
+		$fields->makeFieldReadonly('Sewers');
+		$fields->makeFieldReadonly('SpecialDesignation1');
+		$fields->makeFieldReadonly('MLSStatus');
+		$fields->makeFieldReadonly('StreetNum');
+		$fields->makeFieldReadonly('StreetAbbreviation');
+		$fields->makeFieldReadonly('StreetDirection');
+		$fields->makeFieldReadonly('StreetName');
+		$fields->makeFieldReadonly('Style');
+		$fields->makeFieldReadonly('TaxYear');
+		$fields->makeFieldReadonly('Taxes');
+		$fields->makeFieldReadonly('Type');
+		$fields->makeFieldReadonly('UFFI');
+		$fields->makeFieldReadonly('UnitNum');
+		$fields->makeFieldReadonly('UpdatedTimestamp');
+		$fields->makeFieldReadonly('UtilitiesCable');
+		$fields->makeFieldReadonly('UtilitiesGas');
+		$fields->makeFieldReadonly('UtilitiesHydro');
+		$fields->makeFieldReadonly('UtilitiesTelephone');
+		$fields->makeFieldReadonly('Washrooms');
+		$fields->makeFieldReadonly('Water');
+		$fields->makeFieldReadonly('WaterIncluded');
+		$fields->makeFieldReadonly('WaterSupplyTypes');
+		$fields->makeFieldReadonly('Waterfront');
+		$fields->makeFieldReadonly('Zoning');
+		
+		 	
 	 	$gridFieldConfig = GridFieldConfig_RelationEditor::create();
 	 	$gridFieldConfig->addComponent(
 	 		new GridFieldDeleteAction()
 	 	);
 	 	$gridField = new GridField('Images', 'Linked images', $this->Images(), $gridFieldConfig);
 	 	
+	 	$fields->insertBefore ( HeaderField::create('AddressHead','Address Info',2), 'ListingType' );
+	 	if($this->CityID) {
+		 	$fields->insertAfter(DropdownField::create('NeighbourhoodID', "Neighbourhood", NeighbourhoodPage::get()->filter(array('ParentID' => $this->CityID))->map("ID", "Title"))->setEmptyString('(Select one)'), "IsFeatured");
+	 	}
 	 	
 	 	$fields->addFieldToTab("Root.Images", $gridField);
 	 	
@@ -224,14 +344,11 @@ class MLSListing extends DataObjectAsPage {
 			}
 			
 			//change urls and titles segment to include city
-				$this->Title = (!empty($this->Address) ? $this->Address." " : '').
-					(!empty($this->UnitNum) ? " ".$this->UnitNum." " : '').
-					$this->Municipality." ".
-					(!empty($this->PostalCode) ? " ".$this->PostalCode." " : '').
-					$this->MLS;
 				$filter = URLSegmentFilter::create();
-				$this->URLSegment = $filter->filter($this->Title);
+				
+				$this->URLSegment = $filter->filter($this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality." ".$this->PostalCode." ".$this->MLS);
 				$this->MetaTitle = $this->Address." ". $this->Municipality;
+				$this->Title = $this->Address.(!empty($this->UnitNum) ? " ".$this->UnitNum : '')." ". $this->Municipality;
 			
 			/**
 			 * Clean Values
@@ -384,7 +501,7 @@ class MLSListing extends DataObjectAsPage {
 	}
 	
 	
-	 function RelatedProperties($count = 4) {
+	function RelatedProperties($count = 4) {
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
@@ -393,15 +510,32 @@ class MLSListing extends DataObjectAsPage {
 		 	$varience = 50000;
 	 	}
 	 	
- 		$items = Listing::get()->filter(array(
+	 	$items = new ArrayList();
+	 	
+	 	$ownItems = Listing::get()->filter(array(
  			"CityID" => $this->CityID,
  			"Status" => "Available",
  			"Price:LessThan" => $this->Price + 50000,
  			"Price:GreaterThan" => $this->Price - 50000
  		))->limit($count);
 	 	
-	 	if($items) {
-	 		return $items;
+	 	if($ownItems && $ownItems->count()) {
+		 	$items->merge($ownItems);
+	 	}
+	 	
+	 	$mlsItems = MLSListing::get()->filter(array(
+ 			"CityID" => $this->CityID,
+ 			"IsFeatured" => 1,
+ 			"Price:LessThan" => $this->Price + 50000,
+ 			"Price:GreaterThan" => $this->Price - 50000
+ 		))->exclude("ID", $this->ID)->limit($count);
+	 	
+	 	if($mlsItems && $mlsItems->count()) {
+		 	$items->merge($mlsItems);
+	 	}
+	 	
+	 	if($items->count()) {
+	 		return $items->limit($count);
 	 	} else {
 	 		return false;
 	 	}
@@ -426,25 +560,5 @@ class MLSListing extends DataObjectAsPage {
 	/**
 	 * Object methods
 	 * ----------------------------------*/
-	 
-	public function getCustomSearchContext() {
-        $fields = $this->scaffoldSearchFields(array(
-            'restrictFields' => array(
-            	'Content',
-				//'Type',
-				'PowerTrain',
-            )
-        ));
-        $filters = array(
-            'Content' => new PartialMatchFilter('Content'),
-            //'Type' => new ExactMatchFilter('Type'),
-            'PowerTrain' => new ExactMatchFilter('PowerTrain')
-        );
-        return new SearchContext(
-            $this->class, 
-            $fields, 
-            $filters
-        );
-    }
 	
 }
