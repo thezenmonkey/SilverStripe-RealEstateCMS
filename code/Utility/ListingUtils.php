@@ -94,7 +94,7 @@ class ListingUtils {
 		}
 	}
 	
-	public function RelatedListings($class, $id, $count) {
+	static public function RelatedListings($class, $id, $count) {
 		$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
@@ -116,10 +116,12 @@ class ListingUtils {
 			
 			$listingItems = Listing::get()->filter(array(
 				"CityID" => $item->CityID,
-				"Status" => "Available",
+				"Status" => "Available"/*
+,
 				"Price:LessThan " => $item->Price + 50000,
 				"Price:GreaterThan" => $item->Price - 50000
-			))->exclude('ID', $id)->limit($count);
+*/
+			))->limit($count);
 		} else {
 			 $listingItems = Listing::get()->filter(array(
 				"CityID" => $item->CityID,
@@ -133,9 +135,8 @@ class ListingUtils {
 		 	$items->merge($listingItems);
 	 	}
 	 	
-	 	$includeMLS = $this->config()->get('InlcudeMLS');
-	 	
-	 	if($includeMLS) {
+	 	$includeMLS = Config::inst()->get('ListingUtils', 'InlcudeMLS');
+	 	if($includeMLS != 0) {
 		 	
 		 	if($class = "MLSListing") {
 				$mlsItems = MLSListing::get()->filter(array(
