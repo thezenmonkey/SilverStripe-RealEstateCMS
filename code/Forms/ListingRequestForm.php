@@ -13,16 +13,11 @@ class ListingRequestForm extends Form {
 			TextField::create('Name')->setAttribute('required', true)->setCustomValidationMessage("Please include your name", "error"),
 			EmailField::create('Email','E-Mail Address')->setAttribute('required', true)->setCustomValidationMessage("Please include your email address", "error"),
 			TextField::create('Phone'),
-			TextareaField::create("Company", "Message")->setAttribute('autocomplete', 'no'),
-            TextareaField::create("EmailMessage", "Company")->addExtraClass("honeypot")->setAttribute('autocomplete', 'no'),
+			TextareaField::create("Company", "Message", "Please send me more information about ".$controller->Address)->setAttribute('autocomplete', 'no'),
 			HiddenField::create('Address', '', $controller->Address),
 			HiddenField::create('ID', '', $controller->ID),
 			HiddenField::create('HiddenMLS', 'HiddenMLS', $controller->MLS)
 		);
-		
-		if(!class_exists('StaticPublisher')) {
-	        $fields->insertAfter( HiddenField::create("TimeLog", '', time()), 'EmailMessage' );
-        }
 		
 		// Create actions
 		$actions = new FieldList(
@@ -47,21 +42,6 @@ class ListingRequestForm extends Form {
 	
 	function doSubmit($data, $form) {
 		
-		//check honeypot
-		if( $data['EmailMessage']  ) {
-			$form->addErrorMessage('Message', 'We may have mistakenly marked your message as spam, please contact us via phone or email', 'warning');
-			Controller::curr()->redirectBack();
-		}
-		
-		//check timer
-		if(!class_exists('StaticPublisher')) {
-			$time = time() - 20;
-			if ($data['TimeLog'] <= $time ){
-				$form->addErrorMessage('Message', 'We may have mistakenly marked your message as spam, please contact us via phone or email', 'warning');
-				Controller::curr()->redirectBack();
-			}
-			
-		}
 		//Set data
 		$siteConfig = SiteConfig::current_site_config();
 		if($siteConfig->ContactFormFrom){
