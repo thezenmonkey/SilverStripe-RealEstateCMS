@@ -194,6 +194,18 @@ class Listing extends Page implements HiddenClass {
 	 		)
 	 	);
 	 	
+	 	$useAgents = $this->config()->get('UseAgents');
+	 	
+	 	if($useAgents && $useAgents != 0) {
+		 	$agents = Member::get();
+		 	if($agents->count()) {
+			 	$statusField->push(
+			 		DropdownField::create('AgentID', 'Listing Agent', $agents->map('ID', 'Title'))->setEmptyString('(Select one)')->addExtraClass('stacked')
+			 	);
+		 	}
+		 	
+	 	}
+	 	
 	 	/**
 	 	 *  Check if Multiple Cities or Default City is Set and configure Dropdown Accordingly
 	 	 */
