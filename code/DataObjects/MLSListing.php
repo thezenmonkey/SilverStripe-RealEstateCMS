@@ -496,6 +496,10 @@ class MLSListing extends DataObjectAsPage {
 		return ($this->CityID != 0) ? $this->City()->Title : $this->Municipality;
 	}
 	
+	public function OrderedImages() {
+		return $this->Images()->count() ? $this->Images() : false;
+	}
+	
 	public function SiteConfig() {
 		return SiteConfig::current_site_config();
 	}
