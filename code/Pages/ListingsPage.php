@@ -331,6 +331,22 @@ class ListingsPage_Controller extends DataObjectAsPageHolder_Controller
 		}
 	}
 	
+	public function getAddress() {
+		if($item = $this->getCurrentItem()) {
+			return $item->Address;
+		} else {
+			return false;
+		}
+	}
+	
+	public function getMLS() {
+		if($item = $this->getCurrentItem()) {
+			return $item->MLS;
+		} else {
+			return false;
+		}
+	}
+	
 	
 	function showgallery() {
 	
