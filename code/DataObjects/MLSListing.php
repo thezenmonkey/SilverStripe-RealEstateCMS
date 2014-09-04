@@ -140,6 +140,7 @@ class MLSListing extends DataObjectAsPage {
 		'TotalRooms' => "Varchar(10)",
 		'RoomsPlus' => "Varchar(10)",
 		'SaleLease' => "Varchar(9)",
+		'SaleOrRent' => "Varchar(9)", //Keep consistent with Listing
 		'SellerPropertyInfoStatement' => "Varchar(10)",
 		'Sewers' => "Varchar(15)",
 		'SpecialDesignation1' => "Varchar",
@@ -280,6 +281,7 @@ class MLSListing extends DataObjectAsPage {
 		$fields->makeFieldReadonly('TotalRooms');
 		$fields->makeFieldReadonly('RoomsPlus');
 		$fields->makeFieldReadonly('SaleLease');
+		$fields->makeFieldReadonly('SaleOrRent');
 		$fields->makeFieldReadonly('SellerPropertyInfoStatement');
 		$fields->makeFieldReadonly('Sewers');
 		$fields->makeFieldReadonly('SpecialDesignation1');
@@ -438,6 +440,47 @@ class MLSListing extends DataObjectAsPage {
 	public function LotAcreage() {
 		return !$this->Acreage ? $this->Acreage : false;
 	}
+	
+	//TODO ADD TO DOC
+	
+	public function Garage() {
+		return !$this->GarageType ? $this->GarageType : false;
+	}
+	
+	public function DriveWay() {
+		return !$this->Drive ? $this->Drive : false;
+	}
+	
+	public function AC() {
+		return !$this->AirConditioning ? $this->AirConditioning : false;
+	}
+	
+	public function Heat() {
+		return !$this->HeatType ? $this->HeatType : false;
+	}
+	
+	public function Construction() {
+		return !$this->Exterior ? $this->Exterior : false;
+	}
+	
+	public function Age() {
+		return !$this->ApproxAge ? $this->ApproxAge : false;
+	}
+	
+	public function Sewer() {
+		return !$this->Sewers ? $this->Sewers : false;
+	}
+	
+	public function TotalRooms() {
+		return !$this->NumberRooms ? $this->NumberRooms.(!$this->RoomsPlus ? '+'.$this->RoomsPlus : '') : false;
+	}
+	
+	public function TotalArea() {
+		return !$this->ApproxSquareFootage ? $this->ApproxSquareFootage : false;
+	}
+	
+	
+	// END TO DO
 	
 	public function FormattedPrice() {
 		setlocale(LC_MONETARY, 'en_CA');
