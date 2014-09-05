@@ -56,4 +56,14 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 		return $list;
 	}
 	
+	public function getEditForm($id = null, $fields = null) {
+        $form = parent::getEditForm($id, $fields);
+        // $gridFieldName is generated from the ModelClass, eg if the Class 'Product'
+        // is managed by this ModelAdmin, the GridField for it will also be named 'Product'
+        $gridFieldName = $this->sanitiseClassName($this->modelClass);
+        $gridField = $form->Fields()->fieldByName($gridFieldName);
+        $gridField->getConfig()->removeComponentsByType('GridFieldDeleteAction');
+        return $form;
+    }
+	
 }
