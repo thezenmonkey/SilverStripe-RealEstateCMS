@@ -581,12 +581,18 @@ if ($this->Unit) {
 	}
 	
 	function onBeforeDelete() {
-	
+		
+		
+		
 		if($this->FolderID != 0){
 			$folder = Folder::get()->byID($this->FolderID);
 			
 			if($folder) {
-				$folder->delete();	
+				$listingsUsing = Listing::get()->filter(array("FolderID" => $folder->ID));
+				// Delete Folder Only if this is the only listing using it.
+				if($listingsUsing.count()) {
+					$folder->delete();
+				}
 			}
 		}
 		
