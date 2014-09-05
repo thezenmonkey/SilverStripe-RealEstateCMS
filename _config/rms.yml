@@ -1,0 +1,27 @@
+---
+Name: realestate
+---
+# Set ShowInMenus and ShowInSearch to 0 if not using Neighbourhood Landing Pages  
+# NeighbourhoodPage:
+#  defaults:
+#    'ShowInMenus': 1
+#    'ShowInSearch': 1
+# BlogEntry:
+#  extensions:
+#    - "RMSBlogExtension"
+#Community:
+#  extensions:
+#    - "BlogCommunityExtension"
+
+#RETS_Controller:
+#  RETSBridge:
+#    - "TREBConvert"
+
+#Listing:
+#  UseAgents: 1
+
+ListingsPage:
+ ShowCities: 0
+ 
+RETS_Controller:
+  MLSLimit: 0
