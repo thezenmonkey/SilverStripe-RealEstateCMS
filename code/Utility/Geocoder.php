@@ -51,15 +51,6 @@ class Geocoder  {
 			} else {
 			  // failure to geocode
 			  $geocode_pending = false;
-			  $errorMes = "Address " . $address . " failed to geocoded. Received status " . $status . "\n";
-			  
-					$From = "geocode@dancooper.com";
-				$To = "rick@designplusawesome.com";
-				$Subject = "GeoCoder Error";
-				$body = $errorMes . " Address " . $address . " failed to geocoded. Received status " . $status . "\n";
-				$email = new Email($From, $To, $Subject, $body);
-				//send mail
-				$email->send();
 			  echo "Address " . $address . " failed to geocoded. ";
 			  echo "Received status " . $status . "\n";
 			}
