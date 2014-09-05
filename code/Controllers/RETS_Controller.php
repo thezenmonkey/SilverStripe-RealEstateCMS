@@ -29,6 +29,9 @@ class RETS_Controller extends Controller {
 		$params = Controller::getURLParams();
 		//rets config;
 		$bridge = $this->config()->RETSBridge;
+		$retLimit = $this->config()->MLSLimit;
+		echo "Using ".$bridge."<br>\n";
+		echo "Limit ".$retLimit."<br>\n";
 		// Create Log
 		
 		/*
@@ -119,7 +122,14 @@ class RETS_Controller extends Controller {
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-			        $search = $rets->SearchQuery("Property", $class, $query, array('Limit' => '500')); //set to 100 for testing array('Limit' => 100)
+					if($this->config()->MLSLimit == 0) {
+						$search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+					} else {
+						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $this->config()->MLSLimit)); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+					}
+			        
 		        } elseif ($params['ID'] == "check") {
 			        $query = "(Status = A)";
 		
@@ -134,7 +144,13 @@ class RETS_Controller extends Controller {
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-			        $search = $rets->SearchQuery("Property", $class, $query);
+			       if($this->config()->MLSLimit == 0) {
+						$search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+					} else {
+						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $this->config()->MLSLimit)); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+					}
 		        }
 			    
 		
@@ -204,7 +220,7 @@ class RETS_Controller extends Controller {
 		if ($params['ID'] == "check") {
 	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
 	        $cleanCount = $this->MLSClean($clean);
-	        $startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
+	        //$startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
 	        //$event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
 	        //$event->Duration = time() - strtotime($startEvent->Created) ;
 	        //$event->write();
