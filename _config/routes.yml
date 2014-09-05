@@ -8,7 +8,7 @@ Director:
     # 'MLSSearch': 'MLSSearchController'
     'property/$Action/$ID/$Name' : 'RMSController',
     'rmssearch/$Action/$ID/$Name' : 'RMSController',
-    'rets/$Action/$ID/$Name' : 'RETS_Controller'
+    'rets/$$Action/$ID/$Name' : 'RETS_Controller'
 ---
 Name: maintenance
 After: framework/routes#coreroutes
