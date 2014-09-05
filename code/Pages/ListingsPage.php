@@ -282,6 +282,10 @@ public function ThisCity($City) {
 		
 		return $set->count() ? $set : false;
 	 }
+	 
+	 public function getShowCities() {
+		return $this->config()->ShowCities;
+	 }
 
 	/**
 	 * Object methods
