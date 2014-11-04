@@ -82,11 +82,52 @@ class TeamPage extends Page {
 class TeamPage_Controller extends Page_Controller {
 	
 	private static $allowed_actions = array (
+		"show"
 	);
 
 	public function init() {
 		parent::init();
 		
+	}
+	
+	public function getCurrentItem($itemID = null) {
+		$params = $this->request->allParams();
+		$class =  "Member";		
+		
+		if($itemID)
+		{
+			return $class::get()->byID($itemID);
+		}
+		elseif(isset($params['ID']))
+		{
+			//Sanitize
+			$URL = Convert::raw2sql($params['ID']);
+			
+			return $class::get()->filter("URLSegment", $URL)->first();
+		}		
+	}
+	
+	function show() {
+		if(($item = $this->getCurrentItem()))
+		{
+			if ($this->getCurrentItem()->canView())
+			{
+				$data = array(
+					'Item' => $item,
+					'BackLink' => base64_decode($this->request->getVar('backlink'))
+				);
+
+				return $this->customise(new ArrayData($data));
+			}
+			else
+			{
+				return Security::permissionFailure($this);
+			}
+		}
+		else
+		{
+			return $this->httpError(404);
+		}
 	}
 	
 }

@@ -32,6 +32,7 @@ class Agent extends DataExtension {
 		 	"Cell" => "Varchar",
 		 	"SortOrder" => "Int",
 		 	"Bio" => "HTMLText",
+		 	"URLSegment" => "Varchar"
 		 );
 		 
 		 static $has_many = array(
@@ -69,6 +70,8 @@ class Agent extends DataExtension {
 	
 	function onBeforeWrite() {
 		
+		$filter = URLSegmentFilter::create();
+		$folderName = $filter->filter($this->owner->Title);
 			
 		if ($this->owner->FolderID == 0) {
 		
@@ -77,10 +80,12 @@ class Agent extends DataExtension {
 			* Find or Create Folder under assets/Homes named $address-$city 
 			* Finds and attached the FolderID after its created
 			*/
-			$filter = URLSegmentFilter::create();
-			$folderName = $filter->filter($this->owner->Title);
 			$folderExists = Folder::find_or_make('Uploads/Agents/'.$folderName.'/');
 			$this->owner->FolderID = $folderExists->ID;
+		}
+		
+		if(!$this->owner->URLSegment) {
+			$this->owner->URLSegment = $folderName;
 		}
 		
 		parent::onBeforeWrite();
