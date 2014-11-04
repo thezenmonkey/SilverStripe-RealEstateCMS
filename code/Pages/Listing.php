@@ -538,9 +538,11 @@ if ($this->Unit) {
 			}
 			
 			if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName != "Listing") {
-				$this->newClassInstance("Listing");
+				//$this->newClassInstance("Listing");
+				$this->ClassName('Listing');
 			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
-				$this->newClassInstance("UnavailableListing");
+				//$this->newClassInstance("UnavailableListing");
+				$this->ClassName('UnavailableListing');
 			}
 		}
 		
