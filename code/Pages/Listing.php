@@ -34,7 +34,8 @@ class Listing extends Page implements HiddenClass {
 		//basic sale data
 		'Status' => "Enum('Available,Sold,Closed,Unavailable')", //Listing Availabilty (see onBeforeWrite)
 		'Feature' => 'Boolean', //Flag to define if the listing is considerd a "Feature Listing"
-		'IsNew' => 'Boolean', //Flag to define if a listing is considerd New
+		'IsNew' => 'Boolean', //Flag to define if a listing is considerd New DEPRECIATED
+		'Flag' => "Enum('None,New,Exclusive')", //Optoinal Listing Flags for secial cases (New Listings and Exclusives)
 		'MLS' => "Varchar(100)", //MLS number for primary board (see AddiionalMLS)
 		'ListingType' => "Enum('Residential,Condo,Commercial')", //Type of property based of TREB IDX classification
 		'SaleOrRent' => "Enum('Sale,Lease')", //If listing is classified as a For Sale or For Rent
@@ -189,7 +190,8 @@ class Listing extends Page implements HiddenClass {
 	 			DropdownField::create("Status", "Status", singleton('Listing')->dbObject('Status')->enumValues())->addExtraClass('noborder'),
 	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease"))->addExtraClass('noborder'),
 	 			CheckboxField::create("Feature")->addExtraClass('noborder'),
-	 			CheckboxField::create("IsNew")->addExtraClass('noborder'),
+	 			//CheckboxField::create("IsNew")->addExtraClass('noborder'),
+	 			DropdownField::create("Flag", "Listing Flag", singleton('Listing')->dbObject('Flag')->enumValues())->addExtraClass('noborder'),
 	 			TextField::create("MLS", "MLS Number"),
 	 		)
 	 	);
@@ -822,7 +824,7 @@ if ($this->Unit) {
 	
 	
 	public function UpcomingOpenHouse() {
-		$OpenHouses = $this->OpenHouseDates()->filter(array("OpenHouseDate:greaterThan" => strtotime("today")));
+		$OpenHouses = $this->OpenHouseDates()->filter(array("OpenHouseDate:GreaterThanOrEqual" => strtotime("today")));
 		return $OpenHouses->count() ? $OpenHouses : false;
 	}
 	
