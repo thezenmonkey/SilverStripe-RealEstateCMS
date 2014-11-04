@@ -627,9 +627,11 @@ if ($this->Unit) {
 	 * Accessor methods
 	 * ----------------------------------*/
 	
-	public function getTown(){
+	/*
+public function getTown(){
 		return $this->City() ? $this->City()->Title : $this->Town;
 	}
+*/
 	
 	public function getProvince() {
 		$siteConfig = SiteConfig::current_site_config();
