@@ -227,6 +227,9 @@ public function GetMLSNumber($number) {
 		 return MunicipalityPage::get();
 	 }
 	 
+	 public function GetCity() {
+		 return $this->City ? $this->City : false;
+	 }
 	 /*
 public function ThisCity($City) {
 		 return MunicipalityPage::get()->byID($City);
@@ -250,7 +253,7 @@ public function ThisCity($City) {
 		
 		if($filterList) {
 			
-			$listings = Listing::get()->filter(array("Town" => $filter));
+			$listings = Listing::get()->filter(array("Town" => $filterList));
 			return $listings->count() ? $listings : false;
 			
 		} else {
