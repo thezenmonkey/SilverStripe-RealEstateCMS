@@ -94,6 +94,15 @@ class ListingUtils {
 		}
 	}
 	
+	/**
+	 * Generate ArrayList of Related Properties
+	 *
+	 * @param $class DataObject Class to Search
+	 * @param $id = ID of the Subject Property
+	 * @param $count = INT of items to return
+	 * @return ArrayList()
+	 */
+	
 	static public function RelatedListings($class, $id, $count) {
 		$siteConfig = SiteConfig::current_site_config();
 	 	
@@ -116,11 +125,7 @@ class ListingUtils {
 			
 			$listingItems = Listing::get()->filter(array(
 				"CityID" => $item->CityID,
-				"Status" => "Available"/*
-,
-				"Price:LessThan " => $item->Price + 50000,
-				"Price:GreaterThan" => $item->Price - 50000
-*/
+				"Status" => "Available"
 			))->limit($count);
 		} else {
 			 $listingItems = Listing::get()->filter(array(
@@ -165,5 +170,6 @@ class ListingUtils {
 	 	}
 
 	}
+	
 	
 }
