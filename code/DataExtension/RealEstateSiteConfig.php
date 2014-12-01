@@ -16,12 +16,12 @@ class RealEstateSiteConfig extends DataExtension {
 		//Social Media
 		'Twitter' => 'Varchar',
 		'LinkedInURL' => 'Varchar',
-		'FacebookURL' => 'Varchar',
-		'GooglePlusURL' => 'Varchar',
-		'PinterestURL' => 'Varchar',
-		'YouTubeURL' => 'Varchar',
-		'InstagramURL' => 'Varchar',
-		'TumblrURL' => 'Varchar',
+		'FacebookURL' => 'Varchar(255)',
+		'GooglePlusURL' => 'Varchar(255)',
+		'PinterestURL' => 'Varchar(255)',
+		'YouTubeURL' => 'Varchar(255)',
+		'InstagramURL' => 'Varchar(255)',
+		'TumblrURL' => 'Varchar(255)',
 		//Real Estate Defaults
 		"DefaultProvince" => "Varchar",
 		"InterestRate" => "Decimal",
