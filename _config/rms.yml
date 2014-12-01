@@ -25,3 +25,8 @@ ListingsPage:
  
 RETS_Controller:
   MLSLimit: 0
+
+ListingUtils:
+  InlcudeMLS: 1
+  MLSFilter: "Feature"
+  
