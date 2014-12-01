@@ -496,20 +496,22 @@ class Listing extends Page implements HiddenClass {
 			
 			if($this->Status == "Available") {
 				
+				$city = 0;
+				
 				if($this->CityID != 0) {
 					$city = MunicipalityPage::get()->byID($this->CityID);
 				}
 				
 				$this->Title = (!empty($this->Address) ? $this->Address." " : '').
 					(!empty($this->UnitNum) ? "Unit ".$this->UnitNum." " : '').
-					($city ? $city->Title." " : $this->Town." ").
+					( (gettype($city) == "object") ? $city->Title." " : $this->Town." ").
 					(!empty($this->PostalCode) ? $this->PostalCode." " : '').
 					(!empty($this->MLS) ? $this->MLS." " : '');
 					
 				$this->URLSegment = $URLFilter->filter(
 					(!empty($this->Address) ? $this->Address." " : '').
 					(!empty($this->UnitNum) ? "Unit ".$this->UnitNum." " : '').
-					($city ? $city->Title." " : $this->Town." ").
+					( (gettype($city) == "object") ? $city->Title." " : $this->Town." ").
 					(!empty($this->PostalCode) ? $this->PostalCode." " : '').
 					(empty($this->Address) ? $this->MLS." " : '')
 				);	
@@ -537,13 +539,17 @@ if ($this->Unit) {
 				$this->MetaDescription = "Homes for Sale in ".$this->Town." ".$this->Title." sold by ".$config->BusinessName;
 			}
 			
-			if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName != "Listing") {
+			/*
+if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName == "UnavailableListing") {
 				//$this->newClassInstance("Listing");
-				$this->ClassName('Listing');
+				//$this->ClassName('Listing');
+				$this->ClassName == "Listing";
 			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
 				//$this->newClassInstance("UnavailableListing");
-				$this->ClassName('UnavailableListing');
+				//$this->ClassName('UnavailableListing');
+				$this->ClassName = "UnavailableListing";
 			}
+*/
 		}
 		
 		if($this->ID == 0 || $this->FolderID == 0) {
