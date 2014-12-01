@@ -131,6 +131,46 @@ class ListingsPage extends DataObjectAsPageHolder
 		
 		return $listings->count() ? $listings : false;
 	}
+	
+	/**
+	 * Return Listings without a City 
+	 *
+	 * @param $sold use 1 to include Sold Listings
+	 * @param $count number of listings to return
+	 * @return DataList
+	 */
+	
+	public function TownListings($count = null, $sold = null) {
+		$sqlQuery = new SQLQuery();
+		$sqlQuery->setFrom('Listing');
+		$sqlQuery->setWhere('CityID = 0');
+		if($sold == "1") {
+			$sqlQuery->addWhere("Status IN ('Available', 'Sold')");
+		} else {
+			$sqlQuery->addWhere("Status = 'Available'");
+		}
+		
+		$sqlQuery->selectField('Town');
+		$sqlQuery->setDistinct(true);
+		$result = $sqlQuery->execute();
+		
+		$townList = array();
+		foreach($result as $row){
+			array_push($townList, $row['Town']);
+		}
+		 
+		$filterList = (array_filter($townList));
+		
+		if($filterList) {
+			
+			$listings = Listing::get()->filter(array("Town" => $filterList));
+			
+			return $listings->count() ? ($count) ? $listings->limit($count) : $listings : false;
+			
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Common methods
@@ -236,30 +276,6 @@ public function ThisCity($City) {
 	 }
 */
 	 
-	 public function TownListings() {
-		$sqlQuery = new SQLQuery();
-		$sqlQuery->setFrom('Listing');
-		$sqlQuery->setWhere('CityID = 0');
-		$sqlQuery->selectField('Town');
-		$sqlQuery->setDistinct(true);
-		$result = $sqlQuery->execute();
-		
-		$townList = array();
-		foreach($result as $row){
-			array_push($townList, $row['Town']);
-		}
-		 
-		$filterList = (array_filter($townList));
-		
-		if($filterList) {
-			
-			$listings = Listing::get()->filter(array("Town" => $filterList));
-			return $listings->count() ? $listings : false;
-			
-		} else {
-			return false;
-		}
-	 }
 	 
 	 
 	 //Client Specific
