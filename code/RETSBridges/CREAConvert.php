@@ -134,6 +134,7 @@ class CREAConvert {
 		$MLSListing->UpdatedTimestamp = $MLSRecord['ModificationTimestamp'];
 		$MLSListing->Washrooms = $MLSRecord['BathroomsTotal'];
 		$MLSListing->Zoning = $MLSRecord['Zoning'];
+		$MLSListing->SourceKey = $MLSRecord['ListingKey'];
 		
 		return $MLSListing;
 	}
