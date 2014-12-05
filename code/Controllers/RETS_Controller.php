@@ -20,18 +20,41 @@ class RETS_Controller extends Controller {
         return Director::is_cli() || Permission::check('ADMIN');
     }
 	
-	
-	
+	public function getRetsConfig() {
+		$config = array (
+			"loginURL"		=> $this->config()->LoginURL,
+			"bridge"		=> $this->config()->RETSBridge,
+			"limit"			=> $this->config()->MLSLimit,
+			"retskey"		=> $this->config()->KeyField,
+			"photosize"		=> $this->config()->PhotoSize,
+			"useDDF"		=> $this->config()->UseDDF, 
+			"loginall"		=> $this->config()->LoginAll,
+			"loginupdate"	=> $this->config()->LoginUpdate,
+			"password" 		=> $this->config()->Password
+		);
+		
+		return $config;
+	}
 	
 	public function MLSUpdate() {
 		global $_RETS_SERVER_INFO;
-		$rets_login_url = $_RETS_SERVER_INFO['URL'];
-		$params = Controller::getURLParams();
-		//rets config;
+		
+		$retsConfig = $this->getRetsConfig();
+		
+		$rets_login_url = $this->config()->LoginURL;
 		$bridge = $this->config()->RETSBridge;
 		$retLimit = $this->config()->MLSLimit;
+		$retsKey = $this->config()->KeyField;
+		$photoSize = $this->config()->PhotoSize;
+		$useDDF = $this->config()->PhotoSize;
+		
+		$params = Controller::getURLParams();
+		
+		
+		
 		echo "Using ".$bridge."<br>\n";
 		echo "Limit ".$retLimit."<br>\n";
+		echo "Key ".$retsKey."<br>\n";
 		// Create Log
 		
 		/*
@@ -39,27 +62,26 @@ class RETS_Controller extends Controller {
 		$log->Title = "MLS Update";
 		$log->Value = $params['ID'];
 		$log->write();
-*/
+		*/
 		
 		
 		if($params['ID'] == "all"){
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_ALL'];
-			$previous_start_time = "2012-01-01T00:00:00";
+			$rets_username = $retsConfig['loginall'];
+			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24 * 356 * 2)."T00:00:00";
 		} elseif  ($params['ID'] == "update"){
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_UPDATE'];
+			$rets_username = $retsConfig['loginupdate'];
 			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24)."T00:00:00";
 			//$previous_start_time = "2012-10-10T00:00:00";
 		} elseif ($params['ID'] == "check") {
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_ALL'];
+			$rets_username = $retsConfig['loginall'];
 			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24)."T00:00:00";
 			$clean = array();
 		} elseif ($params['ID'] == "quick") {
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_UPDATE'];
+			$rets_username = $retsConfig['loginupdate'];
 			$previous_start_time = date("Y-m-d")."T".date("H:i:s", time() - 60 * 60 * 3);
 		} else {
 			return "Invalid Parameter";
 		}
-		$rets_password = $_RETS_SERVER_INFO['PASSWORD'];
 		
 		echo "+ Yesterday {$previous_start_time}<br>\n";
 		
@@ -71,9 +93,14 @@ class RETS_Controller extends Controller {
 		
 		// use http://retsmd.com to help determine the names of the classes you want to pull.
 		// these might be something like RE_1, RES, RESI, 1, etc.
-		$property_classes = array("ResidentialProperty","CondoProperty");
 		
+		if($retsConfig['useDDF'] == 1) {
+			$property_classes = array("Property");
+		} else {
+			$property_classes = array("ResidentialProperty","CondoProperty");
+		} 
 		
+		$retsparams = null;
 		
 		//////////////////////////////
 		
@@ -85,8 +112,12 @@ class RETS_Controller extends Controller {
 		// only enable this if you know the server supports the optional RETS feature called 'Offset'
 		$rets->SetParam("offset_support", true);
 		
+		$rets->AddHeader("RETS-Version", "RETS/1.7.2");
+		$rets->AddHeader('Accept', '/');
+		$rets->SetParam('compression_enabled', true);
+		
 		echo "+ Connecting to {$rets_login_url} as {$rets_username}<br>\n";
-		$connect = $rets->Connect($rets_login_url, $rets_username, $rets_password);
+		$connect = $rets->Connect($retsConfig['loginURL'], $rets_username, $retsConfig['password']);
 		
 		if ($connect) {
 		        echo "  + Connected<br>\n";
@@ -117,77 +148,96 @@ class RETS_Controller extends Controller {
 		        
 		        if($params['ID'] == "all") {
 		        	
-			        $query = "(status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
-		
-			        // run RETS search
+		        	$query = null;
+		        	
+		        	if($retsConfig['useDDF'] == 1) {
+			        	//$query = array("Limit" => 1, "Format" => "STANDARD-XML", "Count" => 1);
+			        	$query = "(LastUpdated=" . date('Y-m-d', strtotime("-2 years")) . ")";
+			        	$retsparams = array("Format" => "STANDARD-XML", "Count" => 1);
+		        	} else {
+			        	$query = "(status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+		        	}
+		        	
+		        	// run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-					if($this->config()->MLSLimit == 0) {
+					
+					
+					if($retsConfig['limit'] == 0) {
 						$search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+						echo "Limit Set To ".$retsConfig['limit']."<br>\n";
 					} else {
-						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $this->config()->MLSLimit)); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $retsConfig['password'])); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$retsConfig['password']."<br>\n";
 					}
 			        
 		        } elseif ($params['ID'] == "check") {
-			        $query = "(Status = A)";
-		
+			        
+					if($retsConfig['useDDF'] == 1) {
+			        	//$query = array("Limit" => 1, "Format" => "STANDARD-XML", "Count" => 1);
+			        	//$query = "(ID=*)";
+			        	$query = "(LastUpdated=" . date('Y-m-d', strtotime("-1 year")) . ")";
+			        	$retsparams = array("Format" => "Standard-XML","Count" => 1,"QueryType"=>'DMQL2',"Culture" => "en-CA", "Limit" => 100);
+		        	} else {
+			        	$query = "(Status = A)";
+		        	}
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			       // $log->Events()->add(RMSLogging::createEvent("Query", $query));
-			        $search = $rets->SearchQuery("Property", $class, $query);
+			        $search = $rets->SearchQuery("Property", $class, $query, $retsparams);
 			        
 		        } else {
-			        $query = "(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
-		
+			        
+			        if($retsConfig['useDDF'] == 1) {
+				        $query = "(LastUpdated=" . date('Y-m-d', strtotime("yesterday")) . ")";
+						$retsparams = array("Format" => "STANDARD-XML", "Count" => 1, "Limit" => 1);
+				    } else {
+					    $query = "(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+				    }
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-			       if($this->config()->MLSLimit == 0) {
-						$search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+			       
+			       if($retsConfig['limit'] == 0) {
+						$search = $rets->SearchQuery("Property", $class, $query, $retsparams); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To Unlimited<br>\n";
 					} else {
-						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $this->config()->MLSLimit)); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
+						//$retsparams['Limit'] = 1;
+						$search = $rets->SearchQuery("Property", "Property", $query, $retsparams); //set to 100 for testing array('Limit' => 100)
+						echo "Limit Set To ".$retsConfig['limit']."<br>\n";
 					}
 		        }
+		        
+		        print_r($rets->FetchRow($search));
 			    
-		
+			    echo "fetch rows ".$rets->NumRows($search)." ".$search["Count"]."<br>\n";
+				
+				
 		        if ($rets->NumRows($search) > 0) {
 						//$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
 						echo "   + RETS returns". $rets->NumRows($search);
 		                // print filename headers as first line
 		                $fields_order = $rets->SearchGetFields($search);
-		                //fputcsv($fh, $fields_order);
-						/*if ($params['ID'] != "check") {
-							if(class_exists('CustomMLSFilter')) {
-								$log->Events()->add(RMSLogging::createEvent("Start Filtered MLS Listing Create"));
-							} else {
-								$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Create"));
-							}
-							
-						}*/
+		                
+		                //Debug::show($fields_order);
+		                
 		                // process results
 		                while ($record = $rets->FetchRow($search)) {
-		                        $this_record = array();
-		                        foreach ($fields_order as $fo) {
-		                        		
-		                                $this_record[$fo] = $record[$fo];
-		                                
-		                        }
+		                        
 		                        if ($params['ID'] != "check") {
 		                        	if(class_exists('CustomMLSFilter')) {
 			                        	if(CustomMLSFilter::ImportFilter($record)) {
 				                        	echo "   + RETS returns". $class;
-				                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
+				                        	
+				                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $retsKey));
 			                        	}
 		                        	} else {
-			                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge));
+			                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $retsKey));
 		                        	}
 		                        	
 		                        } else {
-			                        array_push($clean, $record['Ml_num']);
+			                        Debug::show($record);
+			                        array_push($clean, $record[$retsKey]);
 		                        }
 		                        //fputcsv($fh, $this_record);
 		                }
@@ -199,7 +249,7 @@ class RETS_Controller extends Controller {
 		        } else {
 			        
 			        //$log->Events()->add(RMSLogging::createEvent("RETS Fail", implode(" ",$rets->Error()) ));
-			        print_r($rets->Error());
+			        print_r($rets->Error(), true);
 		        }
 		
 		        echo "    + Total found: {$rets->TotalRecordsFound($search)}<br>\n";
@@ -219,14 +269,17 @@ class RETS_Controller extends Controller {
 		//Debug::show($listingEdited);
 		if ($params['ID'] == "check") {
 	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
-	        $cleanCount = $this->MLSClean($clean);
+	        Debug::show($clean);
+	        
+	        //$cleanCount = $this->MLSClean($clean);
+	        
 	        //$startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
 	        //$event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
 	        //$event->Duration = time() - strtotime($startEvent->Created) ;
 	        //$event->write();
         } else {
 	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
-	        $this->MLSImageUpdate($listingEdited, $rets);
+	        $this->MLSImageUpdate($listingEdited, $rets, $photoSize);
 	        //$event = $log->Events()->filter(array("Title" => "Start MLS Image Download"))->First();
 	        //$event->Duration = time() - strtotime($event->Created);
 	        //$event->write();
@@ -289,6 +342,7 @@ class RETS_Controller extends Controller {
 	 * @param $MLSRecord array - should contain the RETS record from the board
 	 * @param $class string - RETS property class for the record 
 	 * @param $board string - Realeste Board Name (included just incase the system needs to handle multiple board confiurations)
+	 * @param $retsKey string - Key Listing ID feild for the Database (MLS Number)
 	 * @return array(MLSListing ID => MLISLISTING MLS Number)
 	 *
 	 * @todo clean up unused fields from Property classes and fix concacted values to check source feild isn't blank before adding to target
@@ -298,18 +352,18 @@ class RETS_Controller extends Controller {
 	 */
 	 
 	 
-	public function createMLSListing($MLSRecord, $class, $board) {
+	public function createMLSListing($MLSRecord, $class, $board, $retsKey) {
 		
-		echo "+ MLS  = ".$MLSRecord['Ml_num'].Listing::get()->filter(array("MLS:PartialMatch" => $MLSRecord['Ml_num']))->count()." ".Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord['Ml_num']))->count()."<br>\n";
+		echo "+ MLS  = ".$MLSRecord[$retsKey].Listing::get()->filter(array("MLS:PartialMatch" => $MLSRecord[$retsKey]))->count()." ".Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$retsKey]))->count()."<br>\n";
 			
 		//check if own listing exists
-		if(!Listing::get()->where("MLS = '".$MLSRecord['Ml_num']."'")->count() && !Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord['Ml_num']))->count()) {
-			if (!MLSListing::get()->filter("MLS", $MLSRecord['Ml_num'])->count()) {
+		if(!Listing::get()->where("MLS = '".$MLSRecord[$retsKey]."'")->count() && !Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$retsKey]))->count()) {
+			if (!MLSListing::get()->filter("MLS", $MLSRecord[$retsKey])->count()) {
 				echo "+ New MLSListing <br>\n";
 				$MLSListing = new MLSListing();
 				$listState = "new";
 			} else {
-				$stageMLSListing = MLSListing::get()->filter("MLS", $MLSRecord['Ml_num'])->First();
+				$stageMLSListing = MLSListing::get()->filter("MLS", $MLSRecord[$retsKey])->First();
 				
 				if($stageMLSListing->isVersioned) {
 					$MLSListing = Versioned::get_by_stage('MLSListing', 'Live')->byID($stageMLSListing->ID);
@@ -328,178 +382,11 @@ class RETS_Controller extends Controller {
 		
 		$MLSlisting = $board::Convert($MLSListing, $class, $MLSRecord);
 		$roomArray = $board::generateRoomArray($MLSRecord);
-		
-		/*
-// TREB CONVERSION FUNCTIONS
-		if($class == "ResidentialProperty" && $board == "TREB") {
-			$MLSListing->Acreage = $MLSRecord['Acres'];
-			$MLSListing->AddlMonthlyFees = $MLSRecord['Addl_mo_fee'];
-			$MLSListing->Drive = $MLSRecord['Drive'];
-			$MLSListing->Extras = $MLSRecord['Extras'];
-			$MLSListing->GarageSpaces = $MLSRecord['Gar_spaces'];
-			//$MLSListing->Fronting = $MLSRecord['Comp_pts'];
-			$MLSListing->LegalDescription = $MLSRecord['Legal_desc'];
-			$MLSListing->LotDepth = $MLSRecord['Depth'];
-			$MLSListing->LotFront = $MLSRecord['Front_ft'];
-			$MLSListing->LotIrregularities = $MLSRecord['Irreg'];
-			$MLSListing->LotSizeCode = $MLSRecord['Lotsz_code'];
-			$MLSListing->OtherStructures = $MLSRecord['Oth_struc1_out'].(!empty($MLSRecord['Oth_struc2_out']) ? ", ".$MLSRecord['Oth_struc2_out'] : '');
-			$MLSListing->ParkCostMo = $MLSRecord['Park_chgs'];
-			$MLSListing->Pool = $MLSRecord['Pool'];
-			$MLSListing->PropertyFeatures = $MLSRecord['Prop_feat1_out'].(!empty($MLSRecord['Prop_feat2_out']) ? ", ".$MLSRecord['Prop_feat2_out'].(!empty($MLSRecord['Prop_feat3_out']) ? ", ".$MLSRecord['Prop_feat3_out'].(!empty($MLSRecord['Prop_feat4_out']) ? ", ".$MLSRecord['Prop_feat4_out'].(!empty($MLSRecord['Prop_feat5_out']) ? ", ".$MLSRecord['Prop_feat5_out'].(!empty($MLSRecord['Prop_feat6_out']) ? ", ".$MLSRecord['Prop_feat6_out'] : '') : '') : '') : '') : '');
-			$MLSListing->SellerPropertyInfoStatement = $MLSRecord['Vend_pis'];
-			$MLSListing->Sewers = $MLSRecord['Sewer'];
-			$MLSListing->UtilitiesCable = $MLSRecord['Util_cable'];
-			$MLSListing->UtilitiesGas = $MLSRecord['Gas'];
-			$MLSListing->UtilitiesHydro = $MLSRecord['Elec'];
-			//$MLSListing->UtilitiesTelephone = $MLSRecord['Util_tel'];
-			$MLSListing->Water = $MLSRecord['Water'];
-			$MLSListing->WaterIncluded = $MLSRecord['Water_inc'];
-			$MLSListing->WaterSupplyTypes = $MLSRecord['Wtr_suptyp'];
-			$MLSListing->Waterfront = $MLSRecord['Waterfront'];
-			
-			//$MLSListing->LeaseTerm = $MLSRecord['Lease'];
-			
-		} elseif ($class == "CondoProperty" && $board == "TREB") {
-			
-			$MLSListing->BuildingInsuranceIncluded = $MLSRecord['Insur_bldg'];
-			$MLSListing->Shares = $MLSRecord['Share_perc'];
-			$MLSListing->Balcony = $MLSRecord['Patio_ter'];
-			$MLSListing->AptUnit = $MLSRecord['Apt_num'];
-			$MLSListing->BuildingAmenities = $MLSRecord['Bldg_amen1_out'].(!empty($MLSRecord['Bldg_amen2_out']) ? ", ".$MLSRecord['Bldg_amen2_out'].(!empty($MLSRecord['Bldg_amen3_out']) ? ", ".$MLSRecord['Bldg_amen3_out'].(!empty($MLSRecord['Bldg_amen4_out']) ? ", ".$MLSRecord['Bldg_amen4_out'].(!empty($MLSRecord['Bldg_amen5_out']) ? ", ".$MLSRecord['Bldg_amen5_out'].(!empty($MLSRecord['Bldg_amen6_out']) ? ", ".$MLSRecord['Bldg_amen6_out'] : '') : '') : '') : '') : '');
-			$MLSListing->Exterior = $MLSRecord['Constr1_out'].(!empty($MLSRecord['Constr2_out']) ? ", ".$MLSRecord['Constr2_out'] : '');
-			$MLSListing->CondoCorpNum = $MLSRecord['Corp_num'];
-			$MLSListing->CondoRegistryOffice = $MLSRecord['Condo_corp'];
-			$MLSListing->CondoTaxesIncluded = $MLSRecord['Cond_txinc'];
-			$MLSListing->EnsuiteLaundry = $MLSRecord['Ens_lndry'];
-			$MLSListing->Exposure = $MLSRecord['Condo_exp'];
-			$MLSListing->ParkingLegalDescription = $MLSRecord['Park_lgl_desc1'].(!empty($MLSRecord['Park_lgl_desc2']) ? ", ".$MLSRecord['Park_lgl_desc2'] : '');
-			$MLSListing->ParkingSpot1 = $MLSRecord['Park_spc1'];
-			$MLSListing->ParkingSpot2 = $MLSRecord['Park_spc2'];
-			$MLSListing->ParkingType = $MLSRecord['Park_desig'];
-			$MLSListing->ParkingType2 = $MLSRecord['Park_desig_2'];
-			$MLSListing->ParkingDrive = $MLSRecord['Park_fac'];
-			$MLSListing->PetsPermitted = $MLSRecord['Pets'];
-			$MLSListing->Locker = $MLSRecord['Locker'];
-			$MLSListing->LockerNum = $MLSRecord['Locker_num'];
-			$MLSListing->UnitNum = $MLSRecord['Unit_num'];
-			
-			$MLSListing->CentralVac = $MLSRecord['Central_vac'];
-			$MLSListing->LeaseTerm = $MLSRecord['Lease_term'];
-			$MLSListing->Maintenance = $MLSRecord['Maint'];
-			$MLSListing->PropType = 'Condo';
-			
-			
-		}
-		
-			
-			
-		$MLSListing->Content = "<p>".$MLSRecord["Ad_text"]."</p>";
-		$MLSListing->Address = $MLSRecord['Addr'];
-		//$MLSListing->AirConditioning = $MLSRecord['A_c'];
-		$MLSListing->AllInclusiveRental = $MLSRecord['All_inc'];
-		$MLSListing->ApproxAge = $MLSRecord['Yr_built'];
-		$MLSListing->ApproxSquareFootage = $MLSRecord['Sqft'];
-		$MLSListing->Area = $MLSRecord['Area'];
-		$MLSListing->Assessment = $MLSRecord['Tv'];
-		$MLSListing->AssessmentYear = $MLSRecord['Ass_year'];
-		$MLSListing->Basement = $MLSRecord['Bsmt1_out'].", ".$MLSRecord['Bsmt2_out'];
-		$MLSListing->Bedrooms = $MLSRecord['Br'];
-		$MLSListing->BedroomsPlus = $MLSRecord['Br_plus'];
-		
-		$MLSListing->CableTVIncluded = $MLSRecord['Cable'];
-		$MLSListing->CACIncluded = $MLSRecord['Cac_inc'];
-		
-		$MLSListing->CommonElementsIncluded = $MLSRecord['Comel_inc'];
-		$MLSListing->Community = $MLSRecord['Community']; //Neighbourhood
-		$MLSListing->CommunityCode = $MLSRecord['Community_code'];
-		$MLSListing->DirectionsCrossStreets = $MLSRecord['Cross_st'];
-		$MLSListing->Elevator = $MLSRecord['Elevator'];
-		$MLSListing->FireplaceStove = $MLSRecord['Fpl_num'];
-		$MLSListing->Furnished = $MLSRecord['Furnished'];
-		$MLSListing->GarageType = $MLSRecord['Gar_type'];
-		$MLSListing->HeatIncluded = $MLSRecord['Heat_inc'];
-		$MLSListing->HeatSource = $MLSRecord['Fuel'];
-		$MLSListing->HeatType = $MLSRecord['Heating'];
-		$MLSListing->HydroIncluded = $MLSRecord['Hydro_inc'];
-		$MLSListing->IDXUpdatedDate = $MLSRecord['Idx_dt'];
-		$MLSListing->Kitchens = $MLSRecord['Num_kit'];
-		$MLSListing->KitchensPlus = $MLSRecord['Kit_plus'];
-		$MLSListing->LaundryAccess = $MLSRecord['Laundry'];
-		$MLSListing->LaundryLevel = $MLSRecord['Laundry_lev'];
-		
-		$MLSListing->ListBrokerage = $MLSRecord['Rltr'];
-		$MLSListing->ListPrice = $MLSRecord['Lp_dol'];
-		$MLSListing->MapNum = $MLSRecord['Mmap_page'];
-		$MLSListing->MapColumnnNum = $MLSRecord['Mmap_col'];
-		$MLSListing->MapRow = $MLSRecord['Mmap_row'];
-		$MLSListing->MLS = $MLSRecord['Ml_num'];
-		$MLSListing->Municipality = $MLSRecord['Municipality'];
-		$MLSListing->MunicipalityDistrict = $MLSRecord['Municipality_district'];
-		$MLSListing->MunicpCode = $MLSRecord['Municipality_code'];
-		$MLSListing->OutofAreaMunicipality = $MLSRecord['Outof_area'];
-		$MLSListing->ParkingIncluded = $MLSRecord['Prkg_inc'];
-		$MLSListing->ParkingSpaces = $MLSRecord['Park_spcs'];
-		$MLSListing->PIN = $MLSRecord['Parcel_id'];
-		$MLSListing->PixUpdatedDate = $MLSRecord['Pix_updt'];
-		$MLSListing->PostalCode = $MLSRecord['Zip'];
-		$MLSListing->PrivateEntrance = $MLSRecord['Pvt_ent'];
-		$MLSListing->Province = $MLSRecord['County'];
-		$MLSListing->RemarksForClients = $MLSRecord['Ad_text'];
-		$MLSListing->Retirement = $MLSRecord['Retirement'];
-		$MLSListing->Rooms = $MLSRecord['Rms'];
-		$MLSListing->RoomsPlus = $MLSRecord['Rooms_plus'];
-		$MLSListing->SaleLease = $MLSRecord['S_r'];
-		$MLSListing->SpecialDesignation = $MLSRecord['Spec_des1_out'].(!empty($MLSRecord['Spec_des2_out']) ? ", ".$MLSRecord['Spec_des2_out'].(!empty($MLSRecord['Spec_des3_out']) ? ", ".$MLSRecord['Spec_des3_out'].(!empty($MLSRecord['Spec_des4_out']) ? ", ".$MLSRecord['Spec_des4_out'].(!empty($MLSRecord['Spec_des5_out']) ? ", ".$MLSRecord['Spec_des5_out'].(!empty($MLSRecord['Spec_des6_out']) ? ", ".$MLSRecord['Spec_des6_out'] : '') : '') : '') : '') : '');
-		$MLSListing->MLSStatus = $MLSRecord['Status'];
-		$MLSListing->StreetNum = $MLSRecord['St_num'];
-		$MLSListing->StreetAbbreviation = $MLSRecord['St_sfx'];
-		$MLSListing->StreetDirection = $MLSRecord['St_dir'];
-		$MLSListing->StreetName = $MLSRecord['St'];
-		$MLSListing->Style = $MLSRecord['Style'];
-		$MLSListing->TaxYear = $MLSRecord['Yr'];
-		$MLSListing->Taxes = $MLSRecord['Taxes'];
-		$MLSListing->Type = $MLSRecord['Type_own_srch'].(!empty($MLSRecord['Type_own1_srch']) ? ", ".$MLSRecord['Type_own1_srch'] : '');
-		$MLSListing->UFFI = $MLSRecord['Uffi'];
-		$MLSListing->UpdatedTimestamp = $MLSRecord['Timestamp_sql'];
-		$MLSListing->Washrooms = $MLSRecord['Bath_tot'];
-		$MLSListing->Zoning = $MLSRecord['Zoning'];
-		
-		
-		$roomArray = array();
-		!empty($MLSRecord['Rm1_out']) ? array_push($roomArray, array($MLSRecord['Rm1_out'] => array ("length" => $MLSRecord['Rm1_len'], "width" => $MLSRecord['Rm1_wth'], "desc" => $MLSRecord['Rm1_dc1_out']." ".$MLSRecord['Rm1_dc2_out']." ".$MLSRecord['Rm1_dc3_out'], "level" => $MLSRecord['Level1']))) : ''; //room 1
-		
-		!empty($MLSRecord['Rm2_out']) ? array_push($roomArray, array($MLSRecord['Rm2_out'] => array ("length" => $MLSRecord['Rm2_len'], "width" => $MLSRecord['Rm2_wth'], "desc" => $MLSRecord['Rm2_dc1_out']." ".$MLSRecord['Rm2_dc2_out']." ".$MLSRecord['Rm2_dc3_out'], "level" => $MLSRecord['Level2']))) : ''; //room 2
-		
-		!empty($MLSRecord['Rm3_out']) ? array_push($roomArray, array($MLSRecord['Rm3_out'] => array ("length" => $MLSRecord['Rm3_len'], "width" => $MLSRecord['Rm3_wth'], "desc" => $MLSRecord['Rm3_dc1_out']." ".$MLSRecord['Rm3_dc2_out']." ".$MLSRecord['Rm3_dc3_out'], "level" => $MLSRecord['Level3']))) : ''; //room 3
-		
-		!empty($MLSRecord['Rm4_out']) ? array_push($roomArray, array($MLSRecord['Rm4_out'] => array ("length" => $MLSRecord['Rm4_len'], "width" => $MLSRecord['Rm4_wth'], "desc" => $MLSRecord['Rm4_dc1_out']." ".$MLSRecord['Rm4_dc2_out']." ".$MLSRecord['Rm4_dc3_out'], "level" => $MLSRecord['Level4']))) : ''; //room 4
-		
-		!empty($MLSRecord['Rm5_out']) ? array_push($roomArray, array($MLSRecord['Rm5_out'] => array ("length" => $MLSRecord['Rm5_len'], "width" => $MLSRecord['Rm5_wth'], "desc" => $MLSRecord['Rm5_dc1_out']." ".$MLSRecord['Rm5_dc2_out']." ".$MLSRecord['Rm5_dc3_out'], "level" => $MLSRecord['Level5']))) : ''; //room 5
-		
-		!empty($MLSRecord['Rm6_out']) ? array_push($roomArray, array($MLSRecord['Rm6_out'] => array ("length" => $MLSRecord['Rm6_len'], "width" => $MLSRecord['Rm6_wth'], "desc" => $MLSRecord['Rm6_dc1_out']." ".$MLSRecord['Rm6_dc2_out']." ".$MLSRecord['Rm6_dc3_out'], "level" => $MLSRecord['Level6']))) : ''; //room 6
-		
-		!empty($MLSRecord['Rm7_out']) ? array_push($roomArray, array($MLSRecord['Rm7_out'] => array ("length" => $MLSRecord['Rm7_len'], "width" => $MLSRecord['Rm7_wth'], "desc" => $MLSRecord['Rm7_dc1_out']." ".$MLSRecord['Rm7_dc2_out']." ".$MLSRecord['Rm7_dc3_out'], "level" => $MLSRecord['Level7']))) : ''; //room 7
-		
-		!empty($MLSRecord['Rm8_out']) ? array_push($roomArray, array($MLSRecord['Rm8_out'] => array ("length" => $MLSRecord['Rm8_len'], "width" => $MLSRecord['Rm8_wth'], "desc" => $MLSRecord['Rm8_dc1_out']." ".$MLSRecord['Rm8_dc2_out']." ".$MLSRecord['Rm8_dc3_out'], "level" => $MLSRecord['Level8']))) : ''; //room 8
-		
-		
-		
-		if($class == "ResidentialProperty" && $board == "TREB") {
-			!empty($MLSRecord['Rm9_out']) ? array_push($roomArray, array($MLSRecord['Rm9_out'] => array ("length" => $MLSRecord['Rm9_len'], "width" => $MLSRecord['Rm9_wth'], "desc" => $MLSRecord['Rm9_dc1_out']." ".$MLSRecord['Rm9_dc2_out']." ".$MLSRecord['Rm9_dc3_out'], "level" => $MLSRecord['Level9']))) : ''; //room 9
-			
-			!empty($MLSRecord['Rm10_out']) ? array_push($roomArray, array($MLSRecord['Rm10_out'] => array ("length" => $MLSRecord['Rm10_len'], "width" => $MLSRecord['Rm10_wth'], "desc" => $MLSRecord['Rm10_dc1_out']." ".$MLSRecord['Rm10_dc2_out']." ".$MLSRecord['Rm10_dc3_out'], "level" => $MLSRecord['Level10']))) : ''; //room 10
-			
-			!empty($MLSRecord['Rm11_out']) ? array_push($roomArray, array($MLSRecord['Rm11_out'] => array ("length" => $MLSRecord['Rm11_len'], "width" => $MLSRecord['Rm11_wth'], "desc" => $MLSRecord['Rm11_dc1_out']." ".$MLSRecord['Rm11_dc2_out']." ".$MLSRecord['Rm11_dc3_out'], "level" => $MLSRecord['Level11']))) : ''; //room 11
-			
-			!empty($MLSRecord['Rm12_out']) ? array_push($roomArray, array($MLSRecord['Rm12_out'] => array ("length" => $MLSRecord['Rm12_len'], "width" => $MLSRecord['Rm12_wth'], "desc" => $MLSRecord['Rm12_dc1_out']." ".$MLSRecord['Rm12_dc2_out']." ".$MLSRecord['Rm12_dc3_out'], "level" => $MLSRecord['Level12']))) : ''; //room 12
-		}
-*/
-		
+				
 		$listingCity = Convert::raw2sql($MLSListing->Municipality);
 		$listingHood = Convert::raw2sql($MLSListing->Community);
 		$listingStatus = $MLSListing->MLSStatus;
-		// END TREB
+		
 		
 		// Link MLS Listing to Existing Cities and Neighbourhoods
 		
@@ -568,51 +455,7 @@ class RETS_Controller extends Controller {
 		
 		//create Room() for new listings
 		if($listState == "new") {
-			$this->createRooms($roomArray, $mlsID);
-			
-			/*
-foreach($roomArray as $room) {
-				//$listingRoom = new Room();
-				
-				$roomName = key($room);
-				
-				if (!Room::get()->filter(
-					array(
-						"MLSListingID" => $mlsID, 
-						"Name" => $roomName, 
-						"Level" => $room[$roomName]['level'],
-						"Width" => $room[$roomName]['width'],
-						"Length" => $room[$roomName]['length']
-					)
-				)->count()) {
-					$listingRoom = new Room();
-				} else {
-					$listingRoom = Room::get()->filter(
-						array(
-							"MLSListingID" => $mlsID, 
-							"Name" => $roomName, 
-							"Level" => $room[$roomName]['level'],
-							"Width" => $room[$roomName]['width'],
-							"Length" => $room[$roomName]['length']
-						)
-					)->First();
-				}
-				
-				
-				$listingRoom->Name = $roomName;
-				$listingRoom->Level = $room[$roomName]['level'];
-				$listingRoom->Width = $room[$roomName]['width'];
-				$listingRoom->Length = $room[$roomName]['length'];
-				$listingRoom->Note = $room[$roomName]['desc'];
-				
-				$listingRoom->MLSListingID = $mlsID; 
-				echo "Writing ".$roomName."<br>\n";
-				$listingRoom->write();
-				$listingRoom->destroy();
-				
-			}
-*/
-			
+			$this->createRooms($roomArray, $mlsID);			
 		}
 		
 		
@@ -688,13 +531,13 @@ foreach($roomArray as $room) {
 	
 	public function ImageUpdate() {
 		global $_RETS_SERVER_INFO;
-		$rets_login_url = $_RETS_SERVER_INFO['URL'];
+		$rets_login_url = $this->config()->LoginURL;
 		$params = Controller::getURLParams();
 		if($params['ID'] == "all"){
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_UPDATE'];
-			$previous_start_time = "1980-01-01T00:00:00";
+			$rets_username = $this->config()->LoginAll;
+			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24 * 356 * 2)."T00:00:00";
 		} elseif ($params['ID'] == "update"){
-			$rets_username = $_RETS_SERVER_INFO['LOGIN_UPDATE'];
+			$rets_username = $this->config()->LoginUpdate;
 			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24)."T00:00:00";
 			//$previous_start_time = "2012-10-10T00:00:00";
 		} else {
@@ -751,8 +594,22 @@ foreach($roomArray as $room) {
 			if(!$MLSlisting->Images()->count() || $MLSlisting->PixUpdateDate >= $previous_start_time) {
 				echo "  + MLS: ".$MLSlisting->MLS."<br>\n";
 				$photos = $rets->GetObject("Property", "Photo", $MLSlisting->MLS, "*", 0);
-				//print_r($photos);
-				foreach ($photos as $photo) {
+				Debug::show($photos);
+				
+				if(count($photos) > 0) {
+					foreach ($photos as $photo) {
+						
+						if(
+							(!isset($photo['Content-ID']) || !isset($photo['Object-ID']))
+							||
+							(is_null($photo['Content-ID']) || is_null($photo['Object-ID']))
+							||
+							($photo['Content-ID'] == 'null' || $photo['Object-ID'] == 'null')
+						) {
+							continue;
+						}
+						
+						
 				        $listing = $photo['Content-ID'];
 				        $number = $photo['Object-ID'];
 				        echo "  + Photo ". $photo['Object-ID'].":<br>\n";
@@ -787,6 +644,8 @@ foreach($roomArray as $room) {
 				        else {
 				                echo "({$listing}-{$number}): {$photo['ReplyCode']} = {$photo['ReplyText']}\n";
 				        }
+					}
+				
 				}
 			}
 			
@@ -801,14 +660,15 @@ foreach($roomArray as $room) {
 	}
 
 
-	public function MLSImageUpdate($listingArray, $rets) {
+	public function MLSImageUpdate($listingArray, $rets, $photoSize) {
 		
 		foreach($listingArray as $listingItem) {
 			if(is_array($listingItem)) {
 				if( strtotime($listingItem[2])  >= date("Y-m-d", time() - 60 * 60 * 24)) {
+					Debug::show($listingItem);
+					$photos = $rets->GetObject("Property", $photoSize, $listingItem[1], "*", 0);
+					Debug::show($photos);
 					
-					$photos = $rets->GetObject("Property", "Photo", $listingItem[1], "*", 0);
-					//print_r($photos);
 					foreach ($photos as $photo) {
 					        $listing = $photo['Content-ID'];
 					        $number = $photo['Object-ID'];
