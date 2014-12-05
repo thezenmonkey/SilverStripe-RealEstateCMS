@@ -26,6 +26,7 @@ class RETS_Controller extends Controller {
 			"bridge"		=> $this->config()->RETSBridge,
 			"limit"			=> $this->config()->MLSLimit,
 			"retskey"		=> $this->config()->KeyField,
+			"mlsfield"		=> $this->config()->MLSField,
 			"photosize"		=> $this->config()->PhotoSize,
 			"useDDF"		=> $this->config()->UseDDF, 
 			"loginall"		=> $this->config()->LoginAll,
@@ -36,25 +37,26 @@ class RETS_Controller extends Controller {
 		return $config;
 	}
 	
+	
 	public function MLSUpdate() {
 		global $_RETS_SERVER_INFO;
-		
+		//$rets_login_url = $_RETS_SERVER_INFO['URL'];
+		//rets config;
 		$retsConfig = $this->getRetsConfig();
 		
-		$rets_login_url = $this->config()->LoginURL;
-		$bridge = $this->config()->RETSBridge;
-		$retLimit = $this->config()->MLSLimit;
-		$retsKey = $this->config()->KeyField;
-		$photoSize = $this->config()->PhotoSize;
-		$useDDF = $this->config()->PhotoSize;
+		
+		$rets_login_url = $retsConfig['loginURL'];
+		$bridge = $retsConfig['bridge'];
+		$retLimit = $retsConfig['limit'];
+		$mlsField = $retsConfig['mlsfield'];
+		$retsKey = $retsConfig['retskey'];
+		$photoSize = $retsConfig['photosize'];
 		
 		$params = Controller::getURLParams();
 		
-		
-		
 		echo "Using ".$bridge."<br>\n";
 		echo "Limit ".$retLimit."<br>\n";
-		echo "Key ".$retsKey."<br>\n";
+		echo "Key ".$mlsField."<br>\n";
 		// Create Log
 		
 		/*
@@ -62,7 +64,7 @@ class RETS_Controller extends Controller {
 		$log->Title = "MLS Update";
 		$log->Value = $params['ID'];
 		$log->write();
-		*/
+*/
 		
 		
 		if($params['ID'] == "all"){
@@ -77,11 +79,12 @@ class RETS_Controller extends Controller {
 			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24)."T00:00:00";
 			$clean = array();
 		} elseif ($params['ID'] == "quick") {
-			$rets_username = $retsConfig['loginupdate'];
+			$rets_username = $retsConfig['loginall'];
 			$previous_start_time = date("Y-m-d")."T".date("H:i:s", time() - 60 * 60 * 3);
 		} else {
 			return "Invalid Parameter";
 		}
+		$rets_password = $this->config()->Password;
 		
 		echo "+ Yesterday {$previous_start_time}<br>\n";
 		
@@ -93,14 +96,20 @@ class RETS_Controller extends Controller {
 		
 		// use http://retsmd.com to help determine the names of the classes you want to pull.
 		// these might be something like RE_1, RES, RESI, 1, etc.
+		//
+		
+		$retsparams = null;
 		
 		if($retsConfig['useDDF'] == 1) {
 			$property_classes = array("Property");
+			$retsparams['Count'] = 1;
 		} else {
 			$property_classes = array("ResidentialProperty","CondoProperty");
-		} 
+		}
 		
-		$retsparams = null;
+		if($retsConfig['limit'] != 0) {
+	        $retsparams['Limit'] = $retsConfig['limit'];
+        }
 		
 		//////////////////////////////
 		
@@ -112,12 +121,8 @@ class RETS_Controller extends Controller {
 		// only enable this if you know the server supports the optional RETS feature called 'Offset'
 		$rets->SetParam("offset_support", true);
 		
-		$rets->AddHeader("RETS-Version", "RETS/1.7.2");
-		$rets->AddHeader('Accept', '/');
-		$rets->SetParam('compression_enabled', true);
-		
-		echo "+ Connecting to {$rets_login_url} as {$rets_username}<br>\n";
-		$connect = $rets->Connect($retsConfig['loginURL'], $rets_username, $retsConfig['password']);
+		echo "+ Connecting to {$retsConfig['loginURL']} as {$rets_username}<br>\n";
+		$connect = $rets->Connect($retsConfig['loginURL'], $rets_username, $rets_password);
 		
 		if ($connect) {
 		        echo "  + Connected<br>\n";
@@ -148,39 +153,28 @@ class RETS_Controller extends Controller {
 		        
 		        if($params['ID'] == "all") {
 		        	
-		        	$query = null;
-		        	
-		        	if($retsConfig['useDDF'] == 1) {
-			        	//$query = array("Limit" => 1, "Format" => "STANDARD-XML", "Count" => 1);
-			        	$query = "(LastUpdated=" . date('Y-m-d', strtotime("-2 years")) . ")";
-			        	$retsparams = array("Format" => "STANDARD-XML", "Count" => 1);
-		        	} else {
-			        	$query = "(status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
-		        	}
-		        	
-		        	// run RETS search
+			        //$query = "(status = A),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+			        //$query = array("Limit" => 1, "Format" => "STANDARD-XML", "Count" => 1);
+			        if($retsConfig['useDDF'] == 1) {
+				        $query = "(LastUpdated=" . date('Y-m-d', strtotime("-1 year")) . ")";
+			        } else {
+				        $query = "(Status = A)";
+			        }
+		
+			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-					
-					
-					if($retsConfig['limit'] == 0) {
-						$search = $rets->SearchQuery("Property", $class, $query); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$retsConfig['limit']."<br>\n";
-					} else {
-						$search = $rets->SearchQuery("Property", $class, $query, array('Limit' => $retsConfig['password'])); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$retsConfig['password']."<br>\n";
-					}
+					$search = $rets->SearchQuery("Property", $class, $query, $retsparams); //set to 100 for testing array('Limit' => 100)
 			        
 		        } elseif ($params['ID'] == "check") {
 			        
 					if($retsConfig['useDDF'] == 1) {
-			        	//$query = array("Limit" => 1, "Format" => "STANDARD-XML", "Count" => 1);
-			        	//$query = "(ID=*)";
-			        	$query = "(LastUpdated=" . date('Y-m-d', strtotime("-1 year")) . ")";
-			        	$retsparams = array("Format" => "Standard-XML","Count" => 1,"QueryType"=>'DMQL2',"Culture" => "en-CA", "Limit" => 100);
-		        	} else {
-			        	$query = "(Status = A)";
-		        	}
+				        $query = "(ID=*)";
+			        } else {
+				        $query = "(Status = A)";
+			        }
+					
+					
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			       // $log->Events()->add(RMSLogging::createEvent("Query", $query));
@@ -190,29 +184,19 @@ class RETS_Controller extends Controller {
 			        
 			        if($retsConfig['useDDF'] == 1) {
 				        $query = "(LastUpdated=" . date('Y-m-d', strtotime("yesterday")) . ")";
-						$retsparams = array("Format" => "STANDARD-XML", "Count" => 1, "Limit" => 1);
-				    } else {
-					    $query = "(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
-				    }
+			        } else {
+				        $query = "(timestamp_sql = {$previous_start_time}+),(lp_dol = $minVal-$maxVal),(s_r = Sale)";
+			        }
+			       
 			        // run RETS search
 			        echo "   + Resource: Property   Class: {$class}   Query: {$query}<br>\n";
 			        //$log->Events()->add(RMSLogging::createEvent("Query", $query));
-			       
-			       if($retsConfig['limit'] == 0) {
-						$search = $rets->SearchQuery("Property", $class, $query, $retsparams); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To Unlimited<br>\n";
-					} else {
-						//$retsparams['Limit'] = 1;
-						$search = $rets->SearchQuery("Property", "Property", $query, $retsparams); //set to 100 for testing array('Limit' => 100)
-						echo "Limit Set To ".$retsConfig['limit']."<br>\n";
-					}
+					
+					$search = $rets->SearchQuery("Property", $class, $query, $retsparams); //set to 100 for testing array('Limit' => 100)
+					echo "Limit Set To ".$this->config()->MLSLimit."<br>\n";
 		        }
-		        
-		        print_r($rets->FetchRow($search));
 			    
-			    echo "fetch rows ".$rets->NumRows($search)." ".$search["Count"]."<br>\n";
-				
-				
+		
 		        if ($rets->NumRows($search) > 0) {
 						//$log->Events()->add(RMSLogging::createEvent("RETS returns", $rets->NumRows($search)));
 						echo "   + RETS returns". $rets->NumRows($search);
@@ -223,21 +207,34 @@ class RETS_Controller extends Controller {
 		                
 		                // process results
 		                while ($record = $rets->FetchRow($search)) {
+		                        $this_record = array();
+		                        foreach ($fields_order as $fo) {
+		                        		
+		                                $this_record[$fo] = $record[$fo];
+		                                
+		                        }
+		                        
+		                        //Debug::show($record);
 		                        
 		                        if ($params['ID'] != "check") {
 		                        	if(class_exists('CustomMLSFilter')) {
 			                        	if(CustomMLSFilter::ImportFilter($record)) {
 				                        	echo "   + RETS returns". $class;
 				                        	
-				                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $retsKey));
+				                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $mlsField));
 			                        	}
 		                        	} else {
-			                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $retsKey));
+			                        	array_push($listingEdited, $this->createMLSListing($record, $class, $bridge, $mlsField));
 		                        	}
 		                        	
 		                        } else {
-			                        Debug::show($record);
-			                        array_push($clean, $record[$retsKey]);
+			                        //Debug::show($record);
+			                        if($retsConfig['useDDF'] == 1) {
+				                        array_push($clean, $record[$retsConfig['retskey']]);
+				                    } else {
+					                    array_push($clean, $record[$mlsField]);
+				                    }
+			                        
 		                        }
 		                        //fputcsv($fh, $this_record);
 		                }
@@ -249,7 +246,7 @@ class RETS_Controller extends Controller {
 		        } else {
 			        
 			        //$log->Events()->add(RMSLogging::createEvent("RETS Fail", implode(" ",$rets->Error()) ));
-			        print_r($rets->Error(), true);
+			        print_r($rets->Error());
 		        }
 		
 		        echo "    + Total found: {$rets->TotalRecordsFound($search)}<br>\n";
@@ -269,9 +266,9 @@ class RETS_Controller extends Controller {
 		//Debug::show($listingEdited);
 		if ($params['ID'] == "check") {
 	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Listing Cleanup"));
-	        Debug::show($clean);
 	        
-	        //$cleanCount = $this->MLSClean($clean);
+	        $cleanCount = $this->MLSClean($clean);
+	        //Debug::show($clean);
 	        
 	        //$startEvent = $log->Events()->filter(array("Title" => "Start MLS Listing Cleanup"))->First();
 	        //$event = $log->Events()->add(RMSLogging::createEvent("Cleaned", $cleanCount));
@@ -279,6 +276,8 @@ class RETS_Controller extends Controller {
 	        //$event->write();
         } else {
 	        //$log->Events()->add(RMSLogging::createEvent("Start MLS Image Download"));
+	        
+	         echo "  - Get Images<br>\n";
 	        $this->MLSImageUpdate($listingEdited, $rets, $photoSize);
 	        //$event = $log->Events()->filter(array("Title" => "Start MLS Image Download"))->First();
 	        //$event->Duration = time() - strtotime($event->Created);
@@ -297,13 +296,16 @@ class RETS_Controller extends Controller {
 	
 	// Clean MLS listings and return number delteted.
 	public function MLSClean($clean) {
+		$retsConfig = $this->getRetsConfig();
+		
 		$sqlQuery = new SQLQuery();
 		$sqlQuery->setFrom('MLSListing');
 		$sqlQuery->setSelect('ID');
 		$sqlQuery->addSelect('MLS');
+		$sqlQuery->addSelect('SourceKey');
 		//$sqlQuery->addSelect('PropType');
 		//$sqlQuery->addWhere("PropType = 'Condo'");
-		 
+		
 		// Get the raw SQL (optional)
 		$rawSQL = $sqlQuery->sql();
 		
@@ -316,18 +318,40 @@ class RETS_Controller extends Controller {
 		while ($counter > 0) {
 			set_time_limit ( 30 );
 			$row = $result->nextRecord();
-			if(!in_array($row['MLS'],$clean)) {
-				echo $row['MLS']." Not in list<br>\n";
-				$listing = MLSListing::get()->byID($row['ID']);
-				if ($listing) {
-					echo "listing found<br>\n";
-					$listing->delete();
-					echo "listing deleted<br>\n";  
-				} 
 			
+			
+			if($retsConfig['useDDF'] == 1) {
+				if(!in_array($row['SourceKey'],$clean)) {
+					echo $row['MLS']." Not in list<br>\n";
+					$listing = MLSListing::get()->byID($row['ID']);
+					if ($listing) {
+						echo "listing found<br>\n";
+						$listing->delete();
+						echo "listing deleted<br>\n";  
+					} 
+				
+				} else {
+					echo $row['MLS']." IS in list<br>\n";
+				}
+
 			} else {
-				echo $row['MLS']." IS in list<br>\n";
-			}
+				
+				if(!in_array($row['MLS'],$clean)) {
+					echo $row['MLS']." Not in list<br>\n";
+					$listing = MLSListing::get()->byID($row['ID']);
+					if ($listing) {
+						echo "listing found<br>\n";
+						$listing->delete();
+						echo "listing deleted<br>\n";  
+					} 
+				
+				} else {
+					echo $row['MLS']." IS in list<br>\n";
+				}
+
+			}			
+			
+			
 			$counter--;
 			$i++;
 		}
@@ -342,7 +366,7 @@ class RETS_Controller extends Controller {
 	 * @param $MLSRecord array - should contain the RETS record from the board
 	 * @param $class string - RETS property class for the record 
 	 * @param $board string - Realeste Board Name (included just incase the system needs to handle multiple board confiurations)
-	 * @param $retsKey string - Key Listing ID feild for the Database (MLS Number)
+	 * @param $mlsField string - Key Listing ID feild for the Database (MLS Number)
 	 * @return array(MLSListing ID => MLISLISTING MLS Number)
 	 *
 	 * @todo clean up unused fields from Property classes and fix concacted values to check source feild isn't blank before adding to target
@@ -352,18 +376,18 @@ class RETS_Controller extends Controller {
 	 */
 	 
 	 
-	public function createMLSListing($MLSRecord, $class, $board, $retsKey) {
+	public function createMLSListing($MLSRecord, $class, $board, $mlsField) {
 		
-		echo "+ MLS  = ".$MLSRecord[$retsKey].Listing::get()->filter(array("MLS:PartialMatch" => $MLSRecord[$retsKey]))->count()." ".Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$retsKey]))->count()."<br>\n";
+		echo "+ MLS  = ".$MLSRecord[$mlsField].Listing::get()->filter(array("MLS:PartialMatch" => $MLSRecord[$mlsField]))->count()." ".Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$mlsField]))->count()."<br>\n";
 			
 		//check if own listing exists
-		if(!Listing::get()->where("MLS = '".$MLSRecord[$retsKey]."'")->count() && !Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$retsKey]))->count()) {
-			if (!MLSListing::get()->filter("MLS", $MLSRecord[$retsKey])->count()) {
+		if(!Listing::get()->where("MLS = '".$MLSRecord[$mlsField]."'")->count() && !Listing::get()->filter(array("AdditionalMLS:PartialMatch" => $MLSRecord[$mlsField]))->count()) {
+			if (!MLSListing::get()->filter("MLS", $MLSRecord[$mlsField])->count()) {
 				echo "+ New MLSListing <br>\n";
 				$MLSListing = new MLSListing();
 				$listState = "new";
 			} else {
-				$stageMLSListing = MLSListing::get()->filter("MLS", $MLSRecord[$retsKey])->First();
+				$stageMLSListing = MLSListing::get()->filter("MLS", $MLSRecord[$mlsField])->First();
 				
 				if($stageMLSListing->isVersioned) {
 					$MLSListing = Versioned::get_by_stage('MLSListing', 'Live')->byID($stageMLSListing->ID);
@@ -465,7 +489,7 @@ class RETS_Controller extends Controller {
 		
 		// if its a new listing pass back MLS number for ImageUpdate function
 		if($listState =="new") {
-			return array($mlsID, $MLSListing->MLS, $MLSListing->PixUpdatedDate);
+			return array($mlsID, $MLSListing->SourceKey, $MLSListing->PixUpdatedDate);
 		} else {
 			return false;
 		}
@@ -661,15 +685,19 @@ class RETS_Controller extends Controller {
 
 
 	public function MLSImageUpdate($listingArray, $rets, $photoSize) {
-		
+		 echo "  - Getting Images<br>\n";
+		//Debug::show($listingArray);
 		foreach($listingArray as $listingItem) {
 			if(is_array($listingItem)) {
+				Debug::show($listingItem);
+				
 				if( strtotime($listingItem[2])  >= date("Y-m-d", time() - 60 * 60 * 24)) {
 					Debug::show($listingItem);
 					$photos = $rets->GetObject("Property", $photoSize, $listingItem[1], "*", 0);
 					Debug::show($photos);
 					
 					foreach ($photos as $photo) {
+					        set_time_limit ( 0 );
 					        $listing = $photo['Content-ID'];
 					        $number = $photo['Object-ID'];
 					        echo "  + Photo ". $photo['Object-ID'].":<br>\n";
