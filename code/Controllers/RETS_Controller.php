@@ -172,6 +172,7 @@ class RETS_Controller extends Controller {
 				        $query = "(ID=*)";
 			        } else {
 				        $query = "(Status = A)";
+				        $retsparams = array();
 			        }
 					
 					
@@ -297,6 +298,8 @@ class RETS_Controller extends Controller {
 	// Clean MLS listings and return number delteted.
 	public function MLSClean($clean) {
 		$retsConfig = $this->getRetsConfig();
+		
+		//Debug::show($clean);
 		
 		$sqlQuery = new SQLQuery();
 		$sqlQuery->setFrom('MLSListing');
