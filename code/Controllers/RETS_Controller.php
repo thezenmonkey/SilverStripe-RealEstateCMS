@@ -144,11 +144,13 @@ class RETS_Controller extends Controller {
 		        $fields_order = array();
 		        
 		        $config = SiteConfig::current_site_config();
-		        if($config->MLSMax != 0) {
-			        $minVal = $config->MLSMin;
-					$maxVal = $config->MLSMax;
-		        } else {
-			        return "Please configure MLS Defaults in Site Settings";
+		        if($retsConfig['useDDF'] === 0) {
+			        if($config->MLSMax != 0) {
+				        $minVal = $config->MLSMin;
+						$maxVal = $config->MLSMax;
+			        } else {
+				        return "Please configure MLS Defaults in Site Settings";
+			        }
 		        }
 		        
 		        if($params['ID'] == "all") {
@@ -695,9 +697,9 @@ class RETS_Controller extends Controller {
 				Debug::show($listingItem);
 				
 				if( strtotime($listingItem[2])  >= date("Y-m-d", time() - 60 * 60 * 24)) {
-					Debug::show($listingItem);
+					// Debug::show($listingItem);
 					$photos = $rets->GetObject("Property", $photoSize, $listingItem[1], "*", 0);
-					Debug::show($photos);
+					// Debug::show($photos);
 					
 					foreach ($photos as $photo) {
 					        set_time_limit ( 0 );
