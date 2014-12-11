@@ -139,6 +139,7 @@ class TREBConvert {
 		$MLSListing->UpdatedTimestamp = $MLSRecord['Timestamp_sql'];
 		$MLSListing->Washrooms = $MLSRecord['Bath_tot'];
 		$MLSListing->Zoning = $MLSRecord['Zoning'];
+		$MLSListing->SourceKey = $MLSRecord['Ml_num'];
 		
 		return $MLSListing;
 	}
