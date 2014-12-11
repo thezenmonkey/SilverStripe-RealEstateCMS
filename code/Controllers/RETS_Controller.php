@@ -68,7 +68,7 @@ class RETS_Controller extends Controller {
 		
 		
 		if($params['ID'] == "all"){
-			$rets_username = $retsConfig['loginall'];
+			$rets_username = $retsConfig['loginupdate'];
 			$previous_start_time = date("Y-m-d", time() - 60 * 60 * 24 * 356 * 2)."T00:00:00";
 		} elseif  ($params['ID'] == "update"){
 			$rets_username = $retsConfig['loginupdate'];
