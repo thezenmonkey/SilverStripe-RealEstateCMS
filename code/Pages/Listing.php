@@ -190,7 +190,6 @@ class Listing extends Page implements HiddenClass {
 	 			DropdownField::create("Status", "Status", singleton('Listing')->dbObject('Status')->enumValues())->addExtraClass('noborder'),
 	 			DropdownField::create("SaleOrRent", "Sale Or Rent", array("Sale" => "Sale", "Lease" => "Lease"))->addExtraClass('noborder'),
 	 			CheckboxField::create("Feature")->addExtraClass('noborder'),
-	 			//CheckboxField::create("IsNew")->addExtraClass('noborder'),
 	 			DropdownField::create("Flag", "Listing Flag", singleton('Listing')->dbObject('Flag')->enumValues())->addExtraClass('noborder'),
 	 			TextField::create("MLS", "MLS Number"),
 	 		)
