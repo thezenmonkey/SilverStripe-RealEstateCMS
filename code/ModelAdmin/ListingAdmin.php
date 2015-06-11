@@ -5,7 +5,7 @@
  * @requires DataObjectAsPage, Mappable
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
-class ListingAdmin extends DataObjectAsPageAdmin {
+class ListingAdmin extends CatalogPageAdmin {
    
    private static $allowed_actions = array(
    		'EditorToolbar'
