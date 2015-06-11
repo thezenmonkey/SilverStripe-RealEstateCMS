@@ -18,4 +18,13 @@ Listing:
 
 ListingUtils:
   InlcudeMLS: 0
-  
+
+
+LeftAndMain:
+  menu_groups:
+    Content:
+      - HomePageAdmin
+      - AboutUsAdmin
+      - ContactUsAdmin
+      - CMSPagesController
+      - AssetAdmin
