@@ -8,6 +8,7 @@ class NeighbourhoodPage extends Community {
 	
 	
 	private static $hide_ancestor = 'Community';
+    private static $allowed_children = array();
 
 	/**
 	 * Object vars

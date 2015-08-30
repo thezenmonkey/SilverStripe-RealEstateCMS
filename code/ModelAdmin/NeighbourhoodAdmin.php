@@ -2,10 +2,10 @@
 /**
  * 	
  * @package Realestate Listing System - Neighbourhood Admin 
- * @requires DataObjectAsPage, Mappable
+ * @requires Mappable
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
-class NeighbourhoodAdmin extends DataObjectAsPageAdmin {
+class NeighbourhoodAdmin extends ModelAdmin {
    
 	public static $managed_models = array(
 		'School'
