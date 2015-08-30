@@ -4,6 +4,7 @@
  * @package Realestate Listing System - Property Listings Page 
  * @requires DataObjectAsPage, Mappable
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
+ * TODO Remove DataObjectAsPage Dependency
  */
 
 

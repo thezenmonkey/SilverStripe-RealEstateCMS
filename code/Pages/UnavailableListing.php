@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Class UnavailableListing DEPRECIATED
+ *
+ */
 class UnavailableListing extends Listing {
 	
 	/**

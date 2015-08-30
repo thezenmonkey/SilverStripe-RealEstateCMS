@@ -15,7 +15,7 @@ class ListingAdmin extends CatalogPageAdmin {
 	public static $managed_models = array(
 		'Listing' => array("title" => 'Listings'),
 		'MLSListing' => array("title" => 'MLS Listings'),
-		'UnavailableListing' => array("title" => 'Unavailable Listings')
+		'UnavailableListing' => array("title" => 'Unavailable Listings') //TODO Remove Depreciated
 	);
 
 	static $url_segment = 'listings';

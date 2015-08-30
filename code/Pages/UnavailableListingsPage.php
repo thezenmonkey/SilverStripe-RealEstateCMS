@@ -1,4 +1,9 @@
 <?php
+/**
+ * Class UnavailableListing DEPRECIATED
+ *
+ */
+
 
 class UnavailableListingsPage extends Page implements HiddenClass {
 	
