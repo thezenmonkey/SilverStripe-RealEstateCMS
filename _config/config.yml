@@ -6,6 +6,7 @@ File:
   extensions:
     - RMSImageExtension
     - RMSFileExtension
+
 Listing:
   extensions:
     - Gallery_PageExtension
@@ -29,6 +30,9 @@ NeighbourhoodPage:
 
 ListingUtils:
   InlcudeMLS: 0
+
+SiteConfig:
+  cms_logo: 'mysite/images/cms_logo.png'
 
 LeftAndMain:
   menu_groups:
