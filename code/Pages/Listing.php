@@ -4,6 +4,7 @@
  * @package Realestate Listing System - Property Listing DataObject 
  * @requires DataObjectAsPage, Mappable, DataObjectManager
  * @author Richard Rudy twitter:thezenmonkey web: http://designplusawesome.com
+ * TODO Remove UnavailableListing References
  */
  
  

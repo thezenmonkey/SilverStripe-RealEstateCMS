@@ -5,7 +5,7 @@
  * @requires DataObjectAsPage, Mappable
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
-class ListingAdmin extends DataObjectAsPageAdmin {
+class ListingAdmin extends CatalogPageAdmin {
    
    private static $allowed_actions = array(
    		'EditorToolbar'
@@ -15,7 +15,7 @@ class ListingAdmin extends DataObjectAsPageAdmin {
 	public static $managed_models = array(
 		'Listing' => array("title" => 'Listings'),
 		'MLSListing' => array("title" => 'MLS Listings'),
-		'UnavailableListing' => array("title" => 'Unavailable Listings')
+		'UnavailableListing' => array("title" => 'Unavailable Listings') //TODO Remove Depreciated
 	);
 
 	static $url_segment = 'listings';

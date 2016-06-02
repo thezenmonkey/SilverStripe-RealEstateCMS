@@ -14,7 +14,8 @@
 	    "silverstripe/dataobjectaspage": "dev-master",
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master",
-	    "heyday/silverstripe-menumanager": "dev-master"
+	    "heyday/silverstripe-menumanager": "dev-master",
+	    "littlegiant/silverstripe-catalogmanager" : "dev-master"
 	},
 	"config": {
 		"process-timeout": 600	

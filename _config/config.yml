@@ -1,7 +1,4 @@
 ---
-ListingsPage:
-  extensions:
-    - ExcludeChildren
 SiteConfig:
   extensions:
     - RealEstateSiteConfig
@@ -9,9 +6,47 @@ File:
   extensions:
     - RMSImageExtension
     - RMSFileExtension
+
 Listing:
   extensions:
-    - 'Gallery_PageExtension'
+    - Gallery_PageExtension
+    - CatalogPageExtension
+  parentClass:
+    - ListingsPage
+  sort_column: false
+  default_sort: 'Created ASC'
+
+CommunitiesHolder:
+  extensions:
+    - Lumberjack
+
+MunicipalityPage:
+  extensions:
+    - 'Lumberjack'
+  show_in_sitetree: false
+
+NeighbourhoodPage:
+  show_in_sitetree: false
 
 ListingUtils:
   InlcudeMLS: 0
+
+SiteConfig:
+  cms_logo: 'mysite/images/cms_logo.png'
+
+LeftAndMain:
+  menu_groups:
+    ListingAdmin: []
+    Content:
+      - HomePageAdmin
+#      - AboutUsAdmin
+#      - ContactUsAdmin
+      - ListingsPageAdmin
+      - CommunitiesAdmin
+      - CMSPagesController
+    BlogAdmin: []
+    NeighbourhoodAdmin: []
+    Other:
+      - ReportAdmin
+      - AssetAdmin
+      - TeamAdmin
