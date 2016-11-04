@@ -9,7 +9,7 @@
 		"silverstripe/framework": ">=3.2",	
 		"silverstripe/blog": "*",
 	    "unclecheese/betterbuttons": ">=1.3.9",
-	    "simonwelsh/gridfieldrelationhandler": "dev-master",
+	    //"simonwelsh/gridfieldrelationhandler": "dev-master",
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
 	    "thezenmonkey/dataobjectaspage": "*",
 	    "silverstripe/widgets": "dev-master",
