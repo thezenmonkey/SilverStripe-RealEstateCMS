@@ -16,7 +16,8 @@
 	    "heyday/silverstripe-menumanager": "dev-master",
         "littlegiant/silverstripe-catalogmanager": "dev-master",
         "littlegiant/silverstripe-singlepageadmin": "dev-master",
-        "silverstripe-australia/grouped-cms-menu": "dev-master"
+        "silverstripe-australia/grouped-cms-menu": "dev-master",
+		"frankmullenger/gallery": "dev-1.2-dev"
 	},
 	"config": {
 		"process-timeout": 600	
