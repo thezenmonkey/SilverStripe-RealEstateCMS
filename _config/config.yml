@@ -12,6 +12,7 @@ File:
 
 Listing:
   extensions:
+    - Gallery_PageExtension
     - CatalogPageExtension
   parentClass:
     - ListingsPage
