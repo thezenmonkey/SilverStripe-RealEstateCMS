@@ -22,7 +22,7 @@ class RMSLogging extends DataObject {
 	    return $number;
 	}
 	
-	static public function getTime() {
+	public function getTime() {
 		if($this->Duration){
 			$ss = $this->Duration;
 			$s = $this->ensure2Digit($ss%60);

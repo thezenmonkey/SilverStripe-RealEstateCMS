@@ -23,7 +23,7 @@ class ListingsPage extends DataObjectAsPageHolder
 		"City" =>  "Varchar",
 	);
 	
-	private static $allowed_children = array("Listing", "ListingsPage");
+	//private static $allowed_children = array("Listing", "ListingsPage", "UnavailableListing");
 	
 
 	

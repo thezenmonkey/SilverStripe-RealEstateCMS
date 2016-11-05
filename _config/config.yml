@@ -1,4 +1,7 @@
 ---
+Name: realestate
+After: 'framework/*','cms/*'
+---
 SiteConfig:
   extensions:
     - RealEstateSiteConfig

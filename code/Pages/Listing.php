@@ -8,7 +8,7 @@
  */
  
  
-class Listing extends Page implements HiddenClass {
+class Listing extends Page {
 	/**
 	 * Static vars
 	 * ----------------------------------*/
@@ -346,34 +346,34 @@ class Listing extends Page implements HiddenClass {
 		 		
 		 	));
 		 	
-		 	$schoolManager = LiteralField::create("Blank2", "");
-		 	$schoolHeader = LiteralField::create("Blank3", "");
-		 	if($this->CityID != 0 ) {
-			 	$schoolManagerConfig = GridFieldConfig::create();
-			 	$schoolManagerConfig->addComponents(
-					new GridFieldManyRelationHandler(true),
-					new GridFieldToolbarHeader(),
-					new GridFieldSortableHeader(),
-					new GridFieldDataColumns(),
-					new GridFieldPaginator(20),
-					new GridFieldEditButton(),
-					new GridFieldDeleteAction(),
-					new GridFieldDetailForm(),
-					'GridFieldPaginator'
-			 	);
-			 	$schoolManager = new GridField(
-			 		"Schools", "Schools",
-			 		$this->Schools()->filter(array(
-			 			"CityID" => $this->CityID,
-			 			"Type" => array('Elementary School','Middle School','Secondary School','RC Elementary School','RC Middle School','RC Secondary School'),
-			 		))->sort("Name"), 
-			 		$schoolManagerConfig
-			 	);
-			 	$schoolHeader = HeaderField::create("SchoolHeader", "Schools", 2);
-			 	//$fields->addFieldToTab('Root.Schools', $schoolManager);
-			 }
-			
-					 	
+//		 	$schoolManager = LiteralField::create("Blank2", "");
+//		 	$schoolHeader = LiteralField::create("Blank3", "");
+//		 	if($this->CityID != 0 ) {
+//			 	$schoolManagerConfig = GridFieldConfig::create();
+//			 	$schoolManagerConfig->addComponents(
+//					new GridFieldManyRelationHandler(true),
+//					new GridFieldToolbarHeader(),
+//					new GridFieldSortableHeader(),
+//					new GridFieldDataColumns(),
+//					new GridFieldPaginator(20),
+//					new GridFieldEditButton(),
+//					new GridFieldDeleteAction(),
+//					new GridFieldDetailForm(),
+//					'GridFieldPaginator'
+//			 	);
+//			 	$schoolManager = new GridField(
+//			 		"Schools", "Schools",
+//			 		$this->Schools()->filter(array(
+//			 			"CityID" => $this->CityID,
+//			 			"Type" => array('Elementary School','Middle School','Secondary School','RC Elementary School','RC Middle School','RC Secondary School'),
+//			 		))->sort("Name"),
+//			 		$schoolManagerConfig
+//			 	);
+//			 	$schoolHeader = HeaderField::create("SchoolHeader", "Schools", 2);
+//			 	//$fields->addFieldToTab('Root.Schools', $schoolManager);
+//			 }
+
+
 		 	$openHouseManager = new GridField(
 		 		"OpenHouseDates",
 		 		"Open House Dates",
@@ -391,9 +391,9 @@ class Listing extends Page implements HiddenClass {
 		 			->addComponent(new GridFieldEditableColumns())
 		 			->addComponent(new GridFieldDeleteAction())
 		 			->addComponent(new GridFieldAddNewInlineButton())
-		 			
+
 		 	);
-		 	$fields->addFieldToTab('Root.OpenHouse', $openHouseManager);
+		 	//$fields->addFieldToTab('Root.OpenHouse', $openHouseManager);
 		 	
 		 	$fields->addFieldToTab("Root.FeatureSheetData",  CompositeField::create(
 		 		array(
@@ -435,7 +435,7 @@ class Listing extends Page implements HiddenClass {
 		 	);
 		 	$roomManager = new GridField(
 		 		"Rooms", "Rooms",
-		 		$this->Rooms(), 
+		 		$this->Rooms(),
 		 		$roomManagerConfig
 		 	);
 		 	
@@ -443,8 +443,8 @@ class Listing extends Page implements HiddenClass {
 		 		array(
 		 			$roomManager,
 		 			LiteralField::create("HR", "<hr>"),
-		 			$schoolHeader,
-		 			$schoolManager
+		 			//$schoolHeader,
+		 			//$schoolManager
 		 		)
 		 	)->addExtraClass('rightcol'));
 		 	
@@ -515,18 +515,7 @@ class Listing extends Page implements HiddenClass {
 					(!empty($this->PostalCode) ? $this->PostalCode." " : '').
 					(empty($this->Address) ? $this->MLS." " : '')
 				);	
-				
-				/*
-if ($this->Unit) {
-					$this->URLSegment = $URLFilter->filter($this->Address." Unit ".$this->Unit." ".$this->Town);
-					$this->MetaTitle = $this->Address." Unit ".$this->Unit." ". $this->Town." MLS ".$this->MLS;
-					$this->Title = $this->Address." Unit ".$this->Unit." ". $this->Town." ".$this->PostalCode;
-				} else {
-					$this->URLSegment = $URLFilter->filter($this->Address." ".$this->Town);
-					$this->MetaTitle = $this->Address." ". $this->Town." MLS ".$this->MLS;
-					$this->Title = $this->Address." ". $this->Town;
-				}
-*/
+
 				if (!$this->MetaDescription) {
 					$this->MetaDescription = $this->Town." Homes for Sale ".$this->Title." | ".strip_tags($this->Summary);
 				}
@@ -538,18 +527,7 @@ if ($this->Unit) {
 				$this->Title = $this->MLS." ". $this->Town ;
 				$this->MetaDescription = "Homes for Sale in ".$this->Town." ".$this->Title." sold by ".$config->BusinessName;
 			}
-			
-			/*
-if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName == "UnavailableListing") {
-				//$this->newClassInstance("Listing");
-				//$this->ClassName('Listing');
-				$this->ClassName == "Listing";
-			} elseif( ( $this->Status == "Unavailable" || $this->Status == "Closed") && $this->ClassName != "UnavailableListing")  {
-				//$this->newClassInstance("UnavailableListing");
-				//$this->ClassName('UnavailableListing');
-				$this->ClassName = "UnavailableListing";
-			}
-*/
+
 		}
 		
 		if($this->ID == 0 || $this->FolderID == 0) {
@@ -645,7 +623,7 @@ public function getTown(){
 	}
 
 	function getFrontCover() {
-		if($this->OrderedImages()->exists()) return $this->OrderedImages()->First()->SetWidth(100); 
+		if($this->OrderedImages()->exists()) return $this->OrderedImages()->First()->ScaleWidth(100);
 	}	 
 
 
