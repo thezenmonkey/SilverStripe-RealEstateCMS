@@ -158,9 +158,9 @@ class Listing extends Page {
 	 	$fields = parent::getCMSFields();
 	 	
 	 	$siteConfig = SiteConfig::current_site_config();
-        $geocodeConfig = Config::inst()->get('Geocoder');
+        $apikey = Config::inst()->get('Geocoder', 'apikey');
 	 	
-	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false&key=".$geocodeConfig->apikey);
+	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false&key=".$apikey);
 	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
