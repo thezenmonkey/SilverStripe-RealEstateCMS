@@ -159,7 +159,7 @@ class Listing extends Page {
 	 	
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
-	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyCRMWuSPxE8ZrOrUSc9sJzHghKilvr7LkI");
+	 	Requirements::javascript("http://maps.google.com/maps/api/js?sensor=false");
 	 	Requirements::javascript("realestate/javascript/cmsmap.js");
 	 	//Requirements::css("RealEstate/css/realestatecms.css");
 	 	
