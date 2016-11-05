@@ -20,6 +20,10 @@ Name: realestate
 #Listing:
 #  UseAgents: 1
 
+#Add your Google Maps API keyt to config
+#Geocoder:
+#  apikey: 'yourkey'
+
 ListingsPage:
  ShowCities: 0
  
@@ -29,4 +33,3 @@ RETS_Controller:
 ListingUtils:
   InlcudeMLS: 1
   MLSFilter: "Feature"
-  
