@@ -36,6 +36,8 @@ ListingUtils:
 
 SiteConfig:
   cms_logo: 'mysite/images/cms_logo.png'
+  extensions:
+    - RealEstateSiteConfig
 
 LeftAndMain:
   menu_groups:
