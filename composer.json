@@ -8,12 +8,11 @@
 		"silverstripe/cms": "^4.0",
 		"silverstripe/framework": "^4.0",	
 		"silverstripe/blog": "*",
-	    "unclecheese/betterbuttons": ">=1.3.9",
+	    "unclecheese/betterbuttons": "dev-master",
 	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
 	    "thezenmonkey/dataobjectaspage": "*",
 	    "silverstripe/widgets": "dev-master",
-	    "colymba/gridfield-bulk-editing-tools": "master",
-	    "littlegiant/silverstripe-catalogmanager" : "dev-master"
+	    "colymba/gridfield-bulk-editing-tools": "master"
 	},
 	"config": {
 		"process-timeout": 600	
