@@ -9,7 +9,7 @@
 		"silverstripe/framework": "~4.0",	
 		"silverstripe/blog": "*",
 	    "unclecheese/betterbuttons": "dev-master",
-	    "ajshort/silverstripe-gridfieldextensions": "dev-master",
+	    "silverstripe-australia/gridfieldextensions": "dev-master",
 	    "thezenmonkey/dataobjectaspage": "*",
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master"
