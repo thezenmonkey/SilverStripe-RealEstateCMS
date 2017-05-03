@@ -10,7 +10,6 @@
 		"silverstripe/blog": "*",
 	    "unclecheese/betterbuttons": "dev-master",
 	    "silverstripe-australia/gridfieldextensions": "dev-master",
-	    "thezenmonkey/dataobjectaspage": "*",
 	    "silverstripe/widgets": "dev-master",
 	    "colymba/gridfield-bulk-editing-tools": "master"
 	},
