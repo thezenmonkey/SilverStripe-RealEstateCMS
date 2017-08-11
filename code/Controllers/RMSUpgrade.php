@@ -1,5 +1,9 @@
 <?php
 
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\Debug;
+use SilverStripe\Control\Controller;
+
 class RMSUpgrade extends Controller {
 	
 	private static $allowed_actions = array (
@@ -12,7 +16,7 @@ class RMSUpgrade extends Controller {
 	
 	
 	//Change Listing FLag to new system
-	public function Upgrade210(SS_HTTPRequest $request) {
+	public function Upgrade210(HTTPRequest $request) {
 		echo "Start Upgrade <br>\n";
 		
 		$listings = Listing::get()->filter(array("IsNew" => '1'));

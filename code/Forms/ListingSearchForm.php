@@ -1,5 +1,9 @@
 <?php
 
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
+
 
 class ListingSearchForm extends Form {
 	function __construct($controller, $name) {
@@ -18,7 +22,7 @@ class ListingSearchForm extends Form {
 	   return $this->renderWith(array(
 	      $this->class,
 	      'ListingSearchForm',
-	      'Form'
+	      Form::class
 	   ));
 	}
 	

@@ -1,4 +1,16 @@
 <?php
+
+use SilverStripe\Forms\TextField;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\Form;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Control\Controller;
 /**
  * 	
  * @package Contact Form 
@@ -11,7 +23,7 @@ class ListingRequestForm extends Form {
 		// Create fields
 		$fields = new FieldList(
 			TextField::create('Name')->setAttribute('required', true)->setCustomValidationMessage("Please include your name", "error"),
-			EmailField::create('Email','E-Mail Address')->setAttribute('required', true)->setCustomValidationMessage("Please include your email address", "error"),
+			EmailField::create(Email::class,'E-Mail Address')->setAttribute('required', true)->setCustomValidationMessage("Please include your email address", "error"),
 			TextField::create('Phone'),
 			TextareaField::create("Company", "Message", "Please send me more information about ".$controller->Address)->setAttribute('autocomplete', 'no'),
 			HiddenField::create('Address', '', $controller->Address),
@@ -27,7 +39,7 @@ class ListingRequestForm extends Form {
 		if($controller->ClassName == "MLSListing") {
 			$controller = MLSListingsPage::get()->First();
 		}
-		$validation = new RequiredFields(array('Email'));
+		$validation = new RequiredFields(array(Email::class));
 		
 		parent::__construct($controller, $name, $fields, $actions, $validation);
 	}
@@ -36,7 +48,7 @@ class ListingRequestForm extends Form {
 	   return $this->renderWith(array(
 	      $this->class,
 	      'ListingRequestForm',
-	      'Form'
+	      Form::class
 	   ));
 	}
 	
@@ -47,12 +59,12 @@ class ListingRequestForm extends Form {
 		if($siteConfig->ContactFormFrom){
 			$From = $siteConfig->ContactFormFrom;
 		} else {
-			$From = $data['Email'];
+			$From = $data[Email::class];
 		}
 		
 		$To = $siteConfig->SiteEmail;
 		$Subject = "Viewing Request ".$data['Address']." From ".$data['Name'];
-		$Body = nl2br($data['Company'])."<br>\n ".$data['Email'];
+		$Body = nl2br($data['Company'])."<br>\n ".$data[Email::class];
 		
 		$email = new Email($From, $To, $Subject,$Body);
 		$email->send();

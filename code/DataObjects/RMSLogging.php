@@ -1,5 +1,10 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
+use SilverStripe\Forms\GridField\GridField;
+
 class RMSLogging extends DataObject {
 	
 	private static $db = array (
@@ -23,16 +28,20 @@ class RMSLogging extends DataObject {
 	}
 	
 	static public function getTime() {
-		if($this->Duration){
-			$ss = $this->Duration;
-			$s = $this->ensure2Digit($ss%60);
-			$m = $this->ensure2Digit(floor(($ss%3600)/60));
-			$h = $this->ensure2Digit(floor(($ss%86400)/3600));
+		if($duration = self::getDuration()){
+
+			$s = self::ensure2Digit($duration%60);
+			$m = self::ensure2Digit(floor(($duration%3600)/60));
+			$h = self::ensure2Digit(floor(($duration%86400)/3600));
 			
 			return "$h:$m:$s";
 		} else {
 			return false;
 		}
+	}
+
+	public function getDuration() {
+		return $this->Duration;
 	}
 	
 }

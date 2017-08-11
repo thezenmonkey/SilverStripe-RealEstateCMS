@@ -1,4 +1,10 @@
 <?php
+
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\HiddenClass;
+use SilverStripe\Control\Session;
+//use PageController;
 /**
  * Class UnavailableListing DEPRECIATED
  *
@@ -93,7 +99,7 @@ class UnavailableListingsPage extends Page implements HiddenClass {
 }
 
 
-class UnavailableListingsPage_Controller extends Page_Controller {
+class UnavailableListingsPage_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 	);

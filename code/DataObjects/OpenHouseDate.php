@@ -1,5 +1,9 @@
 <?php
 
+use SilverStripe\ORM\FieldType\DBDate;
+use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\TimeField;
+
 
 /**
  * Open House Dates for Listing	
@@ -33,7 +37,7 @@ class OpenHouseDate extends ExtraData {
 			
 		));
 		
-		$OpenHouseDateField = new DateField("OpenHouseDate", "Date");
+		$OpenHouseDateField = new DateField("OpenHouseDate", DBDate::class);
 		
 		$OpenHouseDateField->setConfig('showcalendar', true);
 		

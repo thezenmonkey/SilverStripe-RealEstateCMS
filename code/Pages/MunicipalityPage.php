@@ -1,5 +1,10 @@
 <?php
 
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\Tab;
+//use SilverStripe\Lumberjack\Model\Lumberjack;
+
 class MunicipalityPage extends Community {
 	
 	/**
@@ -12,9 +17,13 @@ class MunicipalityPage extends Community {
     private static $description = 'Landing Page for Target Market City';
     private static $icon = 'realestate/images/communities.png';
 
-    private static $allowed_children = array(
-        'NeighbourhoodPage'
-    );
+//	private static $extensions = [
+//		Lumberjack::class,
+//	];
+
+	private static $allowed_children = [
+		'NeighbourhoodPage'
+	];
 
 	/**
 	 * Object vars
@@ -91,7 +100,7 @@ class MunicipalityPage extends Community {
         $listingTab = new Tab('ListingsTab', 'Listings', $listingGrid);
         $fields->insertAfter($listingTab, 'NeighbourhoodsTabs');
 
-        //$fields->removeFieldFromTab('Root', 'ChildPages');
+        $fields->removeFieldFromTab('Root', 'ChildPages');
 
 
         return $fields;

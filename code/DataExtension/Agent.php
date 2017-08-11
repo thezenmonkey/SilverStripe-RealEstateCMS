@@ -1,5 +1,16 @@
 <?php
 
+use SilverStripe\Assets\Image;
+use SilverStripe\Assets\Folder;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\View\Parsers\URLSegmentFilter;
+use SilverStripe\Security\Group;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataExtension;
+
 /**
  * 	
  * @package
@@ -41,8 +52,8 @@ class Agent extends DataExtension {
 		 );
 		 
 		 static $has_one = array(
-		 	"Headshot" => "Image",
-		 	'Folder' => 'Folder',
+		 	"Headshot" => Image::class,
+		 	'Folder' => Folder::class,
 		 );
 		 
 		 static $default_sort = array('SortOrder');
@@ -54,7 +65,7 @@ class Agent extends DataExtension {
 	public function updateCMSFields(FieldList $fields) {
 		
 		$fields->removeFieldFromTab ( "Root", "Pictures");
-		$fields->removeFieldFromTab ( "Root", "Folder");
+		$fields->removeFieldFromTab ( "Root", Folder::class);
 		$fields->removeFieldFromTab ( "Root", "SortOrder");
 		
 		$fields->insertAfter(TextField::create("JobTitle", "Job Title"), "Surname");

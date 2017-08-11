@@ -1,14 +1,60 @@
 <?php
+
+namespace SilverStripeRMS\Model;
+
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
+use SilverStripe\Assets\Folder;
+use SilverStripe\Security\Member;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\Requirements;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\ToggleCompositeField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Forms\GridField\GridFieldConfig;
+use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
+use SilverStripe\Forms\GridField\GridFieldSortableHeader;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldPaginator;
+use SilverStripe\Forms\GridField\GridFieldEditButton;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use SilverStripe\View\Parsers\URLSegmentFilter;
+use SilverStripe\ORM\GroupedList;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\ORM\Filters\PartialMatchFilter;
+use SilverStripe\ORM\Filters\WithinRangeFilter;
+use SilverStripe\ORM\Filters\GreaterThanOrEqualFilter;
+use SilverStripe\ORM\Search\SearchContext;
+use SilverStripe\ORM\HiddenClass;
+use Page;
+use SilverStripe\ORM\DataObject;
 /**
  * 	
  * @package Realestate Listing System - Property Listing DataObject 
- * @requires DataObjectAsPage, Mappable, DataObjectManager
+ * @requires Mappable
  * @author Richard Rudy twitter:thezenmonkey web: http://designplusawesome.com
  * TODO Remove UnavailableListing References
+ * TODO Upgrade functions Convert Floorplans from has_many to many_many
+ * TODO Re-implement Hidden Class
  */
  
  
-class Listing extends Page implements HiddenClass {
+class Listing extends Page  {
 	/**
 	 * Static vars
 	 * ----------------------------------*/
@@ -31,7 +77,7 @@ class Listing extends Page implements HiddenClass {
 	 * Data model
 	 * ----------------------------------*/
 	
-	private static $db = array(
+	private static $db = [
 		//basic sale data
 		'Status' => "Enum('Available,Sold,Closed,Unavailable')", //Listing Availabilty (see onBeforeWrite)
 		'Feature' => 'Boolean', //Flag to define if the listing is considerd a "Feature Listing"
@@ -57,7 +103,7 @@ class Listing extends Page implements HiddenClass {
 		'Taxes' => 'Varchar', //Assessed Property Tax
 		'TaxYear' => 'Int',  //Year of Property TAx Assessment
 		'CondoFee' => 'Int', //Fee for Condo Buildings
-		'HideMonthly' => 'Boolean', //Flag to hide Calulated Mortgage Payment 
+		'HideMonthly' => 'Boolean', //Flag to hide Calculated Mortgage Payment
 		//lot size
 		'LotLength' => 'Varchar', //Length of Lot
 		'LotWidth' => 'Varchar',  //width of Lot
@@ -68,11 +114,11 @@ class Listing extends Page implements HiddenClass {
 		'Summary' => 'HTMLText', //Short Summary Text which can be used on Listing Item or Listing Page
 		
 		//mapping data
-		'Lat' => 'Varchar', //Genreated Geocoded Latitude (see onBeforeWrite)
-		'Lon' => 'Varchar', //Genreated Geocoded Longitude (see onBeforeWrite)
+		'Lat' => 'Varchar', //Generated Geocoded Latitude (see onBeforeWrite)
+		'Lon' => 'Varchar', //Generated Geocoded Longitude (see onBeforeWrite)
 		'SVHeading' => 'Varchar(25)', //Street View Heading
 		'SVPitch' => 'Varchar(25)', //Street View Pitch
-		'SVZoom' => 'Varchar(25)', //STreet View Zoom Level
+		'SVZoom' => 'Varchar(25)', //Street View Zoom Level
 		
 		//feature sheet data
 		'AdditionalMLS' => "Varchar(100)", //USed to store MLS nubmers for additional boards (useful for MLSListing Dublicate checks)
@@ -107,38 +153,45 @@ class Listing extends Page implements HiddenClass {
 		//onbeforewritehack
 		'CityIDHolder' => 'Varchar(100)'
 		
-	);
+	];
 	
-	private static $has_one = array(
+	private static $has_one = [
 		'Neighbourhood' => 'NeighbourhoodPage', //Optional Neighbourhood Page (see code/Pages/NeighbourhoodPage.php)
-		'FeatureSheet' => 'File', //PDF/DOC feature sheet
-		'Folder' => 'Folder', //Generated Folder for to organize related file uploads  
+		'FeatureSheet' => File::class, //PDF/DOC feature sheet
+		//'Folder' => Folder::class, //Generated Folder for to organize related file uploads
 		'City' => 'MunicipalityPage', //City Page (see code/Pages/MunicipailtyPage.php)
-		'Agent' => 'Member' //Listing Agent (see code/DataExtensions/Agent.php)
-	);
+		'Agent' => Member::class //Listing Agent (see code/DataExtensions/Agent.php)
+	];
 	
 	
-	private static $has_many = array(
+	private static $has_many = [
 		'Rooms' => 'Room', //Optional Rooms (see code/DataObjects/Room.php)
-		"OpenHouseDates" => "OpenHouseDate", //Open House (see code/DataObjects/OpenHouseDate.php)
-		"Floorplans" => "File" //Floorplans PDF or JPG
-	);
+		"OpenHouseDates" => "OpenHouseDate" //Open House (see code/DataObjects/OpenHouseDate.php)
+	];
 	
-	private static $many_many = array(
-		'Schools' => 'School' //Local Schools (see code/DataObjects/NeighbourhoodFeature.php)
-	);
+	private static $many_many = [
+		'Schools' => 'School', //Local Schools (see code/DataObjects/NeighbourhoodFeature.php)
+        'Images' => Image::class,
+        "Floorplans" => File::class //Floorplans PDF or JPG
+	];
+
+	private static $many_many_extraFields = [
+	    'Images' => [
+	        "Order" => "Int"
+        ]
+    ];
 	
-	private static $searchable_fields = array(
-		'Title' => array("title" => "Address"),
+	private static $searchable_fields = [
+		'Title' => [
+		    "title" => "Address"
+        ],
 		'MLS',
 		'NumberBed',
 		'NumberBath',
 		'Price'
-	);
+	];
 	
-	
-	
-	private static $summary_fields = array(
+	private static $summary_fields = [
 		'FrontCover',
 		'Address',
 		'Town',
@@ -146,7 +199,15 @@ class Listing extends Page implements HiddenClass {
 		'MLS',
 		'ListingType',
 		'Feature'
-	);
+	];
+
+	private static $cascade_deletes = [
+        'Images',
+        'Floorplans',
+        'Rooms',
+        'OpenHouseDates',
+        'FeatureSheet'
+    ];
 	
 	//private static $default_sort = "Street ASC";
 	
@@ -322,12 +383,12 @@ class Listing extends Page implements HiddenClass {
 		if ($this->ID != 0){
 			
 			
-			$galleryField = GalleryUploadField::create('Images', 'Images', $this->OrderedImages())
-				->setFolderName("/Homes/".$this->Folder()->Name)
+			$galleryField = UploadField::create('Images', 'Images', $this->OrderedImages())
+				->setFolderName("/Homes")
 				->addExtraClass('stacked');
-			
+
 			$featuresheetField = new UploadField('FeatureSheet');
-			$featuresheetField->setFolderName("/Homes/".$this->Folder()->Name);
+			$featuresheetField->setFolderName("/FeatureSheets");
 		 	
 		 	$fields->addFieldsToTab("Root.PictureAndResources", array(
 		 		CompositeField::create(
@@ -337,7 +398,7 @@ class Listing extends Page implements HiddenClass {
 			 			UploadField::create("Floorplans")
 			 				->addExtraClass('stacked')
 			 				->setDescription('Upload Floorplans. Click edit on uploaded file to set Title for each floorplan. ie 1st floor, basement, etc.')
-			 				->setFolderName("/Homes/".$this->Folder()->Name)
+			 				->setFolderName("/Floorplans")
 		 			)->addExtraClass('leftcol'),
 		 			CompositeField::create( 
 		 				$galleryField
@@ -359,7 +420,7 @@ class Listing extends Page implements HiddenClass {
 					new GridFieldEditButton(),
 					new GridFieldDeleteAction(),
 					new GridFieldDetailForm(),
-					'GridFieldPaginator'
+					GridFieldPaginator::class
 			 	);
 			 	$schoolManager = new GridField(
 			 		"Schools", "Schools",
@@ -379,15 +440,9 @@ class Listing extends Page implements HiddenClass {
 		 		"Open House Dates",
 		 		$this->OpenHouseDates(),
 		 		GridFieldConfig_RelationEditor::create()
-		 			->removeComponentsByType('GridFieldAddNewButton')
-		 			//->removeComponentsByType('GridFieldSortableHeader')
-		 			->removeComponentsByType('GridFieldDataColumns')
-		 			//->removeComponentsByType('GridFieldDeleteAction')
-		 			//->removeComponentsByType('GridFieldEditButton')
-		 			->removeComponentsByType('GridFieldAddExistingAutocompleter')
-		 			//->addComponent(new GridFieldButtonRow('before'))
-		 			//->addComponent(new GridFieldToolbarHeader())
-		 			//->addComponent(new GridFieldTitleHeader())
+		 			->removeComponentsByType(GridFieldAddNewButton::class)
+		 			->removeComponentsByType(GridFieldDataColumns::class)
+		 			->removeComponentsByType(GridFieldAddExistingAutocompleter::class)
 		 			->addComponent(new GridFieldEditableColumns())
 		 			->addComponent(new GridFieldDeleteAction())
 		 			->addComponent(new GridFieldAddNewInlineButton())
@@ -424,9 +479,9 @@ class Listing extends Page implements HiddenClass {
 		 	)->addExtraClass('leftcol'));
 		 	
 		 	$roomManagerConfig = GridFieldConfig_RelationEditor::create();
-		 	$roomManagerConfig->removeComponentsByType('GridFieldDataColumns')
-		 		->removeComponentsByType('GridFieldAddExistingAutocompleter')
-		 		->removeComponentsByType('GridFieldAddNewButton');
+		 	$roomManagerConfig->removeComponentsByType(GridFieldDataColumns::class)
+		 		->removeComponentsByType(GridFieldAddExistingAutocompleter::class)
+		 		->removeComponentsByType(GridFieldAddNewButton::class);
 		 	$roomManagerConfig->addComponents(
 		 		//new GridFieldDetailForm('Room')
 		 		new GridFieldEditableColumns(),
@@ -474,8 +529,7 @@ class Listing extends Page implements HiddenClass {
 		return $fields;
 	 	
 	}
-	 
-	 	 
+
 	 
 	function onBeforeWrite() {
 		if ( is_null($this->Lat) || is_null($this->Lon) ) {
@@ -589,35 +643,6 @@ if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName
 		parent::onBeforeWrite();	
 		
 	}
-	
-	function onBeforeDelete() {
-		
-		
-		
-		if($this->FolderID != 0){
-			$folder = Folder::get()->byID($this->FolderID);
-			
-			if($folder) {
-				$listingsUsing = Listing::get()->filter(array("FolderID" => $folder->ID));
-				// Delete Folder Only if this is the only listing using it.
-				if($listingsUsing.count()) {
-					$folder->delete();
-				}
-			}
-		}
-		
-		$rooms = $this->Rooms();
-		if($rooms->count()) {
-			foreach ($rooms as $room) $room->delete();
-		}
-		
-		$openHouses = $this->OpenHouseDates();
-		if($openHouses->count()){
-			foreach ($openHouses as $openHouse) $openHouse->delete();
-		}
-		
-		parent::onBeforeDelete();
-	}
 
 	public function providePermissions() { 
 		return array( 
@@ -632,12 +657,6 @@ if(($this->Status == "Available" || $this->Status == "Sold") && $this->ClassName
 	/**
 	 * Accessor methods
 	 * ----------------------------------*/
-	
-	/*
-public function getTown(){
-		return $this->City() ? $this->City()->Title : $this->Town;
-	}
-*/
 	
 	public function getProvince() {
 		$siteConfig = SiteConfig::current_site_config();
@@ -682,7 +701,7 @@ public function getTown(){
 	
 	
 	//MOVE TO A UTILITY CLASS
-	//checks if Pased Item is with 15 miles of this DataObject Has Been moved to ListingUtils
+	//checks if Passed Item is with 15 miles of this DataObject Has Been moved to ListingUtils
 	public function getDistance($lat,$lon) {
 		return ( 3959 * acos( cos( deg2rad($lat) ) * cos( deg2rad( $this->Lat ) ) * cos( deg2rad($this->Lon ) - deg2rad($lon) ) + sin( deg2rad($lat) ) * sin( deg2rad( $this->Lat ) ) ) );
 	}
@@ -708,7 +727,7 @@ public function getTown(){
 	
 	/**
 	 * Return Money Formated Values  
-	 *
+	 *  TODO Use Locale Getter
 	 * @return 
 	 */
 	
@@ -779,9 +798,15 @@ public function getTown(){
 			return 20;
 		}
 	}
-	
-	 
-	function RelatedProperties($count = 4) {
+
+
+    /**
+     * Get list of related properties based in site configuration
+     * @param int $count
+     *
+     * @return bool|static
+     */
+    function RelatedProperties($count = 4) {
 	 	$siteConfig = SiteConfig::current_site_config();
 	 	
 	 	if($siteConfig->RelatedPriceRange != 0) {
@@ -803,9 +828,10 @@ public function getTown(){
 	 	
 	 }
 	 
+
+
 	 //cache key for listing
-	 
-	 function ListingCacheKey() {
+    function ListingCacheKey() {
 		 return implode('_', array(
 		 $this->URLSegment,
 	        $this->LasteEdited,
@@ -824,21 +850,18 @@ public function getTown(){
 	       
 	        
 	    ));
-	 }
-	
-	// Dan Cooper Specifc TODO REMOVE
-	function ShowListingsPage() {
-		return ListingsPage::get()->where("City = ".$this->CityID)->count() ? ListingsPage::get()->where("City = ".$this->CityID)->First() : false;
 	}
-	
-	
-	
+
+
+    /**
+     * Open House Getters
+     */
+
 	public function UpcomingOpenHouse() {
 		$OpenHouses = $this->OpenHouseDates()->filter(array("OpenHouseDate:GreaterThanOrEqual" => strtotime("today")));
 		return $OpenHouses->count() ? $OpenHouses : false;
 	}
-	
-	
+
 	public function NextOpenHouse() {
 		if($this->OpenHouseDates()->count()) { 
 			$openHouse = $this->OpenHouseDates()->filter(array ("OpenHouseDate:GreaterThan" => strtotime('yesterday'), "OpenHouseDate:LessThan" => strtotime("1 week")))->First();
@@ -899,10 +922,19 @@ public function getTown(){
 	}
 	
 	
-	//DUplicate od getTown
+	//Duplicate of getTown
 	public function getMunicipality() {
 		return $this->Town ? $this->Town : $this->City()->Title;
 	}
+
+
+    /**
+     * TODO Placeholder for OrderdImages
+     * @return \SilverStripe\ORM\DataList or bool
+     */
+    public function OrderedImages() {
+	    return $this->Images() && $this->Images()->count() ? $this->Images() : false;
+    }
 	
 
 
@@ -941,83 +973,11 @@ public function getTown(){
 }
 
 
-class Listing_Controller extends Page_Controller {
-	
-	private static $allowed_actions = array("ContactForm");
-	
-	public function init() {
-		parent::init();
-		
-		if($this->Status == "Unavailable" || $this->Status == "Closed") {
-			Session::set("UnavailListing", array("Price" => $this->Price, "Lat" => $this->Lat, "Lon" => $this->Lon, "City" => $this->City, "Town" => $this->Town));
-			$redirect = SiteTree::get_by_link("listing-unavailable");
-			$this->redirect($redirect->Link(), 301);
-			return;
-		}
-	}
-	
-	public function index() { 
-		if ($this->Status == "Sold") { 
-			return $this->renderWith(array('SoldListing', 'Listing', 'Page')); 
-		} 
-			else return $this->renderWith(array('Listing','Page')); 
-	}		
-	
-	public function ContactForm() {
-		$form = new ListingRequestForm($this, 'ContactForm');
-		
-		if($form->hasExtension('FormSpamProtectionExtension')) {
-		    $form->enableSpamProtection();
-		}
-		
-		return $form;
-	}
-	
-	function RelatedProperties($count = 4) {
-	 	$siteConfig = SiteConfig::current_site_config();
-	 	
-	 	if($siteConfig->RelatedPriceRange != 0) {
-		 	$varience = $siteConfig->RelatedPriceRange;
-	 	} else {
-		 	$varience = 50000;
-	 	}
-	 	
-	 	$items = new ArrayList();
-	 	
-	 	$ownItems = Listing::get()->filter(array(
- 			"CityID" => $this->CityID,
- 			"Status" => "Available",
- 			"Price:LessThan" => $this->Price + 50000,
- 			"Price:GreaterThan" => $this->Price - 50000
- 		))->exclude("ID", $this->ID)->limit($count);
-	 	
-	 	if($ownItems && $ownItems->count()) {
-		 	$items->merge($ownItems);
-	 	}
-	 	
-	 	$mlsItems = MLSListing::get()->filter(array(
- 			"CityID" => $this->CityID,
- 			"Price:LessThan" => $this->Price + 50000,
- 			"Price:GreaterThan" => $this->Price - 50000
- 		))->limit($count);
-	 	
-	 	if($mlsItems && $mlsItems->count()) {
-		 	$items->merge($mlsItems);
-	 	}
-	 	
-	 	if($items->count()) {
-	 		return $items->limit($count);
-	 	} else {
-	 		return false;
-	 	}
-	 	
-	 }
-	
-}
+
 
 class Listing_Images extends DataObject {
 
-    static $db = array (
+	private static $db = array (
         'PageID' => 'Int',
         'ImageID' => 'Int',
         'Caption' => 'Text',

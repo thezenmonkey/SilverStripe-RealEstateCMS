@@ -1,4 +1,11 @@
 <?php
+
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\ArrayData;
+use SilverStripe\Security\Security;
 /**
  * 	
  * @package Realestate Listing System - Property Listings Page 
@@ -8,7 +15,7 @@
  */
 
 
-class ListingsPage extends DataObjectAsPageHolder 
+class ListingsPage extends Page
 {
 	/**
 	 * Static vars
@@ -317,14 +324,13 @@ public function ThisCity($City) {
 
 
 
-class ListingsPage_Controller extends DataObjectAsPageHolder_Controller 
-{
+class ListingsPage_Controller extends PageController {
 	//This needs to know be the Class of the DataObject you want this page to list
 	static $item_class = 'MLSListing';
 	//Set the sort for the items (defaults to Created DESC)
 	static $item_sort = 'Created DESC';
 	
-	public static $allowed_actions = array("ContactForm", "show");
+	private static $allowed_actions = array("ContactForm", "show");
 	
 	public function show()
 	{

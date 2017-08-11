@@ -1,4 +1,7 @@
 <?php
+
+use SilverStripe\Security\Member;
+use SilverStripe\Admin\ModelAdmin;
 /**
  * 	
  * @package Realestate Listing System - Neighbourhood Admin 
@@ -8,12 +11,12 @@
 class TeamAdmin extends ModelAdmin {
    
 	private static $managed_models = array(
-		'Member',
+		Member::class,
 		'Testimonial',
 	);
 
-	static $url_segment = 'team';
-	static $menu_title = 'Team';
-	static $menu_icon = 'realestate/images/our_team.png';
+	private static $url_segment = 'team';
+	private static $menu_title = 'Team';
+	private static $menu_icon = 'realestate/images/our_team.png';
 	
 }

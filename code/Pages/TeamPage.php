@@ -1,5 +1,11 @@
 <?php
 
+use SilverStripe\Security\Member;
+use SilverStripe\Core\Convert;
+use SilverStripe\View\ArrayData;
+use SilverStripe\Security\Security;
+//use PageController;
+
 class TeamPage extends Page {
 	
 	/**
@@ -79,7 +85,7 @@ class TeamPage extends Page {
 }
 
 
-class TeamPage_Controller extends Page_Controller {
+class TeamPage_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 		"show"
@@ -92,7 +98,7 @@ class TeamPage_Controller extends Page_Controller {
 	
 	public function getCurrentItem($itemID = null) {
 		$params = $this->request->allParams();
-		$class =  "Member";		
+		$class =  Member::class;		
 		
 		if($itemID)
 		{

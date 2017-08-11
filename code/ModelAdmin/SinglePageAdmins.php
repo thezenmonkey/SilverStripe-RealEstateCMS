@@ -1,6 +1,6 @@
 <?php
 	
-class HomePageAdmin extends SinglePageAdmin {
+class HomePageAdmin  {
     private static $menu_title = "Home Page";
     private static $tree_class = 'HomePage';
     private static $url_segment = "home-page";
@@ -23,21 +23,21 @@ class AboutUsAdmin extends SinglePageAdmin {
 }
 */
 
-class ListingsPageAdmin extends SinglePageAdmin {
+class ListingsPageAdmin  {
     private static $menu_title = "Listings Page";
     private static $tree_class = 'ListingsPage';
     private static $url_segment = "listings-page";
     static $menu_icon = 'realestate/images/home.png';
 }
 
-class CommunitiesAdmin extends SinglePageAdmin {
+class CommunitiesAdmin  {
     private static $menu_title = "Communities";
     private static $tree_class = 'CommunitiesHolder';
     private static $url_segment = "communities-page";
     //static $menu_icon = 'realestate/images/home.png';
 }
 
-class BlogAdmin extends SinglePageAdmin {
+class BlogAdmin  {
     private static $menu_title = "Blog";
     private static $tree_class = 'Blog';
     private static $url_segment = "blog-admin";

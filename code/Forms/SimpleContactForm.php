@@ -1,11 +1,22 @@
 <?php
 
+use SilverStripe\Forms\TextField;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\HiddenField;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\Form;
+use SilverStripe\Control\Controller;
+use SilverStripe\SiteConfig\SiteConfig;
+
 class SimpleContactForm extends Form {
 	
 	public function __construct($controller, $name) {
         $fields = new FieldList(
             TextField::create("Name"),
-            EmailField::create("Email")->setAttribute('type', 'email'),
+            EmailField::create(Email::class)->setAttribute('type', 'email'),
             TextareaField::create("Company", "Message")->setAttribute('autocomplete', 'no'),
             TextareaField::create("EmailMessage", "Company")->addExtraClass("honeypot")->setAttribute('autocomplete', 'no')
         );
@@ -22,7 +33,7 @@ class SimpleContactForm extends Form {
     function forTemplate() {
 	   return $this->renderWith(array(
 	      $this->class,
-	      'Form'
+	      Form::class
 	   ));
 	}
     
@@ -46,12 +57,12 @@ class SimpleContactForm extends Form {
 		if($siteConfig->ContactFormFrom){
 			$From = $siteConfig->ContactFormFrom;
 		} else {
-			$From = $data['Email'];
+			$From = $data[Email::class];
 		}
 		
 		$To = $siteConfig->SiteEmail;
 		$Subject = "Website Contact From ".$data['Name'];
-		$Body = nl2br($data['Company'])."<br>\n ".$data['Email'];
+		$Body = nl2br($data['Company'])."<br>\n ".$data[Email::class];
 		$email = new Email($From, $To, $Subject,$Body);
 		$email->send();
 		

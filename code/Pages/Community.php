@@ -1,5 +1,7 @@
 <?php
 
+// use PageController;
+
 class Community extends Page {
 	
 	/**
@@ -171,7 +173,7 @@ class Community extends Page {
 }
 
 
-class Community_Controller extends Page_Controller {
+class Community_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 	);

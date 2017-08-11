@@ -1,5 +1,9 @@
 <?php
 
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\HeaderField;
+// use PageController;
+
 class CommunitiesHolder extends Page {
 	
 	/**
@@ -21,7 +25,7 @@ class CommunitiesHolder extends Page {
 	 * ----------------------------------*/
 	
 	
-	
+
 	/**
 	 * Data model
 	 * ----------------------------------*/
@@ -38,26 +42,26 @@ class CommunitiesHolder extends Page {
         $fields = parent::getCMSFIelds();
 
         //Create a list of Towns
-        $sqlQuery = new SQLQuery();
-        $sqlQuery->setFrom('Listing');
-        $sqlQuery->setWhere('CityID = 0');
-        $sqlQuery->selectField('Town');
-        $sqlQuery->setDistinct(true);
-        $result = $sqlQuery->execute();
-
-        $townList = '<ul>';
-
-        foreach($result as $row){
-            $townList = $townList.'<li>'.$row['Town'].'</li>';
-        }
-
-        $townList = $townList.'</ul>';
-
-        $townDisplay = LiteralField::create('TownList', $townList);
+//        $sqlQuery = new SQLQuery();
+//        $sqlQuery->setFrom('Listing');
+//        $sqlQuery->setWhere('CityID = 0');
+//        $sqlQuery->selectField('Town');
+//        $sqlQuery->setDistinct(true);
+//        $result = $sqlQuery->execute();
+//
+//        $townList = '<ul>';
+//
+//        foreach($result as $row){
+//            $townList = $townList.'<li>'.$row['Town'].'</li>';
+//        }
+//
+//        $townList = $townList.'</ul>';
+//
+//        $townDisplay = LiteralField::create('TownList', $townList);
 
         $fields->addFieldsToTab('Root.ChildPages', array(
             HeaderField::create('TownHeader', 'Other Towns Used', 2),
-            $townDisplay
+            //$townDisplay
         ));
 
         //Reorder Main Tab
@@ -101,7 +105,7 @@ class CommunitiesHolder extends Page {
 }
 
 
-class CommunitiesHolder_Controller extends Page_Controller {
+class CommunitiesHolder_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 	);

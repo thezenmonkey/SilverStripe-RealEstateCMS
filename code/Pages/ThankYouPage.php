@@ -1,5 +1,7 @@
 <?php
 
+//use PageController;
+
 class ThankYouPage extends Page {
 	
 	/**
@@ -71,7 +73,7 @@ class ThankYouPage extends Page {
 }
 
 
-class ThankYouPage_Controller extends Page_Controller {
+class ThankYouPage_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 	);

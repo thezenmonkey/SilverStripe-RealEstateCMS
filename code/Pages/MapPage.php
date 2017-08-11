@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\View\Requirements;
+// use PageController;
+
 class MapPage extends Page {
 	
 	/**
@@ -71,7 +74,7 @@ class MapPage extends Page {
 }
 
 
-class MapPage_Controller extends Page_Controller {
+class MapPage_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 		"GetListingsList",

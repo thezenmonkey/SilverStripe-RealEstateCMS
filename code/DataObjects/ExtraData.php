@@ -1,5 +1,7 @@
 <?php
 
+use SilverStripe\ORM\DataObject;
+
 /**
  * 	Class to hold extra Objects TOo small to their own Table 
  *  Add fields here and create a new class that extends this 

@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\Admin\ModelAdmin;
 /**
  * 	
  * @package Realestate Listing System - Neighbourhood Admin 
@@ -7,12 +9,12 @@
  */
 class NeighbourhoodAdmin extends ModelAdmin {
    
-	public static $managed_models = array(
+	private static $managed_models = array(
 		'School'
 	);
 
-	static $url_segment = 'communities';
-	static $menu_title = 'Community Tools';
-	static $menu_icon = 'realestate/images/communities.png';
+	private static $url_segment = 'communities';
+	private static $menu_title = 'Community Tools';
+	private static $menu_icon = 'realestate/images/communities.png';
 	
 }

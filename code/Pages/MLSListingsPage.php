@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\ORM\HiddenClass;
 /**
  * 	
  * @package Realestate Listing System - Neighbourhood Listings Page 
@@ -7,7 +9,7 @@
  */
 
 
-class MLSListingsPage extends DataObjectAsPageHolder implements HiddenClass
+class MLSListingsPage  implements HiddenClass
 {
 	/**
 	 * Static vars
@@ -66,7 +68,7 @@ class MLSListingsPage extends DataObjectAsPageHolder implements HiddenClass
 
 }
 
-class MLSListingsPage_Controller extends DataObjectAsPageHolder_Controller 
+class MLSListingsPage_Controller
 {
 	//This needs to know be the Class of the DataObject you want this page to list
 	static $item_class = 'MLSListing';

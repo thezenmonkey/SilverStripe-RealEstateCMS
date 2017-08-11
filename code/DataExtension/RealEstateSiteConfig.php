@@ -1,8 +1,17 @@
 <?php
+
+use SilverStripe\Assets\Image;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\EmailField;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Forms\ToggleCompositeField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\DataExtension;
  
 class RealEstateSiteConfig extends DataExtension {
 	
-	private static $db = array(
+	private static $db = [
 		//Business Info
 		'BusinessName' => 'Varchar(255)',
 		'StreetAddress' => 'Varchar',
@@ -30,15 +39,15 @@ class RealEstateSiteConfig extends DataExtension {
 		'MLSMin' => 'Int',
 		'MLSMax' => 'Int',
 		"ContactFormFrom" => "Varchar"
-	);
+	];
 	
-	private static $has_one = array(
-		"Picture" => "Image",
-		"Branding" => "Image",
-		"BrokerageLogo" => "Image",
+	private static $has_one = [
+		"Picture" => Image::class,
+		"Branding" => Image::class,
+		"BrokerageLogo" => Image::class,
 		"DefaultCity" => "MunicipalityPage",
 		"DefaultThankYou" => "ThankYouPage"
-	);
+	];
 	
 	
 	

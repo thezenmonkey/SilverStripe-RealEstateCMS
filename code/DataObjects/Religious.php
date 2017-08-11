@@ -1,5 +1,9 @@
 <?php
 
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\FieldList;
+
 class Religious extends NeighbourhoodFeature {
 	
 	private static $db = array (

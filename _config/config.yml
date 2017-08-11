@@ -4,9 +4,10 @@ SiteConfig:
     - RealEstateSiteConfig
 File:
   extensions:
-    - RMSImageExtension
     - RMSFileExtension
-
+Image:
+  extensions:
+    - RMSImageExtension
 Listing:
   extensions:
     - Gallery_PageExtension
@@ -15,25 +16,19 @@ Listing:
     - ListingsPage
   sort_column: false
   default_sort: 'Created ASC'
-
 CommunitiesHolder:
   extensions:
     - Lumberjack
-
 MunicipalityPage:
   extensions:
     - 'Lumberjack'
   show_in_sitetree: false
-
 NeighbourhoodPage:
   show_in_sitetree: false
-
 ListingUtils:
   InlcudeMLS: 0
-
 SiteConfig:
   cms_logo: 'mysite/images/cms_logo.png'
-
 LeftAndMain:
   menu_groups:
     ListingAdmin: []
@@ -50,3 +45,5 @@ LeftAndMain:
       - ReportAdmin
       - AssetAdmin
       - TeamAdmin
+---
+{  }

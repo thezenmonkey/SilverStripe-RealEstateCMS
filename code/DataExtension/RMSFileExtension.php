@@ -1,5 +1,15 @@
 <?php
 
+use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataExtension;
+
+/**
+ * Class: RMSFileExtension
+ * Extension Class for Files
+ * Description
+ * @author: Richard Rudy (rick@desigmplusawesome.com)
+ * @version: 2.0
+ */
 
 class RMSFileExtension extends DataExtension {
 	

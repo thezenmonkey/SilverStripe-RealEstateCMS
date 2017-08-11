@@ -1,5 +1,12 @@
 <?php
 
+use SilverStripe\Assets\Image;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataObject;
+
 /**
  * 	
  * @package Realestate Listing System - Room DataObject 
@@ -39,7 +46,7 @@
  	);
  	
  	private static $has_many = array(
- 		'Pictures' => 'Image'
+ 		'Pictures' => Image::class
  	);
  	
  	private static $summary_fields = array(

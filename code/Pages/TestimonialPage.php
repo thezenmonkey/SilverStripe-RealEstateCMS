@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Security\Member;
+//use PageController;
+
 class TestimonialPage extends Page {
 	
 	/**
@@ -83,7 +86,7 @@ class TestimonialPage extends Page {
 }
 
 
-class TestimonialPage_Controller extends Page_Controller {
+class TestimonialPage_Controller extends PageController {
 	
 	private static $allowed_actions = array (
 	);

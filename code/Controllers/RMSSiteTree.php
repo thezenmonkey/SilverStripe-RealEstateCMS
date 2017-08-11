@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataExtension;
+
 //Currently a hack to get ModalAdmin to manage Listings
 
 class RMSSiteTree extends DataExtension {

@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\Controller;
+
 class RMSMaintenance extends Controller {
 	
 	private static $allowed_actions = array (
@@ -10,7 +13,7 @@ class RMSMaintenance extends Controller {
         'Test/$Action/$ID/$Name' => 'Test'
     );
 	
-	public function Test(SS_HTTPRequest $request) {
+	public function Test(HTTPRequest $request) {
 		print_r($request->allParams());
 	}
 }

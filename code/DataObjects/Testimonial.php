@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Security\Member;
+use SilverStripe\ORM\DataObject;
+
 /**
  * 	
  * @package Testimonials
@@ -30,24 +33,24 @@ class Testimonial extends DataObject {
 	 * Data model
 	 * ----------------------------------*/
 
-	 static $db = array(
+	 private static $db = array(
 	 	"Title" => "Varchar",
 	 	"Content" => "HTMLText",
 	 	"Video" => "Varchar",
 	 	"Client" => "Varchar"
 	 );
-	 
-	 static $has_one = array(
-	 	"Agent" => "Member"
+
+	private static $has_one = array(
+	 	"Agent" => Member::class
 	 );
-	 
-	 static $summary_fields = array(
+
+	private static $summary_fields = array(
 	 	"Title",
 	 	"Agent.Title",
 	 	"Client"
 	 );
-	 
-	 static $search_fields = array(
+
+	private static $search_fields = array(
 	 	"Title",
 	 	"Agent",
 	 	"Client"

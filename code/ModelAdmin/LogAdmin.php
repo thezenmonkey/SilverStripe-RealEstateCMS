@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\Admin\ModelAdmin;
 /**
  * 	
  * @package Realestate Listing System - Logging Admin 
@@ -11,8 +13,8 @@ class LogAdmin extends ModelAdmin {
 		'RMSProcess'
 	);
 
-	static $url_segment = 'logging';
-	static $menu_title = 'Log';
+	private static $url_segment = 'logging';
+	private static $menu_title = 'Log';
 	//static $menu_icon = 'mysite/images/our_team.png';
 	
 }

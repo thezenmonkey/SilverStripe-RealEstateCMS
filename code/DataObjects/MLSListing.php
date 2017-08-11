@@ -1,4 +1,18 @@
 <?php 
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Assets\Image;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\View\Parsers\URLSegmentFilter;
+use SilverStripe\Assets\Folder;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+
 
 /**
  * 	
@@ -7,17 +21,17 @@
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
  
-class MLSListing extends DataObjectAsPage {
+class MLSListing extends DataObject {
 	/**
 	 * Static vars
 	 * ----------------------------------*/
 	//The class of the page which will list this DataObject
 	static $listing_page_class = 'ListingsPage';
 	//Class Naming (optional but reccomended)
-	static $plural_name = 'MLSListings';
-	static $singular_name = 'MLSListing';
-	
-	static $summary_fields = array(
+	private static $plural_name = 'MLSListings';
+	private static $singular_name = 'MLSListing';
+
+	private static $summary_fields = array(
 		'FrontCover',
 		"Title",
 		"Municipality",
@@ -45,9 +59,9 @@ class MLSListing extends DataObjectAsPage {
 	/**
 	 * Data model
 	 * ----------------------------------*/
-	
-	static $db = array(
-		'IsFeatured' => "Boolean",
+
+	private static $db = array(
+		'IsFeatured' => DBBoolean::class,
 		'ListingType' => "Enum('House,Condo,Commercial')",
 		'Shares' => "Varchar",
 		'Acreage' => "Varchar",
@@ -66,41 +80,41 @@ class MLSListing extends DataObjectAsPage {
 		'Bedrooms' => "Varchar",
 		'BedroomsPlus' => "Varchar",
 		'BuildingAmenities' => "Text",
-		'BuildingInsuranceIncluded' => "Boolean",
-		'CableTVIncluded' => "Boolean",
-		'CACIncluded' => "Boolean",
-		'CentralVac' => "Boolean",
-		'CommonElementsIncluded' => "Boolean",
+		'BuildingInsuranceIncluded' => DBBoolean::class,
+		'CableTVIncluded' => DBBoolean::class,
+		'CACIncluded' => DBBoolean::class,
+		'CentralVac' => DBBoolean::class,
+		'CommonElementsIncluded' => DBBoolean::class,
 		'Community' => "Varchar", //neighbourhood
 		'CommunityCode' => "Varchar",
 		'CondoCorpNum' => "Varchar",
 		'CondoRegistryOffice' => "Varchar",
-		'CondoTaxesIncluded' => "Boolean",
+		'CondoTaxesIncluded' => DBBoolean::class,
 		'DirectionsCrossStreets' => "Varchar",
 		'Drive' => "Varchar",
 		'Elevator' => "Varchar",
 		'Exterior' => "Varchar",
-		'EnsuiteLaundry' => "Boolean",
+		'EnsuiteLaundry' => DBBoolean::class,
 		'Exposure' => "Varchar",
 		'Extras' => "Varchar",
 		'FarmAgriculture' => "Varchar",
-		'FireplaceStove' => "Boolean",
+		'FireplaceStove' => DBBoolean::class,
 		'Fronting' => "Varchar",
 		'Furnished' => "Varchar",
 		'GarageSpaces' => "Int",
 		'GarageType' => "Varchar",
-		'HeatIncluded' => "Boolean",
+		'HeatIncluded' => DBBoolean::class,
 		'HeatSource' => "Varchar",
 		'HeatType' => "Varchar",
-		'HydroIncluded' => "Boolean",
-		'IDXUpdatedDate' => "SS_Datetime",
+		'HydroIncluded' => DBBoolean::class,
+		'IDXUpdatedDate' => DBDatetime::class,
 		'Kitchens' => "Varchar",
 		'KitchensPlus' => "Varchar",
 		'LaundryAccess' => "Varchar",
 		'LaundryLevel' => "Varchar",
 		'LeaseTerm' => "Varchar",
-		'LegalDescription' => "Varchar",
-		'ListBrokerage' => "Varchar",
+		'LegalDescription' => "Text",
+		'ListBrokerage' => "Text",
 		'Price' => "Int",
 		'Locker' => "Varchar",
 		'LockerNum' => "Varchar",
@@ -119,8 +133,8 @@ class MLSListing extends DataObjectAsPage {
 		'OtherStructures' => "Varchar",
 		'OutofAreaMunicipality' => "Varchar",
 		'ParkCostMo' => "Currency",
-		'ParkingIncluded' => "Boolean",
-		'ParkingLegalDescription' => "Varchar",
+		'ParkingIncluded' => DBBoolean::class,
+		'ParkingLegalDescription' => "Text",
 		'ParkingSpaces' => "Varchar",
 		'ParkingSpot1' => "Varchar",
 		'ParkingSpot2' => "Varchar",
@@ -129,19 +143,19 @@ class MLSListing extends DataObjectAsPage {
 		'ParkingDrive' => "Varchar",
 		'PetsPermitted' => "Varchar",
 		'PIN' => "Varchar",
-		'PixUpdatedDate' => "SS_Datetime",
+		'PixUpdatedDate' => DBDatetime::class,
 		'Pool' => "Varchar",
 		'PostalCode' => "Varchar",
-		'PrivateEntrance' => "Boolean",
+		'PrivateEntrance' => DBBoolean::class,
 		'PropertyFeatures1' => "Varchar",
 		'Province' => "Varchar",
 		'RemarksForClients' => "Text",
-		'Retirement' => "Boolean",
+		'Retirement' => DBBoolean::class,
 		'TotalRooms' => "Varchar",
 		'RoomsPlus' => "Varchar",
 		'SaleLease' => "Varchar",
 		'SaleOrRent' => "Varchar", //Keep consistent with Listing
-		'SellerPropertyInfoStatement' => "Varchar",
+		'SellerPropertyInfoStatement' => "Text",
 		'Sewers' => "Varchar",
 		'SpecialDesignation1' => "Varchar",
 		'MLSStatus' => "Varchar",
@@ -155,14 +169,14 @@ class MLSListing extends DataObjectAsPage {
 		'Type' => "Varchar",
 		'UFFI' => "Varchar",
 		'UnitNum' => "Varchar",
-		'UpdatedTimestamp' => "SS_Datetime",
-		'UtilitiesCable' => "Boolean",
-		'UtilitiesGas' => "Boolean",
-		'UtilitiesHydro' => "Boolean",
-		'UtilitiesTelephone' => "Boolean",
+		'UpdatedTimestamp' => DBDatetime::class,
+		'UtilitiesCable' => DBBoolean::class,
+		'UtilitiesGas' => DBBoolean::class,
+		'UtilitiesHydro' => DBBoolean::class,
+		'UtilitiesTelephone' => DBBoolean::class,
 		'Washrooms' => "Varchar",
 		'Water' => "Varchar",
-		'WaterIncluded' => "Boolean",
+		'WaterIncluded' => DBBoolean::class,
 		'WaterSupplyTypes' => "Varchar",
 		'Waterfront' => "Varchar",
 		'Zoning' => "Varchar",
@@ -171,14 +185,14 @@ class MLSListing extends DataObjectAsPage {
 		'SourceKey' => 'Varchar'
 	);
 	
-	static $has_many = array(
-		'Rooms' => 'Room',
-		'Images' => 'Image'	
+	private static $has_many = array(
+//		'Rooms' => 'Room',
+//		'Images' => Image::class
 	);
-	
-	static $has_one = array(
-		"City" => "MunicipalityPage",
-		"Neighbourhood" => "NeighbourhoodPage",
+
+	private static $has_one = array(
+//		"City" => "MunicipalityPage",
+//		"Neighbourhood" => "NeighbourhoodPage",
 	);
 	
 	/**

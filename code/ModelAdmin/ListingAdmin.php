@@ -1,11 +1,15 @@
 <?php
+
+use SilverStripe\Versioned\Versioned;
+use SilverStripe\View\Requirements;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 /**
  * 	
  * @package Realestate Listing System - Property Listing Administration 
  * @requires DataObjectAsPage, Mappable
  * @author Richard Rudy twitter:@thezenmonkey web: http://designplusawesome.com
  */
-class ListingAdmin extends CatalogPageAdmin {
+class ListingAdmin  {
    
    private static $allowed_actions = array(
    		'EditorToolbar'
@@ -62,7 +66,7 @@ class ListingAdmin extends CatalogPageAdmin {
         // is managed by this ModelAdmin, the GridField for it will also be named 'Product'
         $gridFieldName = $this->sanitiseClassName($this->modelClass);
         $gridField = $form->Fields()->fieldByName($gridFieldName);
-        $gridField->getConfig()->removeComponentsByType('GridFieldDeleteAction');
+        $gridField->getConfig()->removeComponentsByType(GridFieldDeleteAction::class);
         return $form;
     }
 	
